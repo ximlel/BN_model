@@ -7,7 +7,7 @@
 # ==========================else========================
 
 # Exact solution
-*.exact
+# *.exact
 
 
 # Text Backup
