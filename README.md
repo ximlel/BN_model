@@ -1,5 +1,3 @@
-# 2222
-
 # MATLAB PROGRAM
 
 # Baer-Nunziato Model
