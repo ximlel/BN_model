@@ -70,7 +70,8 @@ end
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
-        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
     end
     %CFL condition
     for i=1:N
@@ -104,8 +105,8 @@ while Time<Tend && isreal(Time)
              d_phi_sL=0.0;
              d_phi_sR=0.0;
          else
-             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,i-1)+0.5*dx*d_U(:,i-1));
-             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,i)-0.5*dx*d_U(:,i));
+             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,i-1)+0.5*d_x*d_U(:,i-1));
+             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,i)-0.5*d_x*d_U(:,i));
              d_U_gL=d_U(1:3,i-1);
              d_U_gR=d_U(1:3,i);
              d_U_sL=d_U(4:6,i-1);
@@ -117,7 +118,8 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
+        [lo_g_mid u_g_mid p_g_mid phi_g_mid lo_s_mid u_s_mid p_s_mid phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));
+        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1))+[0;-p_g_mid;-p_g_mid*u_s_mid;0;p_g_mid;p_g_mid*u_s_mid;-u_s_mid]*d_U(7,i);
         [lo_g(i) u_g(i) p_g(i) phi_g(i) lo_s(i) u_s(i) p_s(i) phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
