@@ -1,6 +1,6 @@
 clear;
 clc;
-%1D shock_tube by MUSCL-Hancock Schemes
+%1D shock_tube by HLLC-GRP Schemes for BN model
 %state constant
 global gama_s gama_g p0;
 gama_s=1.4;
@@ -12,8 +12,9 @@ x_min=0;
 x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
-CFL=0.4;
 x0=0.5;
+CFL=0.4;
+Alpha=1.0;
 %state value
 Time=0;
 Tend=0.1;
@@ -21,6 +22,8 @@ Tend=0.1;
 U=zeros(7,N);
 FL=zeros(7,N+1);
 FR=zeros(7,N+1);
+d_U=zeros(7,N);
+U_int=zeros(7,N+1);%U at cell interface
 %initial condition
 % lo_gL_0  =1;
 % u_gL_0   =2;
@@ -65,6 +68,10 @@ for i=1:N
 end
 %Godunov's Method
 while Time<Tend && isreal(Time)
+    %reconstruction (minmod limiter)
+    for i=2:N-1
+        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+    end
     %CFL condition
     for i=1:N
         a_g(i)=sqrt(gama_g*p_g(i)/lo_g(i));
@@ -79,12 +86,34 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-             [FL(:,1),FR(:,1)]=Riemann_solver_HLLC(lo_g(1),lo_g(1),p_g(1),p_g(1),u_g(1),u_g(1),lo_s(1),lo_s(1),p_s(1),p_s(1),u_s(1),u_s(1),phi_s(1),phi_s(1),d_t/d_x);
+             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,1));
+             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,1));
+             d_U_gL=zeros(3,1);
+             d_U_gR=zeros(3,1);
+             d_U_sL=zeros(3,1);
+             d_U_sR=zeros(3,1);
+             d_phi_sL=0.0;
+             d_phi_sR=0.0;
          elseif i==N+1
-             [FL(:,N+1),FR(:,N+1)]=Riemann_solver_HLLC(lo_g(N),lo_g(N),p_g(N),p_g(N),u_g(N),u_g(N),lo_s(N),lo_s(N),p_s(N),p_s(N),u_s(N),u_s(N),phi_s(N),phi_s(N),d_t/d_x);
+             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,N));
+             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,N));
+             d_U_gL=zeros(3,1);
+             d_U_gR=zeros(3,1);
+             d_U_sL=zeros(3,1);
+             d_U_sR=zeros(3,1);
+             d_phi_sL=0.0;
+             d_phi_sR=0.0;
          else
-            [FL(:,i),FR(:,i)]=Riemann_solver_HLLC(lo_g(i-1),lo_g(i),p_g(i-1),p_g(i),u_g(i-1),u_g(i),lo_s(i-1),lo_s(i),p_s(i-1),p_s(i),u_s(i-1),u_s(i),phi_s(i-1),phi_s(i),d_t/d_x);
-        end
+             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,i-1)+0.5*dx*d_U(:,i-1));
+             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,i)-0.5*dx*d_U(:,i));
+             d_U_gL=d_U(1:3,i-1);
+             d_U_gR=d_U(1:3,i);
+             d_U_sL=d_U(4:6,i-1);
+             d_U_sR=d_U(4:6,i);
+             d_phi_sL=d_U(7,i-1);
+             d_phi_sR=d_U(7,i);
+         end
+       [FL(:,i),FR(:,i),U_int(:,i)]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_U_gL,d_U_gR,d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,d_t/d_x);
     end
     %compute U in next step
     for i=1:N
