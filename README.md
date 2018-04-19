@@ -1,6 +1,4 @@
-# MATLAB PROGRAM
-
-# Baer-Nunziato Model
+# MATLAB PROGRAM for Baer-Nunziato Model
 A series of Godunov-type schemes for Baer-Nunziato Model.
 (To prevent non-physical oscillations)
 
@@ -8,6 +6,9 @@ A series of Godunov-type schemes for Baer-Nunziato Model.
 cd ./test
 
 run .m files in MATLAB
+
+# Main program
+oneD_shock_tube.m in ./src
 
 ## License
 GNU GPL v3.0.
