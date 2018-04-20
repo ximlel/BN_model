@@ -70,8 +70,8 @@ end
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
-        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
-        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
     end
     %CFL condition
     for i=1:N
@@ -89,35 +89,24 @@ while Time<Tend && isreal(Time)
          if i==1
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,1));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,1));
-             d_U_gL=zeros(3,1);
-             d_U_gR=zeros(3,1);
-             d_U_sL=zeros(3,1);
-             d_U_sR=zeros(3,1);
-             d_phi_sL=0.0;
-             d_phi_sR=0.0;
+             d_UL=zeros(7,1);
+             d_UR=zeros(7,1);
          elseif i==N+1
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,N));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,N));
-             d_U_gL=zeros(3,1);
-             d_U_gR=zeros(3,1);
-             d_U_sL=zeros(3,1);
-             d_U_sR=zeros(3,1);
-             d_phi_sL=0.0;
-             d_phi_sR=0.0;
+             d_UL=zeros(7,1);
+             d_UR=zeros(7,1);
          else
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,i-1)+0.5*d_x*d_U(:,i-1));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,i)-0.5*d_x*d_U(:,i));
-             d_U_gL=d_U(1:3,i-1);
-             d_U_gR=d_U(1:3,i);
-             d_U_sL=d_U(4:6,i-1);
-             d_U_sR=d_U(4:6,i);
-             d_phi_sL=d_U(7,i-1);
-             d_phi_sR=d_U(7,i);
+             d_UL=d_U(:,i-1);
+             d_UR=d_U(:,i);
          end
-       [FL(:,i),FR(:,i),U_int(:,i)]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_U_gL,d_U_gR,d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,d_t/d_x);
+       [FL(:,i),FR(:,i),U_int(:,i)]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,d_t/d_x,d_t);
     end
     %compute U in next step
     for i=1:N
+        C_U=zeros(7,7);
         C_U(1:4,1:4)=quasilinear(lo_g(i),u_g(i),p_g(i),p_g(i),u_s(i),'g','C');
         C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i),u_s(i),p_s(i),p_g(i),u_s(i),'s','C');
         [lo_g_mid,u_g_mid,p_g_mid,phi_g_mid,lo_s_mid,u_s_mid,p_s_mid,phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));

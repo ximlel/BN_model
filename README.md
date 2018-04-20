@@ -15,5 +15,4 @@ GNU GPL v3.0.
 
 ## Copyright
 Copyright © 2018 ximlel.
-
 See LICENSE for more details.

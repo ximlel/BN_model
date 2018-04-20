@@ -1,5 +1,5 @@
 %GRP Solver with HLLC scheme (subsonic case)
-function [out_flux_L,out_flux_R,out_U_int]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_U_gL,d_U_gR,d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,ratio_t_x)
+function [out_flux_L,out_flux_R,out_U_int]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,ratio_t_x,d_t)
 %state constant
 global gama_s gama_g p0;
 phi_gL = 1.0-phi_sL;
@@ -40,54 +40,89 @@ else
     U11(1:3) = U_g_srL;
     U22(1:3) = phi_g2*[lo_g2;lo_g2*u_g2;E_g2];
 end
+%solver GRP at star region
+d_U_gL=d_UL(1:3);
+d_U_gR=d_UR(1:3);
+d_U_sL=d_UL(4:6);
+d_U_sR=d_UR(4:6);
+d_phi_sL=d_UL(7);
+d_phi_sR=d_UR(7);
+CA_g_Lsr=(S_gL*eye(4)-quasilinear(lo_g_srL,u_g1,p_g1,p_g1,u_s1,'g','C'))*(S_gL*eye(4)-quasilinear(lo_g_srL,u_g1,p_g1,p_g1,u_s1,'g','A'));
+CA_g_LL =(S_gL*eye(4)-quasilinear(lo_gL   ,u_gL,p_gL,p_gL,u_sL,'g','C'))*(S_gL*eye(4)-quasilinear(lo_gL   ,u_gL,p_gL,p_gL,u_sL,'g','A'));
+CA_s_Lsr=(S_sL*eye(4)-quasilinear(lo_s1   ,u_s1,p_s1,p_g1,u_s1,'s','C'))*(S_sL*eye(4)-quasilinear(lo_s1   ,u_s1,p_s1,p_g1,u_s1,'s','A'));
+CA_s_LL =(S_sL*eye(4)-quasilinear(lo_sL   ,u_sL,p_sL,p_gL,u_sL,'s','C'))*(S_sL*eye(4)-quasilinear(lo_sL   ,u_sL,p_sL,p_gL,u_sL,'s','A'));
+CA_g_Rsr=(S_gR*eye(4)-quasilinear(lo_g_srR,u_g2,p_g2,p_g2,u_s2,'g','C'))*(S_gR*eye(4)-quasilinear(lo_g_srR,u_g2,p_g2,p_g2,u_s2,'g','A'));
+CA_g_RR =(S_gR*eye(4)-quasilinear(lo_gR   ,u_gR,p_gR,p_gR,u_sR,'g','C'))*(S_gR*eye(4)-quasilinear(lo_gR   ,u_gR,p_gR,p_gR,u_sR,'g','A'));
+CA_s_Rsr=(S_sR*eye(4)-quasilinear(lo_s2   ,u_s2,p_s2,p_s2,u_s2,'s','C'))*(S_sR*eye(4)-quasilinear(lo_s2   ,u_s2,p_s2,p_s2,u_s2,'s','A'));
+CA_s_RR =(S_sR*eye(4)-quasilinear(lo_sR   ,u_sR,p_sR,p_sR,u_sR,'s','C'))*(S_sR*eye(4)-quasilinear(lo_sR   ,u_sR,p_sR,p_sR,u_sR,'s','A'));
+d_U_gsr=least_square(d_U_gL,d_U_gR,d_phi_sL,d_phi_sR,CA_g_LL,CA_g_Lsr,CA_g_RR,CA_g_Rsr);
+d_U_ssr=least_square(d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,CA_s_LL,CA_s_Lsr,CA_s_RR,CA_s_Rsr);
 %solve flux at i+1/2
 U0=zeros(7,1);
 F0=zeros(7,1);
+d_U0=zeros(7,1);
 if S_sL>=0.0
     U0(4:7) = UL(4:7);
     F0(4:6) = FL(4:6);
+    d_U0(4:7)=d_UL(4:7);
 elseif S_sR<=0.0
     U0(4:7) = UR(4:7);
     F0(4:6) = FR(4:6);
+    d_U0(4:7)=d_UR(4:7);
 elseif S_sM>0.0
     U0(4:7) = U11(4:7);
     F0(4:6) = FL(4:6)+S_sL*(U0(4:6)-UL(4:6));
+    d_U0(4:6)=d_U_ssr;
+    d_U0(7) = d_UL(7);
 else
     U0(4:7) = U22(4:7);
     F0(4:6) = FR(4:6)+S_sR*(U0(4:6)-UR(4:6));
+    d_U0(4:6)=d_U_ssr;
+    d_U0(7) = d_UR(7);    
 end
 if S_gL>=0.0
     U0(1:3) = UL(1:3);
     F0(1:3) = FL(1:3);
+    d_U0(1:3)=d_UL(1:3);
 elseif S_gR<=0.0
     U0(1:3) = UR(1:3);
     F0(1:3) = FR(1:3);
+    d_U0(1:3)=d_UR(1:3);
 elseif S_sM<0.0 && S_gM<0.0
     U0(1:3) = U_g_srR;
     F0(1:3) = FR(1:3)+S_gR*(U0(1:3)-UR(1:3));
+    d_U0(1:3)=d_U_gsr;
 elseif S_sM<0.0
     U0(1:3) = U22(1:3);
     F0(1:3) = FR(1:3)+S_gR*(U_g_srR-UR(1:3))+S_gM*(U0(1:3)-U_g_srR);
+    d_U0(1:3)=d_U_gsr;
 elseif S_gM<0.0
     U0(1:3) = U11(1:3);
     F0(1:3) = FL(1:3)+S_gL*(U_g_srL-UL(1:3))+S_gM*(U0(1:3)-U_g_srL);
+    d_U0(1:3)=d_U_gsr;
 else
     U0(1:3) = U_g_srL;
     F0(1:3) = FL(1:3)+S_gL*(U0(1:3)-UL(1:3));
+    d_U0(1:3)=d_U_gsr;
 end
 [lo_g0,u_g0,p_g0,phi_g0,lo_s0,u_s0,p_s0,phi_s0]=primitive_comp(U0);
+C_U=zeros(7,7);
+C_U(1:4,1:4)=quasilinear(lo_g0,u_g0,p_g0,p_g0,u_s0,'g','C');
+C_U([1 5:7],[1 5:7])=quasilinear(lo_s0,u_s0,p_s0,p_g0,u_s0,'s','C');
+A_U=zeros(7,7);
+A_U(1:4,1:4)=quasilinear(lo_g0,u_g0,p_g0,p_g0,u_s0,'g','A');
+A_U([1 5:7],[1 5:7])=quasilinear(lo_s0,u_s0,p_s0,p_g0,u_s0,'s','A');
+out_U_int=U0-d_t*C_U*d_U0;
 % phi_g0 = 1.0 - phi_s0;
 % F0=[phi_g0*lo_g0*u_g0;phi_g0*lo_g0*u_g0^2+phi_g0*p_g0;(U0(3)+phi_g0*p_g0)*u_g0;
 %     phi_s0*lo_s0*u_s0;phi_s0*lo_s0*u_s0^2+phi_s0*p_s0;(U0(6)+phi_s0*p_s0)*u_s0;0.0];
-out_flux_L=F0;
-out_flux_R=F0;
+out_flux_L=F0-0.5*d_t*A_U*C_U*d_U0;
+out_flux_R=F0-0.5*d_t*A_U*C_U*d_U0;
 % [lo_g1 u_g1 p_g1 phi_g1 lo_s1 u_s1 p_s1 phi_s1]=primitive_comp(UL);
 % [lo_g2 u_g2 p_g2 phi_g2 lo_s2 u_s2 p_s2 phi_s2]=primitive_comp(UR);
 % out_flux_L=FL;
 % out_flux_R=FL;
 % S_sM = u_sL;
-
-out_U_int=zeros(7,1);
 
 %non-conservative term
 d_u_s=phi_sR-phi_sL;
