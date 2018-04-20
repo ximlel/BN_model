@@ -87,8 +87,8 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,1));
-             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,1));
+             [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,1));
+             [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,1));
              d_U_gL=zeros(3,1);
              d_U_gR=zeros(3,1);
              d_U_sL=zeros(3,1);
@@ -96,8 +96,8 @@ while Time<Tend && isreal(Time)
              d_phi_sL=0.0;
              d_phi_sR=0.0;
          elseif i==N+1
-             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,N));
-             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,N));
+             [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,N));
+             [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,N));
              d_U_gL=zeros(3,1);
              d_U_gR=zeros(3,1);
              d_U_sL=zeros(3,1);
@@ -105,8 +105,8 @@ while Time<Tend && isreal(Time)
              d_phi_sL=0.0;
              d_phi_sR=0.0;
          else
-             [lo_gL u_gL p_gL phi_gL lo_sL u_sL p_sL phi_sL]=primitive_comp(U(:,i-1)+0.5*d_x*d_U(:,i-1));
-             [lo_gR u_gR p_gR phi_gR lo_sR u_sR p_sR phi_sR]=primitive_comp(U(:,i)-0.5*d_x*d_U(:,i));
+             [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,i-1)+0.5*d_x*d_U(:,i-1));
+             [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,i)-0.5*d_x*d_U(:,i));
              d_U_gL=d_U(1:3,i-1);
              d_U_gR=d_U(1:3,i);
              d_U_sL=d_U(4:6,i-1);
@@ -118,9 +118,11 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-        [lo_g_mid u_g_mid p_g_mid phi_g_mid lo_s_mid u_s_mid p_s_mid phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));
+        C_U(1:4,1:4)=quasilinear(lo_g(i),u_g(i),p_g(i),p_g(i),u_s(i),'g','C');
+        C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i),u_s(i),p_s(i),p_g(i),u_s(i),'s','C');
+        [lo_g_mid,u_g_mid,p_g_mid,phi_g_mid,lo_s_mid,u_s_mid,p_s_mid,phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));
         U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1))+[0;-p_g_mid;-p_g_mid*u_s_mid;0;p_g_mid;p_g_mid*u_s_mid;-u_s_mid]*d_U(7,i);
-        [lo_g(i) u_g(i) p_g(i) phi_g(i) lo_s(i) u_s(i) p_s(i) phi_s(i)]=primitive_comp(U(:,i));
+        [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
 % if Time > 5*d_t

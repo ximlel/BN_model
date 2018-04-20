@@ -1,11 +1,11 @@
-%Riemann Solver with HLLC scheme (subsonic case)
-function [out_flux_L,out_flux_R,out_U_int]=Riemann_solver_HLL(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_U_gL,d_U_gR,d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,ratio_t_x)
+%GRP Solver with HLLC scheme (subsonic case)
+function [out_flux_L,out_flux_R,out_U_int]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_U_gL,d_U_gR,d_U_sL,d_U_sR,d_phi_sL,d_phi_sR,ratio_t_x)
 %state constant
 global gama_s gama_g p0;
 phi_gL = 1.0-phi_sL;
 phi_gR = 1.0-phi_sR;
 %comput wave speed
-[S_gL S_gM S_gR S_sL S_sM S_sR lo_g_srL lo_g_srR p_g1 p_g2 u_g1 u_g2 lo_s1 lo_s2 p_s1 p_s2 u_s1 u_s2 phi_s1 phi_s2] = solid_cont(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR);
+[S_gL,S_gM,S_gR,S_sL,S_sM,S_sR,lo_g_srL,lo_g_srR,p_g1,p_g2,u_g1,u_g2,lo_s1,lo_s2,p_s1,p_s2,u_s1,u_s2,phi_s1,phi_s2] = solid_cont(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR);
 phi_g1=1.0-phi_s1;
 phi_g2=1.0-phi_s2;
 %solve conservative vector at i+1/2
@@ -75,7 +75,7 @@ else
     U0(1:3) = U_g_srL;
     F0(1:3) = FL(1:3)+S_gL*(U0(1:3)-UL(1:3));
 end
-[lo_g0 u_g0 p_g0 phi_g0 lo_s0 u_s0 p_s0 phi_s0]=primitive_comp(U0);
+[lo_g0,u_g0,p_g0,phi_g0,lo_s0,u_s0,p_s0,phi_s0]=primitive_comp(U0);
 % phi_g0 = 1.0 - phi_s0;
 % F0=[phi_g0*lo_g0*u_g0;phi_g0*lo_g0*u_g0^2+phi_g0*p_g0;(U0(3)+phi_g0*p_g0)*u_g0;
 %     phi_s0*lo_s0*u_s0;phi_s0*lo_s0*u_s0^2+phi_s0*p_s0;(U0(6)+phi_s0*p_s0)*u_s0;0.0];

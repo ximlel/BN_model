@@ -5,8 +5,8 @@ global gama_g gama_s p0;
 phi_gL = 1.0-phi_sL;
 phi_gR = 1.0-phi_sR;
 %comput Roe mean
-[S_gL S_gR lo_wave_g u_wave_g a_wave_g H_wave_g E_wave_g p_wave_g]=Roe_Mean_g(lo_gL,lo_gR,phi_gL,phi_gR,p_gL,p_gR,u_gL,u_gR);
-[S_sL S_sR lo_wave_s u_wave_s a_wave_s H_wave_s E_wave_s p_wave_s]=Roe_Mean_s(lo_sL,lo_sR,phi_sL,phi_sR,p_sL,p_sR,u_sL,u_sR);
+[S_gL,S_gR,lo_wave_g,u_wave_g,a_wave_g,H_wave_g,E_wave_g,p_wave_g]=Roe_Mean_g(lo_gL,lo_gR,phi_gL,phi_gR,p_gL,p_gR,u_gL,u_gR);
+[S_sL,S_sR,lo_wave_s,u_wave_s,a_wave_s,H_wave_s,E_wave_s,p_wave_s]=Roe_Mean_s(lo_sL,lo_sR,phi_sL,phi_sR,p_sL,p_sR,u_sL,u_sR);
 %solve averaged eigenvalues
 lamda1=u_wave_g-a_wave_g;
 lamda2=u_wave_g;
@@ -85,11 +85,11 @@ elseif u_wave_s > 0.0
 else
     U0 = UR - K(:,idx(lamda_pos(1):7))    *alpha(idx(lamda_pos(1):7));
 end
-[lo_g0 u_g0 p_g0 phi_g0 lo_s0 u_s0 p_s0 phi_s0]=primitive_comp(U0);
+[lo_g0,u_g0,p_g0,phi_g0,lo_s0,u_s0,p_s0,phi_s0]=primitive_comp(U0);
 U11 = UL + K(:,idx(1:(min(find(idx==5),find(idx==7))-1)))*alpha(idx(1:(min(find(idx==5),find(idx==7))-1)));
-[lo_g1 u_g1 p_g1 phi_g1 lo_s1 u_s1 p_s1 phi_s1]=primitive_comp(U11);
+[lo_g1,u_g1,p_g1,phi_g1,lo_s1,u_s1,p_s1,phi_s1]=primitive_comp(U11);
 U22 = UR - K(:,idx((max(find(idx==5),find(idx==7))+1):7))*alpha(idx((max(find(idx==5),find(idx==7))+1):7));
-[lo_g2 u_g2 p_g2 phi_g2 lo_s2 u_s2 p_s2 phi_s2]=primitive_comp(U22);
+[lo_g2,u_g2,p_g2,phi_g2,lo_s2,u_s2,p_s2,phi_s2]=primitive_comp(U22);
 %solve flux at i+1/2
 F0=[phi_g0*lo_g0*u_g0;phi_g0*lo_g0*u_g0^2+phi_g0*p_g0;phi_g0*(gama_g/(gama_g-1.0)*p_g0+0.5*lo_g0*u_g0^2)*u_g0;
     phi_s0*lo_s0*u_s0;phi_s0*lo_s0*u_s0^2+phi_s0*p_s0;phi_s0*(gama_s/(gama_s-1.0)*(p_s0+p0)+0.5*lo_s0*u_s0^2)*u_s0;0.0];

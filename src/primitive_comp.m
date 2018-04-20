@@ -1,5 +1,5 @@
 %compute flux
-function [lo_g u_g p_g phi_g lo_s u_s p_s phi_s]=primitive_comp(U)
+function [lo_g,u_g,p_g,phi_g,lo_s,u_s,p_s,phi_s]=primitive_comp(U)
 global gama_s gama_g p0;
 phi_s = U(7);
 phi_g = 1.0-phi_s;

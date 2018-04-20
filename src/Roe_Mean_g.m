@@ -1,5 +1,5 @@
 %comput Roe mean
-function [SL SR lo_wave u_wave a_wave H_wave E_wave p_wave]=Roe_Mean_g(loL,loR,phiL,phiR,pL,pR,uL,uR)
+function [SL,SR,lo_wave,u_wave,a_wave,H_wave,E_wave,p_wave]=Roe_Mean_g(loL,loR,phiL,phiR,pL,pR,uL,uR)
 global gama_g;
 u_wave=(sqrt(loL*phiL)*uL+sqrt(loR*phiR)*uR)/(sqrt(loL*phiL)+sqrt(loR*phiR));
 EL=pL/(gama_g-1)+0.5*loL*uL^2;

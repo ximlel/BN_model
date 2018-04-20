@@ -1,6 +1,5 @@
 %comput solid contact
-
-function [S_gL S_gM S_gR S_sL S_sM S_sR lo_g_srL lo_g_srR p_g_srL p_g_srR u_g_srL u_g_srR lo_s_srL lo_s_srR p_s_srL p_s_srR u_s_srL u_s_srR phi_sL phi_sR] = solid_cont_one(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR)
+function [S_gL,S_gM,S_gR,S_sL,S_sM,S_sR,lo_g_srL,lo_g_srR,p_g_srL,p_g_srR,u_g_srL,u_g_srR,lo_s_srL,lo_s_srR,p_s_srL,p_s_srR,u_s_srL,u_s_srR,phi_sL,phi_sR] = solid_cont(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR)
 phi_gL = 1.0-phi_sL;
 phi_gR = 1.0-phi_sR;
 global ep;
@@ -48,8 +47,6 @@ it_max = 500;
 k = 0; err = 1e50; repe = 0;
 fun_L  = zeros(1,4);
 fun_R  = zeros(1,4);
-dfun_L = zeros(4,4);
-dfun_R = zeros(4,4);
 %while (abs(phi_sL-phi_sR)>ep && k<it_max && err>ep)
 while (k<it_max)
 if p_s_srL <= p_sL
@@ -125,7 +122,7 @@ p_s_srR=max(x_star(2),ep);
 p_g_srL=max(x_star(3),ep);
 p_g_srR=max(x_star(4),ep);
 k=k+1;
-if k>=it_max && repe == 0;
+if k>=it_max && repe == 0
     p_s_srL = p_sL;
     p_s_srR = p_sR;
     p_g_srL = p_gL;
