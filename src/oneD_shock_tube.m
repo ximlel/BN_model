@@ -13,7 +13,7 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.4;
+CFL=0.04;
 Alpha=1.0;
 %state value
 Time=0;
@@ -70,8 +70,8 @@ end
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
-        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
-        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
     end
     %CFL condition
     for i=1:N
@@ -110,7 +110,7 @@ while Time<Tend && isreal(Time)
         C_U(1:4,1:4)=quasilinear(lo_g(i),u_g(i),p_g(i),p_g(i),u_s(i),'g','C');
         C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i),u_s(i),p_s(i),p_g(i),u_s(i),'s','C');
         [lo_g_mid,u_g_mid,p_g_mid,phi_g_mid,lo_s_mid,u_s_mid,p_s_mid,phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));
-        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1))+[0;-p_g_mid;-p_g_mid*u_s_mid;0;p_g_mid;p_g_mid*u_s_mid;-u_s_mid]*d_U(7,i);
+        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1))+d_t*[0;-p_g_mid;-p_g_mid*u_s_mid;0;p_g_mid;p_g_mid*u_s_mid;-u_s_mid]*d_U(7,i);
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
