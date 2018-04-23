@@ -39,7 +39,7 @@ U_int=zeros(7,N+1);%U at cell interface
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test_new1.mat;
+load ../test/test_toro3.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -71,7 +71,8 @@ while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
         %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
-        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        d_U(:,i)=0;
     end
     %CFL condition
     for i=1:N
@@ -86,34 +87,41 @@ while Time<Tend && isreal(Time)
     %Riemann Reoblem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
+        C_U=zeros(7,7);
          if i==1
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,1));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,1));
              d_UL=zeros(7,1);
              d_UR=zeros(7,1);
+             UL_mid=U(:,1);
+             UR_mid=U(:,1);
          elseif i==N+1
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,N));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,N));
              d_UL=zeros(7,1);
              d_UR=zeros(7,1);
+             UL_mid=U(:,N);
+             UR_mid=U(:,N);
          else
              [lo_gL,u_gL,p_gL,phi_gL,lo_sL,u_sL,p_sL,phi_sL]=primitive_comp(U(:,i-1)+0.5*d_x*d_U(:,i-1));
              [lo_gR,u_gR,p_gR,phi_gR,lo_sR,u_sR,p_sR,phi_sR]=primitive_comp(U(:,i)-0.5*d_x*d_U(:,i));
              d_UL=d_U(:,i-1);
              d_UR=d_U(:,i);
+             C_U(1:4,1:4)=quasilinear(lo_g(i-1),u_g(i-1),p_g(i-1),p_g(i-1),u_s(i-1),'g','C');
+             C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i-1),u_s(i-1),p_s(i-1),p_g(i-1),u_s(i-1),'s','C');
+             UL_mid=U(:,i-1)-0.5*d_t*C_U*d_UL;
+             C_U(1:4,1:4)=quasilinear(lo_g(i),u_g(i),p_g(i),p_g(i),u_s(i),'g','C');
+             C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i),u_s(i),p_s(i),p_g(i),u_s(i),'s','C');
+             UR_mid=U(:,i)-0.5*d_t*C_U*d_UR;
          end
-       [FL(:,i),FR(:,i),U_int(:,i)]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,d_t/d_x,d_t);
+       [FL(:,i),FR(:,i),U_int(:,i)]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,UL_mid,UR_mid,d_t/d_x,d_t);
     end
     %compute U in next step
     for i=1:N
-        C_U=zeros(7,7);
-        C_U(1:4,1:4)=quasilinear(lo_g(i),u_g(i),p_g(i),p_g(i),u_s(i),'g','C');
-        C_U([1 5:7],[1 5:7])=quasilinear(lo_s(i),u_s(i),p_s(i),p_g(i),u_s(i),'s','C');
-        [lo_g_mid,u_g_mid,p_g_mid,phi_g_mid,lo_s_mid,u_s_mid,p_s_mid,phi_s_mid]=primitive_comp(U(:,i)-0.5*d_t*C_U*d_U(:,i));
-        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1))+d_t*[0;-p_g_mid;-p_g_mid*u_s_mid;0;p_g_mid;p_g_mid*u_s_mid;-u_s_mid]*d_U(7,i);
+        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
-    Time=Time+d_t
+    Time=Time+d_t;
 % if Time > 5*d_t
 %     break;
 % end
@@ -126,13 +134,13 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test_new1.exact;
-for i=1:N
-     W_exact(i,:) = test_new1(ceil(i/(N/300)),:);
-end
+% load ../test/test_new1.exact;
+% for i=1:N
+%      W_exact(i,:) = test_new1(ceil(i/(N/300)),:);
+% end
 
 %plot
-col = '-r';
+col = '-b';
 figure(1);
 subplot(2,2,1);
 hold on

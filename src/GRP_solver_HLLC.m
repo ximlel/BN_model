@@ -1,5 +1,5 @@
 %GRP Solver with HLLC scheme (subsonic case)
-function [out_flux_L,out_flux_R,out_U_int]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,ratio_t_x,d_t)
+function [out_flux_L,out_flux_R,out_U_int]=GRP_solver_HLLC(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,phi_sL,phi_sR,d_UL,d_UR,UL_mid,UR_mid,ratio_t_x,d_t)
 %state constant
 global gama_s gama_g p0;
 phi_gL = 1.0-phi_sL;
@@ -123,13 +123,24 @@ out_flux_R=F0-0.5*d_t*A_U*C_U*d_U0;
 % out_flux_L=FL;
 % out_flux_R=FL;
 % S_sM = u_sL;
+d_u_s=phi_sR-phi_sL;
+out_U_mid=U0-0.5*d_t*C_U*d_U0;
+[lo_g0_mid,u_g0_mid,p_g0_mid,phi_g0_mid,lo_s0_mid,u_s0_mid,p_s0_mid,phi_s0_mid]=primitive_comp(out_U_mid);
+F0_mid=[phi_g0_mid*lo_g0_mid*u_g0_mid;phi_g0_mid*lo_g0_mid*u_g0_mid^2+phi_g0_mid*p_g0_mid;(out_U_mid(3)+phi_g0_mid*p_g0_mid)*u_g0_mid;
+        phi_s0_mid*lo_s0_mid*u_s0_mid;phi_s0_mid*lo_s0_mid*u_s0_mid^2+phi_s0_mid*p_s0_mid;(out_U_mid(6)+phi_s0_mid*p_s0_mid)*u_s0_mid;0.0];
+out_flux_L=F0_mid;
+out_flux_R=F0_mid;
+[lo_gL_mid,u_gL_mid,p_gL_mid,phi_gL_mid,lo_sL_mid,u_sL_mid,p_sL_mid,phi_sL_mid]=primitive_comp(UL_mid);
+[lo_gR_mid,u_gR_mid,p_gR_mid,phi_gR_mid,lo_sR_mid,u_sR_mid,p_sR_mid,phi_sR_mid]=primitive_comp(UR_mid);
+out_flux_R=out_flux_R-[0;p_g0_mid;p_g0_mid*u_s0_mid;0;-p_g0_mid;-p_g0_mid*u_s0_mid;u_s0_mid]*(phi_sR_mid-phi_s0_mid);
+out_flux_L=out_flux_L+[0;p_g0_mid;p_g0_mid*u_s0_mid;0;-p_g0_mid;-p_g0_mid*u_s0_mid;u_s0_mid]*(phi_s0_mid-phi_sL_mid);
 
 %non-conservative term
-d_u_s=phi_sR-phi_sL;
 rat = 1;
 if S_sM > 0.0
     out_flux_R=out_flux_R-[0;0;0;0;0;0;S_sM]*d_u_s;
     %out_flux_R=out_flux_R-[0;p_g0-p_g1;u_s0*p_g0-S_sM*p_g1;0;p_g1-p_g0;S_sM*p_g1-u_s0*p_g0;u_s0-S_sM]*d_u_s;
+    out_flux_R=out_flux_R-[0;-p_g1;-S_sM*p_g1;0;p_g1;S_sM*p_g1;-S_sM]*d_u_s;
     out_flux_R=out_flux_R-rat*[0;1;S_sM;0;-1;-S_sM;0]*(phi_s2*p_s2-phi_s1*p_s1);
     out_flux_R=out_flux_R-(1-rat)*[0;p_gR;u_sR*p_gR;0;-p_gR;-u_sR*p_gR;u_sR-S_sM]*d_u_s;
     dE_s = E_s_correct(S_sM,lo_g1,u_g1,p_g1,lo_s1,p_s1,phi_s1,lo_g2,u_g2,p_g2,lo_s2,p_s2,phi_s2,ratio_t_x);
@@ -140,6 +151,7 @@ if S_sM > 0.0
 else
     out_flux_L=out_flux_L+[0;0;0;0;0;0;S_sM]*d_u_s;
     %out_flux_L=out_flux_L+[0;p_g0-p_g2;u_s0*p_g0-S_sM*p_g2;0;p_g2-p_g0;S_sM*p_g2-u_s0*p_g0;u_s0-S_sM]*d_u_s;
+    out_flux_L=out_flux_L+[0;-p_g2;-S_sM*p_g2;0;p_g2;S_sM*p_g2;-S_sM]*d_u_s;
     out_flux_L=out_flux_L+rat*[0;1;S_sM;0;-1;-S_sM;0]*(phi_s2*p_s2-phi_s1*p_s1);
     out_flux_L=out_flux_L+(1-rat)*[0;p_gL;u_sL*p_gL;0;-p_gL;-u_sL*p_gL;u_sL-S_sM]*d_u_s;
     dE_s = E_s_correct(-S_sM,lo_g2,-u_g2,p_g2,lo_s2,p_s2,phi_s2,lo_g1,-u_g1,p_g1,lo_s1,p_s1,phi_s1,ratio_t_x);
