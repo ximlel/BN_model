@@ -84,7 +84,7 @@ while Time<Tend && isreal(Time)
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;
     end
-    %Riemann Reoblem:compute flux
+    %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
         C_U=zeros(7,7);
