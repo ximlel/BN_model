@@ -13,7 +13,7 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.1;
+CFL=0.05;
 Alpha=1.0;
 %state value
 Time=0;
@@ -39,7 +39,7 @@ U_int=zeros(7,N+1);%U at cell interface
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test_new1.mat;
+load ../test/test3.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -70,9 +70,9 @@ end
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
-        %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
+        d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U_int(:,i+1)-U_int(:,i))/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
         %d_U(:,i)=minmod(Alpha*(U(:,i)-U(:,i-1))/d_x,(U(:,i+1)-U(:,i-1))/2.0/d_x,Alpha*(U(:,i+1)-U(:,i))/d_x);
-        d_U(:,i)=0;
+        %d_U(:,i)=0;
     end
     %CFL condition
     for i=1:N
@@ -134,13 +134,13 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test_new1.exact;
+load ../test/test3.exact;
 for i=1:N
-     W_exact(i,:) = test_new1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test3(ceil(i/(N/300)),:);
 end
 
 %plot
-col = '--b';
+col = '-r';
 figure(1);
 subplot(2,2,1);
 hold on
