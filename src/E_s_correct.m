@@ -19,13 +19,11 @@ E_sum = phi_g2*E_g2+phi_s2*E_s2 + KL*(phi_s1*(p_s1+E_s1)-phi_s2*(p_s2+E_s2))+rat
 e_sum = E_sum - 0.5*phi_sM*lo_sM*S_sM^2 - 0.5*phi_gM*lo_gM*u_gM^2;
 %Riemann invariants
 HL = 0.5*(u_g1-S_sM)^2+gama_g/(gama_g-1)*p_g1/lo_g1;
-HR = 0.5*(u_g2-S_sM)^2+gama_g/(gama_g-1)*p_g2/lo_g2;
-HM = HL*KL+HR*KR;
-E_gM = (HM-0.5*(u_gM-S_sM)^2)/gama_g*phi_gM*lo_gM + 0.5*phi_gM*lo_gM*u_gM^2; %
+E_gM = (HL-0.5*(u_gM-S_sM)^2)/gama_g*phi_gM*lo_gM + 0.5*phi_gM*lo_gM*u_gM^2; %
 dE_g = E_gM-E_gsum;
-phi_p_gM = (HM-0.5*(u_gM-S_sM)^2)/gama_g*(gama_g-1)*phi_gM*lo_gM;
+phi_p_gM = (HL-0.5*(u_gM-S_sM)^2)/gama_g*(gama_g-1)*phi_gM*lo_gM;
 P_M = phi_s1*p_s1+phi_g1*p_g1+phi_g1*lo_g1*(u_g1-S_sM)^2-phi_gM*lo_gM*(u_gM-S_sM)^2;
 phi_p_sM = P_M - phi_p_gM;
 phi_p_s0 = (e_sum - phi_p_gM/(gama_g-1))*(gama_s-1) - phi_p_sM;
-phi_s_out = phi_p_s0/p0;
+phi_s_out = phi_p_s0/p0/gama_s;
 end

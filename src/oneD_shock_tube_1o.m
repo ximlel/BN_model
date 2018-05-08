@@ -85,7 +85,6 @@ while Time<Tend && isreal(Time)
          else
              [phi_s_out,FL(:,i),FR(:,i)]=Riemann_solver_HLLC(lo_g(i-1),lo_g(i),p_g(i-1),p_g(i),u_g(i-1),u_g(i),lo_s(i-1),lo_s(i),p_s(i-1),p_s(i),u_s(i-1),u_s(i),phi_s(i-1),phi_s(i),d_t/d_x);
          end
-         phi_s_out
          if phi_s_out > 0.0 && i<N+1
              U(7,i) = phi_s_out;
          elseif phi_s_out <= 0.0 && i>1
@@ -94,13 +93,13 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
-%        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
+%        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
+        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
 % if Time > d_t
-    break;
+%    break;
 % end
 end
 W_exact = zeros(N,8);
@@ -117,7 +116,7 @@ for i=1:N
 end
 
 %plot
-col = '-r';
+col = '-b';
 figure(1);
 subplot(2,2,1);
 hold on
