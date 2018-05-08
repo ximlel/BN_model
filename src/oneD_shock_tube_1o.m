@@ -36,7 +36,7 @@ FR=zeros(7,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test_new1.mat;
+load ../test/test_new1_pi.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -85,6 +85,7 @@ while Time<Tend && isreal(Time)
          else
              [phi_s_out,FL(:,i),FR(:,i)]=Riemann_solver_HLLC(lo_g(i-1),lo_g(i),p_g(i-1),p_g(i),u_g(i-1),u_g(i),lo_s(i-1),lo_s(i),p_s(i-1),p_s(i),u_s(i-1),u_s(i),phi_s(i-1),phi_s(i),d_t/d_x);
          end
+         phi_s_out
          if phi_s_out > 0.0 && i<N+1
              U(7,i) = phi_s_out;
          elseif phi_s_out <= 0.0 && i>1
@@ -94,11 +95,12 @@ while Time<Tend && isreal(Time)
     %compute U in next step
     for i=1:N
         U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
+%        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
-% if Time > 5*d_t
-%     break;
+% if Time > d_t
+    break;
 % end
 end
 W_exact = zeros(N,8);
@@ -109,9 +111,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test_new1.exact;
+load ../test/test_new1_pi.exact;
 for i=1:N
-     W_exact(i,:) = test_new1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test_new1_pi(ceil(i/(N/300)),:);
 end
 
 %plot

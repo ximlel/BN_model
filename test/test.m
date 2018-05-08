@@ -125,6 +125,25 @@ p_sR_0    =11.33028440541645;
 phi_sR_0  =0.3;
 save test_new1.mat
 
+%test new1_pi
+clear
+gama_s = 3.0;
+p0 = 3.0;
+lo_gL_0   =1;
+u_gL_0    =1;
+p_gL_0    =1;
+lo_sL_0   =2;
+u_sL_0    =0.3;
+p_sL_0    =5;
+phi_sL_0  =0.8;
+lo_gR_0   =1.17283230280172;
+u_gR_0    =0.4705273631381315;
+p_gR_0    =1.250058353622465;
+lo_sR_0   =2;
+u_sR_0    =0.3;
+p_sR_0    =11.33028440541645;
+phi_sR_0  =0.3;
+save test_new1_pi.mat
 
 %test new2
 clear
