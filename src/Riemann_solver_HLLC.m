@@ -88,7 +88,7 @@ out_flux_R=F0;
 % S_sM = u_sL;
 
 %non-conservative term
-d_u_s=phi_sR-phi_sL;
+d_u_s=phi_sR-phi_sL;  
 rat = 1;
 if S_sM > 0.0
     out_flux_R=out_flux_R-[0;0;0;0;0;0;S_sM]*d_u_s;

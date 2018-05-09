@@ -93,8 +93,8 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-%        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
-        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
+        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
+%        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
@@ -116,7 +116,7 @@ for i=1:N
 end
 
 %plot
-col = '-b';
+col = '-m';
 figure(1);
 subplot(2,2,1);
 hold on
