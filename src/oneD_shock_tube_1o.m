@@ -116,7 +116,7 @@ for i=1:N
 end
 
 %plot
-col = '-m';
+col = '-r';
 figure(1);
 subplot(2,2,1);
 hold on
