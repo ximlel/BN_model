@@ -43,6 +43,3 @@ out_flux=1/2*(FL+FR)-1/2*K*(alpha.*abs_lamda);
 out_flux=A*out_flux;
 end
 
-    
-
-

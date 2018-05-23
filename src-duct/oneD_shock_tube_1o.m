@@ -14,17 +14,47 @@ x0=0.5;
 CFL=0.4;
 %state value
 Time=0;
-Tend=0.1;
+Tend=1;
 %Tend=0.15;
 A=zeros(1,N+1);
 U=zeros(3,N);
-F=zeros(7,N+1);
+F=zeros(3,N+1);
 %initial condition
-lo_L_0  =1;
-u_L_0   =2;
-p_L_0   =1;
-phi_L_0 =0.8;
-phi_R_0 =0.3;
+% lo_L_0  =169.34;
+% u_L_0   =0;
+% p_L_0   =2.96e8;
+% lo_R_0  =0.76278;
+% u_R_0   =0;
+% p_R_0   =1e5;
+% phi_L_0 =0.25;
+% phi_R_0 =1.0;
+
+lo_L_0  =151.13;
+u_L_0   =212.31;
+p_L_0   =2.4836e8;
+lo_R_0  =95.199;
+u_R_0   =1348.2;
+p_R_0   =1.4067e8;
+phi_L_0 =0.25;
+phi_R_0 =1.0;
+
+% lo_L_0  =1.0555;
+% u_L_0   =-1.0651;
+% p_L_0   =1.5;
+% lo_R_0  =1;
+% u_R_0   =-1;
+% p_R_0   =1;
+% phi_L_0 =1.0;
+% phi_R_0 =1.25;
+
+% lo_L_0  =0.6894;
+% u_L_0   =-1.6941;
+% p_L_0   =1.5;
+% lo_R_0  =1;
+% u_R_0   =-0.5;
+% p_R_0   =1;
+% phi_L_0 =1.0;
+% phi_R_0 =1.25;
 % load ../test/test_new1_pi.mat;
 %test begin
 E_L_0=p_L_0/(gama-1)+0.5*lo_L_0*u_L_0^2;
@@ -50,9 +80,10 @@ while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
         [lo_L(i),u_L(i),p_L(i),lo_R(i),u_R(i),p_R(i)]=primitive_comp(U(:,i),A(i),A(i+1));
-        a(i)=sqrt(gama*p(i)/lo(i));
+        a_L(i)=sqrt(gama*p_L(i)/lo_L(i));
+        a_R(i)=sqrt(gama*p_R(i)/lo_R(i));
     end
-    Smax=max(max(abs(u)+a),max(abs(u)+a));
+    Smax=max(max(abs(u_L)+a_L),max(abs(u_R)+a_R));
     d_t=CFL*d_x/Smax;
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;

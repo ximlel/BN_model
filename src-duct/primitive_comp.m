@@ -1,12 +1,37 @@
 %compute flux
-function [lo_L,u_L,p_L,lo_R,u_R,p_R]=primitive_comp(U,AL,AR)
+function [lo_L,u_L,p_L,lo_R,u_R,p_R]=primitive_comp(U,A_L,A_R)
 global gama;
-phi_s = U(7);
-phi_g = 1.0-phi_s;
-lo_g  = U(1)/phi_g;
-u_g   = U(2)/U(1);
-p_g   = (U(3)/phi_g - 0.5*lo_g*u_g^2)*(gama_g-1);
-lo_s  = U(4)/phi_s;
-u_s   = U(5)/U(4);
-p_s   = (U(6)/phi_s - 0.5*lo_s*u_s^2)*(gama_s-1)-gama_s*p0;
+global ep;
+U1=U(1);
+U2=U(2);
+U3=U(3);
+u=U2/U1;
+lo_L  = U1/A_L;
+p_L   = (U3/A_L - 0.5*lo_L*u^2)*(gama-1);
+lo_R  = U1/A_R;
+p_R   = (U3/A_R - 0.5*lo_R*u^2)*(gama-1);
+it_max = 500; 
+k = 0; err = 1e50;
+fun  = zeros(1,4);
+while (k<it_max && err>ep && abs(A_L-A_R)>ep)
+fun(1) = U1-A_L*lo_L-A_R*p_R;
+fun(2) = U3-0.5*U2^2/A_L/lo_L-A_L*p_L/(gama-1)-0.5*U2^2/A_R/lo_R-A_R*p_R/(gama-1);
+fun(3) = 0.5*U2^2/A_L^2/lo_L^2+gama/(gama-1)*p_L/lo_L-0.5*U2^2/A_R^2/lo_R^2-gama/(gama-1)*p_R/lo_R;
+fun(4) = p_L/lo_L^gama-p_R/lo_R^gama;
+dfun=[
+ -A_L, U2^2/(2*A_L*lo_L^2), - U2^2/(A_L^2*lo_L^3) - (gama*p_L)/(lo_L^2*(gama - 1)), -(gama*p_L)/lo_L^(gama + 1);
+    0, U2^2/(2*A_R*lo_R^2),   U2^2/(A_R^2*lo_R^3) + (gama*p_R)/(lo_R^2*(gama - 1)),  (gama*p_R)/lo_R^(gama + 1);
+    0,     -A_L/(gama - 1),                                 gama/(lo_L*(gama - 1)),                 1/lo_L^gama;
+ -A_R,     -A_R/(gama - 1),                                -gama/(lo_R*(gama - 1)),                -1/lo_R^gama];
+[x_star, err] = NewtonRapshon(fun,dfun,[lo_L lo_R p_L p_R],ep);
+lo_L=max(x_star(1),ep);
+lo_R=max(x_star(2),ep);
+p_L=max(x_star(3),ep);
+p_R=max(x_star(4),ep);
+end
+if k>=it_max 
+    err
+end
+u_L=U2/A_L/lo_L;
+u_R=U2/A_R/lo_R;
 end
