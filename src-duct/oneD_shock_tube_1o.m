@@ -3,18 +3,18 @@ clc;
 %1D shock_tube by Roe Schemes for duct-flow model
 %state constant
 global gama;
-gama=1.4;
+gama=1.23;
 global ep;
-ep=1e-9;
+ep=1e-6;
 x_min=0;
 x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
-x0=0.5;
+x0=0.7;
 CFL=0.4;
 %state value
 Time=0;
-Tend=1;
+Tend=0.15;
 %Tend=0.15;
 A=zeros(1,N+1);
 U=zeros(3,N);
@@ -29,14 +29,14 @@ F=zeros(3,N+1);
 % phi_L_0 =0.25;
 % phi_R_0 =1.0;
 
-lo_L_0  =151.13;
-u_L_0   =212.31;
-p_L_0   =2.4836e8;
-lo_R_0  =95.199;
-u_R_0   =1348.2;
-p_R_0   =1.4067e8;
-phi_L_0 =0.25;
-phi_R_0 =1.0;
+% lo_L_0  =151.13;
+% u_L_0   =212.31;
+% p_L_0   =2.4836e8;
+% lo_R_0  =95.199;
+% u_R_0   =1348.2;
+% p_R_0   =1.4067e8;
+% phi_L_0 =1.0;
+% phi_R_0 =0.25;
 
 % lo_L_0  =1.0555;
 % u_L_0   =-1.0651;
@@ -47,14 +47,14 @@ phi_R_0 =1.0;
 % phi_L_0 =1.0;
 % phi_R_0 =1.25;
 
-% lo_L_0  =0.6894;
-% u_L_0   =-1.6941;
-% p_L_0   =1.5;
-% lo_R_0  =1;
-% u_R_0   =-0.5;
-% p_R_0   =1;
-% phi_L_0 =1.0;
-% phi_R_0 =1.25;
+lo_L_0  =0.6894;
+u_L_0   =-1.6941;
+p_L_0   =1.5;
+lo_R_0  =1;
+u_R_0   =-0.5;
+p_R_0   =1;
+phi_L_0 =1.0;
+phi_R_0 =1.25;
 % load ../test/test_new1_pi.mat;
 %test begin
 E_L_0=p_L_0/(gama-1)+0.5*lo_L_0*u_L_0^2;
@@ -104,7 +104,7 @@ while Time<Tend && isreal(Time)
         if abs(A(i+1)-A(i))<ep;
             S=0.5*(p_L(i)+p_R(i))*(A(i+1)-A(i));
         else
-            S_tmp=A(i+1)*((lo_R(i)*u_R(i)^2+p_R(i))-A(i)*(lo_L(i)*u_L(i)^2+p_L(i)));
+            S_tmp=A(i+1)*(lo_R(i)*u_R(i)^2+p_R(i))-A(i)*(lo_L(i)*u_L(i)^2+p_L(i));
             if (S_tmp/(A(i+1)-A(i))>max(p_L(i),p_R(i)))
                 S=max(p_L(i),p_R(i))*(A(i+1)-A(i));
             elseif (S_tmp/(A(i+1)-A(i))<min(p_L(i),p_R(i)))
@@ -113,10 +113,10 @@ while Time<Tend && isreal(Time)
                 S=S_tmp;
             end
         end
-        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*S;
+        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S;0];
     end
     Time=Time+d_t
-% if Time > d_t
+% if Time > 0.5*d_t
 %    break;
 % end
 end
@@ -134,7 +134,7 @@ W_exact(:,4)=u';
 %end
 
 %plot
-col = ':.m';
+col = '-m';
 figure(1);
 subplot(2,2,1);
 hold on
