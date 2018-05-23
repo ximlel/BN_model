@@ -81,7 +81,7 @@ while Time<Tend && isreal(Time)
          if i==1
              [phi_s_out,FL(:,1),FR(:,1)]=Riemann_solver_HLLC(lo_g(1),lo_g(1),p_g(1),p_g(1),u_g(1),u_g(1),lo_s(1),lo_s(1),p_s(1),p_s(1),u_s(1),u_s(1),phi_s(1),phi_s(1),d_t/d_x);
          elseif i==N+1
-             [phi_s_out,FL(:,N+1),         FR(:,N+1)]=Riemann_solver_HLLC(lo_g(N),lo_g(N),p_g(N),p_g(N),u_g(N),u_g(N),lo_s(N),lo_s(N),p_s(N),p_s(N),u_s(N),u_s(N),phi_s(N),phi_s(N),d_t/d_x);
+             [phi_s_out,FL(:,N+1),FR(:,N+1)]=Riemann_solver_HLLC(lo_g(N),lo_g(N),p_g(N),p_g(N),u_g(N),u_g(N),lo_s(N),lo_s(N),p_s(N),p_s(N),u_s(N),u_s(N),phi_s(N),phi_s(N),d_t/d_x);
          else
              [phi_s_out,FL(:,i),FR(:,i)]=Riemann_solver_HLLC(lo_g(i-1),lo_g(i),p_g(i-1),p_g(i),u_g(i-1),u_g(i),lo_s(i-1),lo_s(i),p_s(i-1),p_s(i),u_s(i-1),u_s(i),phi_s(i-1),phi_s(i),d_t/d_x);
          end
