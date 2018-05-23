@@ -6,16 +6,21 @@ U1=U(1);
 U2=U(2);
 U3=U(3);
 u=U2/U1;
-lo_L  = U1/A_L;
-p_L   = (U3/A_L - 0.5*lo_L*u^2)*(gama-1);
-lo_R  = U1/A_R;
-p_R   = (U3/A_R - 0.5*lo_R*u^2)*(gama-1);
+% lo_L  = U1/A_L;
+% p_L   = (U3/A_L - 0.5*lo_L*u^2)*(gama-1);
+% lo_R  = U1/A_R;
+% p_R   = (U3/A_R - 0.5*lo_R*u^2)*(gama-1);
+A=0.5*(A_L+A_R);
+lo_L  = U1/A;
+p_L   = (U3/A - 0.5*lo_L*u^2)*(gama-1);
+lo_R  = lo_L;
+p_R   = p_L;
 it_max = 500; 
 k = 0; err = 1e50;
 fun  = zeros(1,4);
 while (k<it_max && err>ep && abs(A_L-A_R)>ep)
-fun(1) = U1-A_L*lo_L-A_R*p_R;
-fun(2) = U3-0.5*U2^2/A_L/lo_L-A_L*p_L/(gama-1)-0.5*U2^2/A_R/lo_R-A_R*p_R/(gama-1);
+fun(1) = 2*U1-A_L*lo_L-A_R*p_R;
+fun(2) = 2*U3-0.5*U2^2/A_L/lo_L-A_L*p_L/(gama-1)-0.5*U2^2/A_R/lo_R-A_R*p_R/(gama-1);
 fun(3) = 0.5*U2^2/A_L^2/lo_L^2+gama/(gama-1)*p_L/lo_L-0.5*U2^2/A_R^2/lo_R^2-gama/(gama-1)*p_R/lo_R;
 fun(4) = p_L/lo_L^gama-p_R/lo_R^gama;
 dfun=[
