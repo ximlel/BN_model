@@ -36,9 +36,9 @@ F=zeros(6,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test_new1_pi.mat;
+load ../test/test1.mat;
 phi_gL_0=1.0-phi_sL_0;
-phi_gR_0=1.0-phi_gR_0;
+phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
 E_sL_0=(p_sL_0+gama_s*p0)/(gama_s-1)+0.5*lo_sL_0*u_sL_0^2;
 U_L_0=[phi_gL_0*lo_gL_0;phi_gL_0*lo_gL_0*u_gL_0;phi_gL_0*E_gL_0;phi_sL_0*lo_sL_0;phi_sL_0*lo_sL_0*u_sL_0;phi_sL_0*E_sL_0];
@@ -56,7 +56,7 @@ for i=1:N
         Alpha(i+1) =phi_sR_0;
     else
         U(:,i) =0.5*(U_L_0+U_R_0);
-        Alpha(i)   =phi_sL_0;
+        Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
 end
@@ -64,12 +64,21 @@ end
 while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
-        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1));
+      if i==1
+          x_delta_L=0.5*d_x;
+          x_delta_R=0.5*(x(2)-x(1));          
+      elseif i==N
+          x_delta_L=0.5*(x(N)-x(N-1));
+          x_delta_R=0.5*d_x;
+      else
+          x_delta_L=0.5*(x(i)-x(i-1));
+          x_delta_R=0.5*(x(i+1)-x(i));
+      end
+        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),x_delta_L/(x_delta_L+x_delta_R),x_delta_R/(x_delta_L+x_delta_R));
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
         a_gR(i)=sqrt(gama_g*p_gR(i)/lo_gR(i));
         a_sR(i)=sqrt(gama_s*(p_sR(i)+p0)/lo_sR(i));
-        V_S(i)=0.5*(u_sL(i)+u_sR(i));
     end
     Smax=max([max(abs(u_gL)+a_gL),max(abs(u_sL)+a_sL),max(abs(u_gR)+a_gR),max(abs(u_sR)+a_sR)]);
     d_t=CFL*d_x/Smax;
@@ -80,14 +89,14 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
         if i==1
-            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),V_S(1));
-            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),V_S(1));
+            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,u_sL(1));
+            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,u_sL(1));
         elseif i==N+1
-            F(1:3,N+1)=Riemann_solver_Exact(lo_gL(N),lo_gL(N),p_gL(N),p_gL(N),u_gL(N),u_gL(N),1-Alpha(N+1),V_S(N));
-            F(4:6,N+1)=Riemann_solver_Exact(lo_sL(N),lo_sL(N),p_sL(N),p_sL(N),u_sL(N),u_sL(N),Alpha(N+1),V_S(N));
+            F(1:3,N+1)=Riemann_solver_Exact(lo_gL(N),lo_gL(N),p_gL(N),p_gL(N),u_gL(N),u_gL(N),1-Alpha(N+1),gama_g,u_sL(N));
+            F(4:6,N+1)=Riemann_solver_Exact(lo_sL(N),lo_sL(N),p_sL(N),p_sL(N),u_sL(N),u_sL(N),Alpha(N+1),gama_s,u_sL(N));
         else
-            F(1:3,i)=Riemann_solver_Exact(lo_gL(i-1),lo_gL(i),p_gL(i-1),p_gL(i),u_gL(i-1),u_gL(i),1-Alpha(i),0.5*(V_S(i-1)+V_S(i)));
-            F(4:6,i)=Riemann_solver_Exact(lo_sL(i-1),lo_sL(i),p_sL(i-1),p_sL(i),u_sL(i-1),u_sL(i),Alpha(i),0.5*(V_S(i-1)+V_S(i)));
+            F(1:3,i)=Riemann_solver_Exact(lo_gL(i-1),lo_gL(i),p_gL(i-1),p_gL(i),u_gL(i-1),u_gL(i),1-Alpha(i),gama_g,0.5*(u_sL(i-1)+u_sL(i)));
+            F(4:6,i)=Riemann_solver_Exact(lo_sL(i-1),lo_sL(i),p_sL(i-1),p_sL(i),u_sL(i-1),u_sL(i),Alpha(i),gama_s,0.5*(u_sL(i-1)+u_sL(i)));
         end
     end
     %compute U in next step
@@ -104,7 +113,27 @@ while Time<Tend && isreal(Time)
               S=S_tmp;
           end
       end
-        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1))+d_t/d_x*[0;S;S*V_S(i);0;-S;-S*V_S(i)];
+      if i==1
+          x_delta=0.5*(x(2)-x(1)+d_x);
+      elseif i==N
+          x_delta=0.5*(x(N)-x(N-1)+d_x);
+      else
+          x_delta=0.5*(x(i+1)-x(i-1));
+      end
+        U(:,i)=U(:,i)*x_delta+d_t*(F(:,i)-F(:,i+1))+d_t*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
+    end
+    for i=1:N
+        x(i)=x(i)+u_sL(i)*d_t;
+    end
+    for i=1:N
+      if i==1
+          x_delta=0.5*(x(2)-x(1)+d_x);
+      elseif i==N
+          x_delta=0.5*(x(N)-x(N-1)+d_x);
+      else
+          x_delta=0.5*(x(i+1)-x(i-1));
+      end
+        U(:,i)=U(:,i)/x_delta;
     end
     Time=Time+d_t
 % if Time > d_t
@@ -126,9 +155,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test_new1_pi.exact;
+load ../test/test1.exact;
 for i=1:N
-     W_exact(i,:) = test_new1_pi(ceil(i/(N/300)),:);
+     W_exact(i,:) = test1(ceil(i/(N/300)),:);
 end
 %plot
 col = ':.m';

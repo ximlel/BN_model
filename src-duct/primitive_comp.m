@@ -1,7 +1,6 @@
 %compute flux
 function [lo_L,u_L,p_L,lo_R,u_R,p_R]=primitive_comp(U,A_L,A_R)
 global gama;
-global ep;
 U1=U(1);
 U2=U(2);
 U3=U(3);
@@ -21,7 +20,7 @@ p_R   = p_L;
 %     lo_R  =95.199;
 %     p_R   =1.4067e8;
 % end
-
+global ep;
 fun  = zeros(1,4);
 it_max = 50;
 %it_max = 500;
