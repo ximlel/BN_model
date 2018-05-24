@@ -1,6 +1,7 @@
 %t4: Riemann Solver exactly method
-function [out_flux out_W_exact]=Riemann_solver_Exact(loL,loR,pL,pR,vel_uL,vel_uR,A,ratio_x_t)
+function [out_flux out_W_exact]=Riemann_solver_Exact(loL,loR,pL,pR,vel_uL,vel_uR,A)
 %state constant
+ratio_x_t=0;
 global gama;
 both_rarefaction=1;
 both_shock=2;
@@ -40,16 +41,16 @@ elseif f_min<=0&&f_max>=0
     end
 else
     disp('error:occur while judging wave pattern');
-end 
+end
 %solve pStar by Newton interation
 %guess p initial value
-TOL=10^-6;
+global ep
 pPV=1/2*(pL+pR)-1/8*d_vel_u*(loL+loR)*(aL+aR);
-p0=max([TOL pPV]);
+p0=max([ep pPV]);
 p(1)=p0;
 k=1;
 CHA=1;
-while CHA>=TOL
+while CHA>=ep
     switch wave_pattern
         case both_rarefaction,
             f_L(k)=2*aL/(gama-1)*((p(k)/pL)^(1/2-1/2/gama)-1);
@@ -69,7 +70,7 @@ while CHA>=TOL
             diff_f(k)=sqrt(AR/(BR+p(k)))*(1-(p(k)-pR)/2/(BR+p(k)))+1/loL/aL*(p(k)/pL)^(-1/2-1/2/gama);
         otherwise,
             disp('error:occur while computing derivative');
-    end  
+    end
     f(k)=f_L(k)+f_R(k)+d_vel_u;
     p(k+1)=p(k)-f(k)/diff_f(k);
     CHA=2*abs(p(k+1)-p(k))/(p(k+1)+p(k));
@@ -100,7 +101,7 @@ switch wave_pattern
             W_0=[loR;vel_uR;pR];
         else
             disp('error:ratio_x_t runs out of real');
-        end         
+        end
     case both_rarefaction,
         loStar_L=loL*ratio_pStar_pL^(1/gama);
         loStar_R=loR*ratio_pStar_pR^(1/gama);
@@ -123,12 +124,12 @@ switch wave_pattern
         elseif ratio_x_t>=SHR
             W_0=[loR;vel_uR;pR];
         else
-            disp('error:ratio_x_t runs out of real'); 
+            disp('error:ratio_x_t runs out of real');
         end
     case right_shock_left_rarefaction,
         loStar_R=loR*(ratio_pStar_pR+C1)/(C1*ratio_pStar_pR+1);
         SR=vel_uR+aR*sqrt(C3*ratio_pStar_pR+C2);
-        loStar_L=loL*ratio_pStar_pL^(1/gama); 
+        loStar_L=loL*ratio_pStar_pL^(1/gama);
         aStar_L=aL*ratio_pStar_pL^C2;
         SHL=vel_uL-aL;
         STL=uStar-aStar_L;
@@ -144,7 +145,7 @@ switch wave_pattern
             W_0=[loR;vel_uR;pR];
         else
             disp('error:ratio_x_t runs out of real');
-        end 
+        end
     case left_shock_right_rarefaction,
         loStar_L=loL*(ratio_pStar_pL+C1)/(C1*ratio_pStar_pL+1);
         SL=vel_uL-aL*sqrt(C3*ratio_pStar_pL+C2);
@@ -163,8 +164,8 @@ switch wave_pattern
         elseif ratio_x_t>=SHR
             W_0=[loR;vel_uR;pR];
         else
-            disp('error:ratio_x_t runs out of real'); 
-        end 
+            disp('error:ratio_x_t runs out of real');
+        end
     otherwise,
         disp('error:occur while computing complete solutions');
 end
@@ -176,7 +177,3 @@ out_W_exact=[out_lo;out_vel_u;out_p];
 out_flux=[out_lo*out_vel_u;out_lo*out_vel_u^2+out_p;(out_E+out_p)*out_vel_u];
 out_flux=A*out_flux;
 end
-
-    
-
-

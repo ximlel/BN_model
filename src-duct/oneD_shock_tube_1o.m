@@ -3,19 +3,24 @@ clc;
 %1D shock_tube by Roe Schemes for duct-flow model
 %state constant
 global gama;
-gama=1.23;%1.4;
+gama=1.23;
 global ep;
 ep=1e-6;
 x_min=0;
-x_max=0.06;%1;
-N=2000*1;
-d_x=(x_max-x_min)/N;
-x0=0.02;%0.7;
-CFL=0.8;
+x_max=0.06;
+x0=0.02;
 %state value
 Time=0;
-Tend=0.000005;%0.15;
-%Tend=0.15;
+Tend=6.3e-6;
+% gama=1.4;
+% x_max=1;
+% x0=0.7;
+% Tend=0.2;
+% %it_max = 500;
+
+CFL=0.8;
+N=2000*1;
+d_x=(x_max-x_min)/N;
 A=zeros(1,N+1);
 U=zeros(3,N);
 F=zeros(3,N+1);
@@ -26,8 +31,8 @@ p_L_0   =2.96e8;
 lo_R_0  =0.76278;
 u_R_0   =0;
 p_R_0   =1e5;
-phi_L_0 =0.25;
-phi_R_0 =1.0;
+phi_L_0 =1.0;
+phi_R_0 =0.25;
 
 % lo_L_0  =151.13;
 % u_L_0   =212.31;
@@ -101,7 +106,7 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-        if abs(A(i+1)-A(i))<ep;
+        if abs(A(i+1)-A(i))<ep
             S=0.5*(p_L(i)+p_R(i))*(A(i+1)-A(i));
         else
             S_tmp=A(i+1)*(lo_R(i)*u_R(i)^2+p_R(i))-A(i)*(lo_L(i)*u_L(i)^2+p_L(i));
@@ -138,11 +143,12 @@ col = '-m';
 figure(1);
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,A(1:N),col,'LineWidth',1.0);
+% plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
+% plot(x_min:d_x:x_max-d_x,A(1:N),col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,p./lo.^gama,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
-ylabel('Cross section','FontWeight','bold');
-subplot(2,2,2);
+ylabel('Entropy','FontWeight','bold');
+subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
@@ -154,7 +160,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density','FontWeight','bold');
-subplot(2,2,3);
+subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,u,col,'LineWidth',1.0);
