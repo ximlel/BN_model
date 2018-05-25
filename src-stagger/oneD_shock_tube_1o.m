@@ -36,7 +36,7 @@ F=zeros(6,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test3.mat;
+load ../test/test5.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -164,9 +164,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test3.exact;
+load ../test/test5.exact;
 for i=1:N
-     W_exact(i,:) = test3(ceil(i/(N/300)),:);
+     W_exact(i,:) = test5(ceil(i/(N/300)),:);
 end
 %plot
 col = '-m';

@@ -12,12 +12,17 @@ U5=U(5);
 U6=U(6);
 phi_s = area_L*phi_sL+area_R*phi_sR;
 phi_g = 1-phi_s;
+lo_s  = U4/phi_s;
+u_s   = U5/U4;
 lo_gR = U1/phi_g;
 u_gR  = U2/U1;
 p_gR  = (U3/phi_g - 0.5*lo_gR*u_gR^2)*(gama_g-1);
 p_sR  = (U6/phi_s - 0.5*lo_s*u_s^2)*(gama_s-1);
-lo_s  = U4/phi_s;
-u_s   = U5/U4;
+
+% lo_gR = U1/phi_gR;
+% u_gR  = U2/U1;
+% p_gR  = (U3/phi_gR - 0.5*lo_gR*u_gR^2)*(gama_s-1);
+% p_sR  = (U6/phi_sR - 0.5*lo_s*u_s^2)*(gama_s-1);
 % if abs(phi_sL-phi_sR)>ep
 %     lo_gL   =1;
 %     u_gL    =2;
@@ -31,8 +36,8 @@ u_s   = U5/U4;
 %     p_sR    =12.85675006887399;
 % end
 fun  = zeros(1,4);
-it_max = 50;
-%it_max = 500;
+%it_max = 50;
+it_max = 500;
 k = 0; err = 1e50;
 while (k<it_max && err>ep && abs(phi_sL-phi_sR)>ep)
     fun(1) = U3-area_L*phi_gL*(0.5*((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL)*((U2-area_R*phi_gR*lo_gR*u_gR)/(U1-area_R*phi_gR*lo_gR))^2+(p_gR/lo_gR^gama_g*((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL)^gama_g)/(gama_g-1))-area_R*phi_gR*(0.5*lo_gR*u_gR^2+p_gR/(gama_g-1));
@@ -45,10 +50,10 @@ while (k<it_max && err>ep && abs(phi_sL-phi_sR)>ep)
 	                                                                                                                                                                                                                                                                                                                                                                           (area_R*lo_gR*phi_gR*(U2 - area_R*lo_gR*phi_gR*u_gR))/(U1 - area_R*lo_gR*phi_gR) - area_R*lo_gR*phi_gR*u_gR,                                                                                                                                                                                                                                          - lo_gR*phi_gR - (area_R*lo_gR*phi_gR)/area_L,                                                                                                                                                                                                                                                                                                                                                                                                                                           (2*area_R*lo_gR*phi_gR*(u_s - (U2 - area_R*lo_gR*phi_gR*u_gR)/(U1 - area_R*lo_gR*phi_gR)))/area_L - lo_gR*phi_gR*(2*u_gR - 2*u_s),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      u_s - u_gR + (area_R*lo_gR*phi_gR*(u_s - (U2 - area_R*lo_gR*phi_gR*u_gR)/(U1 - area_R*lo_gR*phi_gR)))/(U1 - area_R*lo_gR*phi_gR);
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     0,                                                                                                                                                                                                                                                                                      0,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           - phi_sR - (area_R*phi_sR)/area_L,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     0];
     [x_star, err] = NewtonRapshon(fun,dfun,[lo_gR p_gR u_gR p_sR],ep);
-    lo_gR=max(x_star(1),ep);
-    p_gR =max(x_star(2),ep);
-    u_gR =max(x_star(3),ep);
-    p_sR =max(x_star(4),ep);
+    lo_gR=max(real(x_star(1)),ep);
+    p_gR =max(real(x_star(2)),ep);
+    u_gR =real(x_star(3));
+    p_sR =max(real(x_star(4)),ep);
     k=k+1;
 end
 if k>=it_max
