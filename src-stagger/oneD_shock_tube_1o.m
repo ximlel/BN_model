@@ -92,11 +92,11 @@ while Time<Tend && isreal(Time)
             F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,u_sL(1));
             F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,u_sL(1));
         elseif i==N+1
-            F(1:3,N+1)=Riemann_solver_Exact(lo_gL(N),lo_gL(N),p_gL(N),p_gL(N),u_gL(N),u_gL(N),1-Alpha(N+1),gama_g,u_sL(N));
-            F(4:6,N+1)=Riemann_solver_Exact(lo_sL(N),lo_sL(N),p_sL(N),p_sL(N),u_sL(N),u_sL(N),Alpha(N+1),gama_s,u_sL(N));
+            F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,u_sL(N));
+            F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,u_sL(N));
         else
-            F(1:3,i)=Riemann_solver_Exact(lo_gL(i-1),lo_gL(i),p_gL(i-1),p_gL(i),u_gL(i-1),u_gL(i),1-Alpha(i),gama_g,0.5*(u_sL(i-1)+u_sL(i)));
-            F(4:6,i)=Riemann_solver_Exact(lo_sL(i-1),lo_sL(i),p_sL(i-1),p_sL(i),u_sL(i-1),u_sL(i),Alpha(i),gama_s,0.5*(u_sL(i-1)+u_sL(i)));
+            F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.5*(u_sL(i-1)+u_sL(i)));
+            F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.5*(u_sL(i-1)+u_sL(i)));
         end
     end
     %compute U in next step
@@ -136,7 +136,7 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)/x_delta;
     end
     Time=Time+d_t
-% if Time > d_t
+% if Time > 0.5*d_t
 %    break;
 % end
 end
@@ -147,6 +147,7 @@ lo_s = 0.5*(lo_sL+lo_sR);
 p_s  = 0.5*(p_sL +p_sR);
 u_s  = 0.5*(u_sL +u_sR);
 phi_s= Alpha(1,1:N);
+phi_g=1-phi_s;
 W_exact = zeros(N,8);
 W_exact(:,2)=phi_s';
 W_exact(:,3)=lo_s';
