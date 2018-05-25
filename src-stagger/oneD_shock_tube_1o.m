@@ -13,7 +13,7 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.4;
+CFL=0.2;
 %state value
 Time=0;
 Tend=0.1;
@@ -36,7 +36,7 @@ F=zeros(6,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test1.mat;
+load ../test/test3.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -164,62 +164,62 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test1.exact;
+load ../test/test3.exact;
 for i=1:N
-     W_exact(i,:) = test1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test3(ceil(i/(N/300)),:);
 end
 %plot
-col = ':.m';
+col = '-m';
 figure(1);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,lo_s,col,'LineWidth',1.0);
+plot(x,lo_s,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density-solid','FontWeight','bold');
 ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,u_s,col,'LineWidth',1.0);
+plot(x,u_s,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Velocity-solid','FontWeight','bold');
 ylim([min(u_s)-0.00001 max(u_s)+0.00001])
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,p_s,col,'LineWidth',1.0);
+plot(x,p_s,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Pressure-solid','FontWeight','bold');
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,phi_s,col,'LineWidth',1.0);
+plot(x,phi_s,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Porosity-solid','FontWeight','bold');
 figure(2);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,lo_g,col,'LineWidth',1.0);
+plot(x,lo_g,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density-gas','FontWeight','bold');
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,u_g,col,'LineWidth',1.0);
+plot(x,u_g,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Velocity-gas','FontWeight','bold');
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,p_g,col,'LineWidth',1.0);
+plot(x,p_g,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Pressure-gas','FontWeight','bold');
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,eta,col,'LineWidth',1.0);
+plot(x,eta,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Entropy-gas','FontWeight','bold');
 ylim([min(eta)-0.00001 max(eta)+0.00001])
@@ -227,21 +227,21 @@ figure(3)
 subplot(3,1,1);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,Q_inv,col,'LineWidth',1.0);
+plot(x,Q_inv,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Riemann_inv-Q','FontWeight','bold');
 ylim([min(Q_inv)-0.00001 max(Q_inv)+0.00001])
 subplot(3,1,2);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,P_inv,col,'LineWidth',1.0);
+plot(x,P_inv,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Riemann_inv-P','FontWeight','bold');
 ylim([min(P_inv)-0.00001 max(P_inv)+0.00001])
 subplot(3,1,3);
 hold on
 plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',1.0);
-plot(x(1)-0.5*d_x:d_x:x(N)+0.5*d_x,H_inv,col,'LineWidth',1.0);
+plot(x,H_inv,col,'LineWidth',1.0);
 ylim([min(H_inv)-0.00001 max(H_inv)+0.00001])
 xlabel('Position','FontWeight','bold');
 ylabel('Riemann_inv-H','FontWeight','bold');
