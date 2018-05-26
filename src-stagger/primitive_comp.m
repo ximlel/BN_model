@@ -1,5 +1,5 @@
 %compute flux
-function [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=primitive_comp(U,phi_sL,phi_sR,area_L,area_R);
+function [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=primitive_comp(U,U_lo_sL,U_lo_sR,phi_sL,phi_sR,area_L,area_R);
 phi_gL=1-phi_sL;
 phi_gR=1-phi_sR;
 global gama_s gama_g;
@@ -63,8 +63,10 @@ lo_gL= (U1-area_R*phi_gR*lo_gR)/area_L/phi_gL;
 u_gL = (U2-area_R*phi_gR*lo_gR*u_gR)/(U1-area_R*phi_gR*lo_gR);
 p_gL = p_gR/lo_gR^gama_g*((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL)^gama_g;
 p_sL = ((U6-0.5*phi_s*lo_s*u_s^2)*(gama_s-1)-area_R*phi_sR*p_sR)/area_L/phi_sL;
-lo_sL=lo_s;
-lo_sR=lo_s;
-u_sL =u_s;
-u_sR =u_s;
+lo_sL= lo_s;
+lo_sR= lo_s;
+% lo_sL= U_lo_sL/phi_sL;
+% lo_sR= U_lo_sR/phi_sR;
+u_sL = u_s;
+u_sR = u_s;
 end

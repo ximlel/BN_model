@@ -21,6 +21,8 @@ Tend=0.1;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
 F=zeros(6,N+1);
+U_lo_sL=zeros(1,N);
+U_lo_sR=zeros(1,N);
 %initial condition
 % lo_gL_0  =1;
 % u_gL_0   =2;
@@ -36,7 +38,7 @@ F=zeros(6,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test5.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -50,12 +52,18 @@ for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
     if i<round(N*x0/(x_max-x_min))
         U(:,i) =U_L_0;
+        U_lo_sL(i) =phi_sL_0*lo_sL_0;
+        U_lo_sR(i) =phi_sL_0*lo_sL_0;
         Alpha(i) =phi_sL_0;
     elseif i>round(N*x0/(x_max-x_min))
         U(:,i) =U_R_0;
+        U_lo_sL(i) =phi_sR_0*lo_sR_0;
+        U_lo_sR(i) =phi_sR_0*lo_sR_0;
         Alpha(i+1) =phi_sR_0;
     else
         U(:,i) =0.5*(U_L_0+U_R_0);
+        U_lo_sL(i) =phi_sL_0*lo_sL_0;
+        U_lo_sR(i) =phi_sR_0*lo_sR_0;
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -74,7 +82,7 @@ while Time<Tend && isreal(Time)
           x_delta_L=0.5*(x(i)-x(i-1));
           x_delta_R=0.5*(x(i+1)-x(i));
       end
-        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),x_delta_L/(x_delta_L+x_delta_R),x_delta_R/(x_delta_L+x_delta_R));
+        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),U_lo_sL(i),U_lo_sR(i),Alpha(i),Alpha(i+1),x_delta_L/(x_delta_L+x_delta_R),x_delta_R/(x_delta_L+x_delta_R));
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
         a_gR(i)=sqrt(gama_g*p_gR(i)/lo_gR(i));
@@ -121,6 +129,9 @@ while Time<Tend && isreal(Time)
           x_delta=0.5*(x(i+1)-x(i-1));
       end
         U(:,i)=U(:,i)*x_delta+d_t*(F(:,i)-F(:,i+1))+d_t*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
+        U_lo_sL(i)=U_lo_sL(i)*x_delta+d_t*(F(4,i));
+        U_lo_sR(i)=U_lo_sR(i)*x_delta+d_t*(-F(4,i+1));
+
     end
     for i=1:N
         x(i)=x(i)+u_sL(i)*d_t;
@@ -134,6 +145,8 @@ while Time<Tend && isreal(Time)
           x_delta=0.5*(x(i+1)-x(i-1));
       end
         U(:,i)=U(:,i)/x_delta;
+        U_lo_sL(i)=U_lo_sL(i)/x_delta;
+        U_lo_sR(i)=U_lo_sR(i)/x_delta;
     end
     Time=Time+d_t
 % if Time > 0.5*d_t
@@ -164,12 +177,12 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test5.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test5(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
-col = '-m';
+col = ':.b';
 figure(1);
 subplot(2,2,1);
 hold on

@@ -22,8 +22,8 @@ p_R   = p_L;
 % end
 global ep;
 fun  = zeros(1,4);
-it_max = 50;
-%it_max = 500;
+%it_max = 50;
+it_max = 500;
 k = 0; err = 1e50;
 while (k<it_max && err>ep && abs(A_L-A_R)>ep)
     fun(1) = 2*U1-A_L*lo_L-A_R*lo_R;
