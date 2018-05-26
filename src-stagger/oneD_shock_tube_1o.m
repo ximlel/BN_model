@@ -131,7 +131,6 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)*x_delta+d_t*(F(:,i)-F(:,i+1))+d_t*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
         U_lo_sL(i)=U_lo_sL(i)*x_delta+d_t*(F(4,i));
         U_lo_sR(i)=U_lo_sR(i)*x_delta+d_t*(-F(4,i+1));
-
     end
     for i=1:N
         x(i)=x(i)+u_sL(i)*d_t;
