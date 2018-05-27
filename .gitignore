@@ -1,5 +1,8 @@
 # ======================MATLAB project==================
 
+# mexFunction
+*.mexa64
+
 # Data in
 *.mat
 

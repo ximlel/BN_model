@@ -564,7 +564,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     m = mxGetM(prhs[0]);
     n = mxGetN(prhs[0]);
      
-    plhs[0] = mxCreateDoubleMatrix(6,1,mxINT32_CLASS,mxREAL);
+    plhs[0] = mxCreateDoubleMatrix(6,1,mxREAL);
     double *A;
     A = mxGetPr(plhs[0]);
      
