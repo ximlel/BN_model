@@ -190,7 +190,7 @@ double Riemann_solver_exact(double * U_star, double * P_star, double gamma, doub
 void linear_GRP_solver_Edir
 (double * direvative, double * mid, double * input)
 {
-  double rho_L, rho_R, s_rho_L, s_rho_R, u_L, u_R, s_u_L, s_u_R, p_L, p_R, s_p_L, s_p_R, gamma, eps;
+  double rho_L, rho_R, s_rho_L, s_rho_R, u_L, u_R, s_u_L, s_u_R, p_L, p_R, s_p_L, s_p_R, geo_factor, gamma, eps;
   rho_L = input[0];
   rho_R = input[1];
   s_rho_L = input[2];
@@ -203,8 +203,9 @@ void linear_GRP_solver_Edir
   p_R = input[9];
   s_p_L = input[10];
   s_p_R = input[11];
-  gamma = input[12];
-  eps = input[13];
+  geo_factor = input[11];
+  gamma = input[13];
+  eps = input[14];
 
   double dist;
   double c_L, c_R;
@@ -318,6 +319,9 @@ void linear_GRP_solver_Edir
       }
       //printf("%lf\t%lf\t%lf\n\n", direvative[0], direvative[1], direvative[2]);
     }
+
+	direvative[2] += -geo_factor*mid[2]*mid[1]*gamma;
+	direvative[0] += -geo_factor*mid[0]*mid[1];
 
     //printf("rho=%lf\tu=%lf\tt=%lf\n", mid[0], mid[1], mid[2]);
     return;
@@ -553,6 +557,8 @@ void linear_GRP_solver_Edir
     }
   //----end of non-trivial case----
   }
+  	direvative[2] += -geo_factor*mid[2]*mid[1]*gamma;
+	direvative[0] += -geo_factor*mid[0]*mid[1];
 }
 
 
