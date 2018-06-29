@@ -1,19 +1,18 @@
 clear;
 clc;
-%1D shock_tube by HLLC Schemes for BN model
+%1D shock_tube by exact Riemann solver for ghost fluid method
 %state constant
-global gama_s gama_g p0;
+global gama_s gama_g;
 gama_s=1.4;
-gama_g=1.4;
-p0=0;
+gama_g=1.6667;
 global ep;
 ep=1e-9;
 x_min=0;
 x_max=1;
-N=300*1;
+N=200*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.4;
+CFL=0.9;
 %state value
 Time=0;
 Tend=0.1;
@@ -36,7 +35,7 @@ FR=zeros(7,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test_new1_pi.mat;
+load ../data/RS.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
