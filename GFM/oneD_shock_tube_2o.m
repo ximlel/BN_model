@@ -41,9 +41,9 @@ for i=1:N
         u_g(i) =u_R_0;
         p_g(i) =p_R_0;
     end
-    phi(i)=x(i)-x_0;
+    phi(i)=x(i)-x0;
     if phi(i)<0.0;
-      E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_S(i)^2;
+      E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
     else
       E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
@@ -59,7 +59,7 @@ while Time<Tend && isreal(Time)
           end
       end
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g)
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
         p_g(J-1)=p_s(J-1);
         u_g(J-1)=u_s(J-1);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
@@ -74,7 +74,7 @@ while Time<Tend && isreal(Time)
         lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
     for i=(J-2):(J+3)
-        E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_S(i)^2;
+        E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
         E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
         U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
         U_g(:,i)=[lo_g(i);lo_g(i)*u_g(i);E_g(i)];
@@ -89,6 +89,9 @@ while Time<Tend && isreal(Time)
         dlo_g(:,i)=minmod(Alpha*(lo_g(:,i)-lo_g(:,i-1))/d_x,(lo_g(:,i+1)-lo_g(:,i-1))/2.0/d_x,Alpha*(lo_g(:,i+1)-lo_g(:,i))/d_x);
         du_g(:,i) =minmod(Alpha*(u_g(:,i) -u_g(:,i-1) )/d_x,(u_g(:,i+1) -u_g(:,i-1) )/2.0/d_x,Alpha*(u_g(:,i+1) -u_g(:,i) )/d_x);
         dp_g(:,i) =minmod(Alpha*(p_g(:,i) -p_g(:,i-1) )/d_x,(p_g(:,i+1) -p_g(:,i-1) )/2.0/d_x,Alpha*(p_g(:,i+1) -p_g(:,i) )/d_x);
+    end
+    for i=2:(N-1)
+        dphi(:,i) =minmod(Alpha*(phi(:,i) -phi(:,i-1) )/d_x,(phi(:,i+1) -phi(:,i-1) )/2.0/d_x,Alpha*(phi(:,i+1) -phi(:,i) )/d_x);
     end
     %CFL condition
     for i=1:J
@@ -105,15 +108,15 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-            [F_s(:,1),phi_s(1)]=GRP_solver(lo_s(1),lo_s(1),0,0,u_s(1),u_s(1),0,0,p_s(1),p_s(1),0,0,phi(1),phi(1),d_t);
+            [F_s(:,1),phi_s(1)]=GRP_solver(lo_s(1),lo_s(1),0,0,u_s(1),u_s(1),0,0,p_s(1),p_s(1),0,0,phi(1),phi(1),0,0,gama_s,d_t);
          elseif i==N+1
-            [F_g(:,N+1),phi_g(i)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(1),0,0,phi(N),phi(N),d_t);
+            [F_g(:,N+1),phi_g(i)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(1),0,0,phi(N),phi(N),0,0,gama_g,d_t);
          else
             if i<=J+2
-                [F_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),d_t);
+                [F_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_s,d_t);
             end
             if i>=J-1
-                [F_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i),du_g(i-1),du_g(i),p_g(i-1),p_g(i),dp_g(i-1),dp_g(i),phi(i-1),phi(i),d_t);
+                [F_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i),du_g(i-1),du_g(i),p_g(i-1),p_g(i),dp_g(i-1),dp_g(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
          end
     end
@@ -128,7 +131,7 @@ while Time<Tend && isreal(Time)
         phi(i)  =phi(i)+d_t/d_x*(u_g(i)+0.5*dt*(-dp_g(i)/lo_g(i)-u_g(i)*du_g(i)))*(phi_g(i)-phi_g(i+1));
         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
     end
-    Time=Time+d_t;
+    Time=Time+d_t
 % if Time > 5*d_t
 %     break;
 % end

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include "mex.h"
 
 
 double Riemann_solver_exact(double * U_star, double * P_star, double gammaL, double gammaR, double u_L, double u_R, double p_L, double p_R, double c_L, double c_R, int * CRW, double eps, double tol, int N)
