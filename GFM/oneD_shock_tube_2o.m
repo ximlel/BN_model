@@ -58,21 +58,21 @@ end
 %Godunov's Method
 while Time<Tend && isreal(Time)
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal_ori(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
         p_g(J-1) =p_s(J-1);
         u_g(J-1) =u_s(J-1);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
         p_g(J-2) =p_s(J-2);
         u_g(J-2) =u_s(J-2);
         lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
-        lo_g(J+1)=(p_g(J+1)/p_g(J+2))^(1/gama_g)*lo_g(J+2);
+        lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
         p_s(J+2) =p_g(J+2);
         u_s(J+2) =u_g(J+2);
         lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
         p_s(J+3) =p_g(J+3);
         u_s(J+3) =u_g(J+3);
         lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
-        lo_s(J)  =(p_s(J)/p_s(J-1))^(1/gama_s)*lo_s(J-1);
+        lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
     for i=(J-2):(J+3)
         E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;

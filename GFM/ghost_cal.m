@@ -7,6 +7,8 @@ function [p_IL,u_IL,lo_IL,p_IR,u_IR,lo_IR]=ghost_cal(lo_L,u_L,p_L,gama_L,lo_R,u_
     u_IR =put_out(16);
 %    lo_IL=put_out(15);
 %    lo_IR=put_out(17);
-    lo_IL=(p_IL/p_R)^(1/gama_R)*lo_R;
-    lo_IR=(p_IR/p_L)^(1/gama_L)*lo_L;
+%    lo_IL=(p_IL/p_R)^(1/gama_R)*lo_R;
+%    lo_IR=(p_IR/p_L)^(1/gama_L)*lo_L;
+    lo_IR=put_out(15);
+    lo_IL=put_out(17);
 end
