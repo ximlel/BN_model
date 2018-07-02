@@ -10,25 +10,24 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.9;
-Alpha=1.0;
+Alpha=1.9;
 %state value
 Time=0;
 Tend=0.1;
-%Tend=0.15;
-U_s  =zeros(3,N);
-F_s  =zeros(3,N+1);
-U_g  =zeros(3,N);
-F_g  =zeros(3,N+1);
-%initial condition
-% lo_L_0   =0.9600000000000004;
-% u_L_0    =1.083333333333333;
-% p_L_0    =2.833333333333334;
-% phi_sL_0 =0.4;
-% lo_R_0   =1;
-% u_R_0    =0;
-% p_R_0    =0.303591608441676;
-% phi_sR_0 =0.3;
-load ./data/test1.mat;
+U_s=zeros(3,N);
+F_s=zeros(3,N+1);
+U_g=zeros(3,N);
+F_g=zeros(3,N+1);
+phi_s=zeros(1,N+1);
+phi_g=zeros(1,N+1);
+dlo_s=zeros(1,N);
+du_s =zeros(1,N);
+dp_s =zeros(1,N);
+dlo_g=zeros(1,N);
+du_g =zeros(1,N);
+dp_g =zeros(1,N);
+dphi =zeros(1,N);
+load ./data/test2.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -110,7 +109,7 @@ while Time<Tend && isreal(Time)
          if i==1
             [F_s(:,1),phi_s(1)]=GRP_solver(lo_s(1),lo_s(1),0,0,u_s(1),u_s(1),0,0,p_s(1),p_s(1),0,0,phi(1),phi(1),0,0,gama_s,d_t);
          elseif i==N+1
-            [F_g(:,N+1),phi_g(i)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(1),0,0,phi(N),phi(N),0,0,gama_g,d_t);
+            [F_g(:,N+1),phi_g(i)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(N),0,0,phi(N),phi(N),0,0,gama_g,d_t);
          else
             if i<=J+2
                 [F_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_s,d_t);
@@ -123,18 +122,18 @@ while Time<Tend && isreal(Time)
     %compute U in next step
     for i=1:(J+1)
         U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));
-        phi(i)  =phi(i)+d_t/d_x*(u_s(i)+0.5*dt*(-dp_s(i)/lo_s(i)-u_s(i)*du_s(i)))*(phi_s(i)-phi_s(i+1));
+        phi(i)  =phi(i)+d_t/d_x*(u_s(i)+0.5*d_t*(-dp_s(i)/lo_s(i)-u_s(i)*du_s(i)))*(phi_s(i)-phi_s(i+1));
         [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U_s(:,i),gama_s);
     end
     for i=J:N
         U_g(:,i)=U_g(:,i)+d_t/d_x*(F_g(:,i)-F_g(:,i+1));
-        phi(i)  =phi(i)+d_t/d_x*(u_g(i)+0.5*dt*(-dp_g(i)/lo_g(i)-u_g(i)*du_g(i)))*(phi_g(i)-phi_g(i+1));
+        phi(i)  =phi(i)+d_t/d_x*(u_g(i)+0.5*d_t*(-dp_g(i)/lo_g(i)-u_g(i)*du_g(i)))*(phi_g(i)-phi_g(i+1));
         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
     end
     Time=Time+d_t
-% if Time > 5*d_t
-%     break;
-% end
+if Time > 200*d_t
+    break;
+end
 end
 for i=1:J
     lo(i)=lo_s(i);
@@ -151,36 +150,34 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ../test/test1.exact;
-for i=1:N
-     W_exact(i,:) = test1(ceil(i/(N/300)),:);
-end
+% load ../test/test1.exact;
+% for i=1:N
+%      W_exact(i,:) = test1(ceil(i/(N/300)),:);
+% end
 %plot
-col = '-r';
+col = '.r';
 figure(1);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo_s,col,'LineWidth',1.0);
+%plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density-solid','FontWeight','bold');
-ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
 subplot(2,2,2);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,u_s,col,'LineWidth',1.0);
+%plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,u,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Velocity-solid','FontWeight','bold');
-ylim([min(u_s)-0.00001 max(u_s)+0.00001])
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p_s,col,'LineWidth',1.0);
+%plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Pressure-solid','FontWeight','bold');
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
+%plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,phi,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Porosity-solid','FontWeight','bold');

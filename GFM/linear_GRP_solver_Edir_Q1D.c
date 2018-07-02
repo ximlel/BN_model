@@ -246,7 +246,6 @@ void linear_GRP_solver_Edir_Q1D
  eps=input[32];
  atc=input[33];
 
-
 	int CRW[2]={0};
 	double dist;
 	double c_L, c_R, C, c_frac;
