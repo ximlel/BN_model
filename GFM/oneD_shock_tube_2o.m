@@ -27,11 +27,11 @@ dlo_g=zeros(1,N);
 du_g =zeros(1,N);
 dp_g =zeros(1,N);
 dphi =zeros(1,N);
-load ./data/test1.mat;
+load ./data/test4.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
-    if x(i)<=x0
+    if x(i)<x0
         lo_s(i)=lo_L_0;
         u_s(i) =u_L_0;
         p_s(i) =p_L_0;
@@ -49,28 +49,30 @@ for i=1:N
       U_g(:,i)=[lo_g(i);lo_g(i)*u_g(i);E_g(i)];
     end
 end
+for i=1:N-1
+    if (phi(i)*phi(i+1))<0.0
+        J=i;
+        break;
+    end
+end
 %Godunov's Method
 while Time<Tend && isreal(Time)
-      for i=1:N-1
-          if (phi(i)*phi(i+1))<0.0
-              J=i;
-              break;
-          end
-      end
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal_ori(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
-        p_g(J-1)=p_s(J-1);
-        u_g(J-1)=u_s(J-1);
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
+        p_g(J-1) =p_s(J-1);
+        u_g(J-1) =u_s(J-1);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
         p_g(J-2) =p_s(J-2);
         u_g(J-2) =u_s(J-2);
         lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
+        lo_g(J+1)=(p_g(J+1)/p_g(J+2))^(1/gama_g)*lo_g(J+2);
         p_s(J+2) =p_g(J+2);
         u_s(J+2) =u_g(J+2);
         lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
         p_s(J+3) =p_g(J+3);
         u_s(J+3) =u_g(J+3);
         lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
+        lo_s(J)  =(p_s(J)/p_s(J-1))^(1/gama_s)*lo_s(J-1);
      end
     for i=(J-2):(J+3)
         E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
@@ -80,17 +82,17 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:(J+2)
-        dlo_s(:,i)=minmod(Alpha*(lo_s(:,i)-lo_s(:,i-1))/d_x,(lo_s(:,i+1)-lo_s(:,i-1))/2.0/d_x,Alpha*(lo_s(:,i+1)-lo_s(:,i))/d_x);
-        du_s(:,i) =minmod(Alpha*(u_s(:,i) -u_s(:,i-1) )/d_x,(u_s(:,i+1) -u_s(:,i-1) )/2.0/d_x,Alpha*(u_s(:,i+1) -u_s(:,i) )/d_x);
-        dp_s(:,i) =minmod(Alpha*(p_s(:,i) -p_s(:,i-1) )/d_x,(p_s(:,i+1) -p_s(:,i-1) )/2.0/d_x,Alpha*(p_s(:,i+1) -p_s(:,i) )/d_x);
+        dlo_s(:,i)=minmod(Alpha,(lo_s(:,i)-lo_s(:,i-1))/d_x,(lo_s(:,i+1)-lo_s(:,i-1))/2.0/d_x,(lo_s(:,i+1)-lo_s(:,i))/d_x);
+        du_s(:,i) =minmod(Alpha,(u_s(:,i) -u_s(:,i-1) )/d_x,(u_s(:,i+1) -u_s(:,i-1) )/2.0/d_x,(u_s(:,i+1) -u_s(:,i) )/d_x);
+        dp_s(:,i) =minmod(Alpha,(p_s(:,i) -p_s(:,i-1) )/d_x,(p_s(:,i+1) -p_s(:,i-1) )/2.0/d_x,(p_s(:,i+1) -p_s(:,i) )/d_x);
     end
     for i=(J-1):(N-1)
-        dlo_g(:,i)=minmod(Alpha*(lo_g(:,i)-lo_g(:,i-1))/d_x,(lo_g(:,i+1)-lo_g(:,i-1))/2.0/d_x,Alpha*(lo_g(:,i+1)-lo_g(:,i))/d_x);
-        du_g(:,i) =minmod(Alpha*(u_g(:,i) -u_g(:,i-1) )/d_x,(u_g(:,i+1) -u_g(:,i-1) )/2.0/d_x,Alpha*(u_g(:,i+1) -u_g(:,i) )/d_x);
-        dp_g(:,i) =minmod(Alpha*(p_g(:,i) -p_g(:,i-1) )/d_x,(p_g(:,i+1) -p_g(:,i-1) )/2.0/d_x,Alpha*(p_g(:,i+1) -p_g(:,i) )/d_x);
+        dlo_g(:,i)=minmod(Alpha,(lo_g(:,i)-lo_g(:,i-1))/d_x,(lo_g(:,i+1)-lo_g(:,i-1))/2.0/d_x,(lo_g(:,i+1)-lo_g(:,i))/d_x);
+        du_g(:,i) =minmod(Alpha,(u_g(:,i) -u_g(:,i-1) )/d_x,(u_g(:,i+1) -u_g(:,i-1) )/2.0/d_x,(u_g(:,i+1) -u_g(:,i) )/d_x);
+        dp_g(:,i) =minmod(Alpha,(p_g(:,i) -p_g(:,i-1) )/d_x,(p_g(:,i+1) -p_g(:,i-1) )/2.0/d_x,(p_g(:,i+1) -p_g(:,i) )/d_x);
     end
     for i=2:(N-1)
-        dphi(:,i) =minmod(Alpha*(phi(:,i) -phi(:,i-1) )/d_x,(phi(:,i+1) -phi(:,i-1) )/2.0/d_x,Alpha*(phi(:,i+1) -phi(:,i) )/d_x);
+        dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(phi(:,i+1) -phi(:,i-1) )/2.0/d_x,(phi(:,i+1) -phi(:,i) )/d_x);
     end
     %CFL condition
     for i=1:J
@@ -114,7 +116,7 @@ while Time<Tend && isreal(Time)
             if i<=J+2
                 [F_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_s,d_t);
             end
-            if i>=J-1
+            if i>=J
                 [F_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i),du_g(i-1),du_g(i),p_g(i-1),p_g(i),dp_g(i-1),dp_g(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
          end
@@ -129,6 +131,12 @@ while Time<Tend && isreal(Time)
         U_g(:,i)=U_g(:,i)+d_t/d_x*(F_g(:,i)-F_g(:,i+1));
         phi(i)  =phi(i)+d_t/d_x*(u_g(i)+0.5*d_t*(-dp_g(i)/lo_g(i)-u_g(i)*du_g(i)))*(phi_g(i)-phi_g(i+1));
         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
+    end
+    for i=1:N-1
+        if (phi(i)*phi(i+1))<0.0
+            J=i;
+            break;
+        end
     end
     Time=Time+d_t
 if Time > N_T*d_t
@@ -155,7 +163,7 @@ W_exact(:,4)=phi';
 %      W_exact(i,:) = test1(ceil(i/(N/300)),:);
 % end
 %plot
-col = '.r';
+col = '.b';
 figure(1);
 subplot(2,2,1);
 hold on
