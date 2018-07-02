@@ -27,7 +27,7 @@ dlo_g=zeros(1,N);
 du_g =zeros(1,N);
 dp_g =zeros(1,N);
 dphi =zeros(1,N);
-load ./data/test2.mat;
+load ./data/test1.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -41,7 +41,7 @@ for i=1:N
         p_g(i) =p_R_0;
     end
     phi(i)=x(i)-x0;
-    if phi(i)<0.0;
+    if phi(i)<0.0
       E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
     else
@@ -58,7 +58,7 @@ while Time<Tend && isreal(Time)
           end
       end
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal_ori(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
         p_g(J-1)=p_s(J-1);
         u_g(J-1)=u_s(J-1);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
@@ -131,7 +131,7 @@ while Time<Tend && isreal(Time)
         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
     end
     Time=Time+d_t
-if Time > 200*d_t
+if Time > N_T*d_t
     break;
 end
 end
@@ -162,22 +162,22 @@ hold on
 %plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
-ylabel('Density-solid','FontWeight','bold');
+ylabel('Density','FontWeight','bold');
 subplot(2,2,2);
 hold on
 %plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,u,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
-ylabel('Velocity-solid','FontWeight','bold');
+ylabel('Velocity','FontWeight','bold');
 subplot(2,2,3);
 hold on
 %plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
-ylabel('Pressure-solid','FontWeight','bold');
+ylabel('Pressure','FontWeight','bold');
 subplot(2,2,4);
 hold on
 %plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,phi,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
-ylabel('Porosity-solid','FontWeight','bold');
+ylabel('level-set','FontWeight','bold');
