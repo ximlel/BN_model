@@ -14,6 +14,7 @@ u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
 x0s   =0.2;
 x0    =0.2;
 N_T   =200;
+Tend  =0.0411;
 save test1.mat
 %% test2
 clear
@@ -30,6 +31,7 @@ u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
 x0s   =0.2;
 x0    =0.2;
 N_T   =200;
+Tend  =0.0136;
 save test2.mat
 %% test3
 clear
@@ -46,6 +48,7 @@ u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
 x0s   =0.2;
 x0    =0.2;
 N_T   =350;
+Tend  =0.033;
 save test3.mat
 %% test4
 clear
@@ -62,4 +65,5 @@ u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
 x0s   =0.2;
 x0    =0.2;
 N_T   =200;
+Tend  =0.0534;
 save test4.mat

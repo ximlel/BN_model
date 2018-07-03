@@ -18,6 +18,8 @@ U_s=zeros(3,N);
 F_s=zeros(3,N+1);
 U_g=zeros(3,N);
 F_g=zeros(3,N+1);
+W_int_s=zeros(4,N+1);
+W_int_g=zeros(4,N+1);
 phi_s=zeros(1,N+1);
 phi_g=zeros(1,N+1);
 dlo_s=zeros(1,N);
@@ -27,7 +29,7 @@ dlo_g=zeros(1,N);
 du_g =zeros(1,N);
 dp_g =zeros(1,N);
 dphi =zeros(1,N);
-load ./data/test4.mat;
+load ./data/test1.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -85,15 +87,27 @@ while Time<Tend && isreal(Time)
         dlo_s(:,i)=minmod(Alpha,(lo_s(:,i)-lo_s(:,i-1))/d_x,(lo_s(:,i+1)-lo_s(:,i-1))/2.0/d_x,(lo_s(:,i+1)-lo_s(:,i))/d_x);
         du_s(:,i) =minmod(Alpha,(u_s(:,i) -u_s(:,i-1) )/d_x,(u_s(:,i+1) -u_s(:,i-1) )/2.0/d_x,(u_s(:,i+1) -u_s(:,i) )/d_x);
         dp_s(:,i) =minmod(Alpha,(p_s(:,i) -p_s(:,i-1) )/d_x,(p_s(:,i+1) -p_s(:,i-1) )/2.0/d_x,(p_s(:,i+1) -p_s(:,i) )/d_x);
+%         dlo_s(:,i)=minmod(Alpha,(lo_s(:,i)-lo_s(:,i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(:,i+1)-lo_s(:,i))/d_x);
+%         du_s(:,i) =minmod(Alpha,(u_s(:,i) -u_s(:,i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(:,i+1) -u_s(:,i) )/d_x);
+%         dp_s(:,i) =minmod(Alpha,(p_s(:,i) -p_s(:,i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(:,i+1) -p_s(:,i) )/d_x);
     end
     for i=(J-1):(N-1)
         dlo_g(:,i)=minmod(Alpha,(lo_g(:,i)-lo_g(:,i-1))/d_x,(lo_g(:,i+1)-lo_g(:,i-1))/2.0/d_x,(lo_g(:,i+1)-lo_g(:,i))/d_x);
         du_g(:,i) =minmod(Alpha,(u_g(:,i) -u_g(:,i-1) )/d_x,(u_g(:,i+1) -u_g(:,i-1) )/2.0/d_x,(u_g(:,i+1) -u_g(:,i) )/d_x);
         dp_g(:,i) =minmod(Alpha,(p_g(:,i) -p_g(:,i-1) )/d_x,(p_g(:,i+1) -p_g(:,i-1) )/2.0/d_x,(p_g(:,i+1) -p_g(:,i) )/d_x);
+%         dlo_g(:,i)=minmod(Alpha,(lo_g(:,i)-lo_g(:,i-1))/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(:,i+1)-lo_g(:,i))/d_x);
+%         du_g(:,i) =minmod(Alpha,(u_g(:,i) -u_g(:,i-1) )/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(:,i+1) -u_g(:,i) )/d_x);
+%         dp_g(:,i) =minmod(Alpha,(p_g(:,i) -p_g(:,i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(:,i+1) -p_g(:,i) )/d_x);
     end
     for i=2:(N-1)
         dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(phi(:,i+1) -phi(:,i-1) )/2.0/d_x,(phi(:,i+1) -phi(:,i) )/d_x);
     end
+%     for i=2:J
+%         dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(W_int_s(4,i+1)-W_int_s(4,i))/d_x,(phi(:,i+1) -phi(:,i) )/d_x);        
+%     end
+%     for i=(J+1):(N-1)
+%         dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(W_int_g(4,i+1)-W_int_g(4,i))/d_x,(phi(:,i+1) -phi(:,i) )/d_x);                
+%     end
     %CFL condition
     for i=1:J
         S(i)=abs(u_s(i))+sqrt(gama_s*p_s(i)/lo_s(i));
@@ -109,15 +123,15 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-            [F_s(:,1),phi_s(1)]=GRP_solver(lo_s(1),lo_s(1),0,0,u_s(1),u_s(1),0,0,p_s(1),p_s(1),0,0,phi(1),phi(1),0,0,gama_s,d_t);
+            [F_s(:,1),W_int_s(:,1),phi_s(1)]=GRP_solver(lo_s(1),lo_s(1),0,0,u_s(1),u_s(1),0,0,p_s(1),p_s(1),0,0,phi(1),phi(1),0,0,gama_s,d_t);
          elseif i==N+1
-            [F_g(:,N+1),phi_g(i)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(N),0,0,phi(N),phi(N),0,0,gama_g,d_t);
+            [F_g(:,N+1),W_int_g(:,N+1),phi_g(N+1)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(N),0,0,phi(N),phi(N),0,0,gama_g,d_t);
          else
             if i<=J+2
-                [F_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_s,d_t);
+                [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_s,d_t);
             end
             if i>=J
-                [F_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i),du_g(i-1),du_g(i),p_g(i-1),p_g(i),dp_g(i-1),dp_g(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_g,d_t);
+                [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i),du_g(i-1),du_g(i),p_g(i-1),p_g(i),dp_g(i-1),dp_g(i),phi(i-1),phi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
          end
     end
@@ -139,9 +153,9 @@ while Time<Tend && isreal(Time)
         end
     end
     Time=Time+d_t
-if Time > N_T*d_t
-    break;
-end
+% if Time > N_T*d_t
+%     break;
+% end
 end
 for i=1:J
     lo(i)=lo_s(i);
@@ -163,7 +177,7 @@ W_exact(:,4)=phi';
 %      W_exact(i,:) = test1(ceil(i/(N/300)),:);
 % end
 %plot
-col = '.b';
+col = '.r';
 figure(1);
 subplot(2,2,1);
 hold on
