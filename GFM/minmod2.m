@@ -1,4 +1,4 @@
-function C = minmod(Alpha,A,C,B)
+function C = minmod2(Alpha,A,C,B)
 %MINMOD FUNCTION
 for i=1:size(C,1)
     if A(i)>0 && B(i)>0
