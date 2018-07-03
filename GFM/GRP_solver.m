@@ -14,5 +14,6 @@ function [F,W_int,phi]=GRP_solver(lo_L,lo_R,dlo_L,dlo_R,u_L,u_R,du_L,du_R,p_L,p_
     W_int(2) = put_out(10) + d_t*put_out(4);			
     W_int(3) = put_out(12) + d_t*put_out(6);   
     W_int(4) = put_out(14) + d_t*put_out(8);
+%     phi  = F(1)*phi;
 end
 
