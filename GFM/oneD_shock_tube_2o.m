@@ -29,7 +29,7 @@ dlo_g=zeros(1,N);
 du_g =zeros(1,N);
 dp_g =zeros(1,N);
 dphi =zeros(1,N);
-load ./data/test4.mat;
+load ./data/test5.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -60,7 +60,7 @@ end
 %Godunov's Method
 while Time<Tend && isreal(Time)
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal_ori(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
         p_g(J-1) =p_s(J-1);
         u_g(J-1) =u_s(J-1);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
@@ -172,7 +172,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact4.mat;
+load ./data/exact5.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
