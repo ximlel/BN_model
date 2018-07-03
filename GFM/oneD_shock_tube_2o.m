@@ -10,8 +10,8 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.9;
-%Alpha=1.9;
-Alpha=0;
+Alpha=1.9;
+%Alpha=0;
 %state value
 Time=0;
 Tend=0.1;
@@ -44,7 +44,7 @@ for i=1:N
         u_g(i) =u_R_0;
         p_g(i) =p_R_0;
     end
-    phi(i)=x(i)-x0;
+    phi(i)=sign(x(i)-x0);
     if phi(i)<0.0
       E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
@@ -172,7 +172,7 @@ while Time<Tend && isreal(Time)
         end
     end
     Time=Time+d_t
-% if Time > N_T*d_t
+% if Time > 25*d_t
 %     break;
 % end
 end
