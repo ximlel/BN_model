@@ -33,7 +33,7 @@ dphi =zeros(1,N);
 U_phi=zeros(1,N);
 lo_g =zeros(1,N);
 lo_s =zeros(1,N);
-load ./data/test5.mat;
+load ./data/test4.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -48,7 +48,6 @@ for i=1:N
     end
     phi(i)=sign(x(i)-x0);
     if phi(i)<0.0
-      phi(i)=2*phi(i);
       E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
       U_phi(i)=lo_s(i)*phi(i);
@@ -216,7 +215,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact5.mat;
+load ./data/exact4.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
