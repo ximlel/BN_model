@@ -10,8 +10,8 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.9;
-Alpha=1.9;
-%Alpha=0;
+%Alpha=1.9;
+Alpha=0;
 %state value
 Time=0;
 Tend=0.1;
@@ -31,6 +31,8 @@ du_g =zeros(1,N);
 dp_g =zeros(1,N);
 dphi =zeros(1,N);
 U_phi=zeros(1,N);
+lo_g =zeros(1,N);
+lo_s =zeros(1,N);
 load ./data/test5.mat;
 %test begin
 for i=1:N
@@ -46,6 +48,7 @@ for i=1:N
     end
     phi(i)=sign(x(i)-x0);
     if phi(i)<0.0
+      phi(i)=2*phi(i);
       E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
       U_phi(i)=lo_s(i)*phi(i);
@@ -62,23 +65,44 @@ for i=1:N-1
     end
 end
 %Godunov's Method
+count=1;
 while Time<Tend && isreal(Time)
+%      if rem(count,10)==0
+%          for i=1:N
+%             phi_A(i)=x(i)-(-x(J)*phi(J)+x(J+1)*phi(J+1))/(phi(J+1)-phi(J));
+%          end
+%          for i=1:N
+%             phi(i)=phi_A(i);
+%          end
+%      end
      if phi(J)<0.0
         [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));
         p_g(J-1) =p_s(J-1);
         u_g(J-1) =u_s(J-1);
+%         p_g(J-1) =p_g(J);
+%         u_g(J-1) =u_g(J);
         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
+%         lo_g(J-1)=lo_g(J)+(p_g(J-1)-p_g(J))/gama_g/p_g(J)*lo_g(J);
         p_g(J-2) =p_s(J-2);
         u_g(J-2) =u_s(J-2);
         lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
-        lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
+%         lo_g(J-2)=lo_g(J)+(p_g(J-2)-p_g(J))/gama_g/p_g(J)*lo_g(J);
+%         p_g(J+1) =p_s(J);
+%         u_g(J+1) =u_s(J);
+%         lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
         p_s(J+2) =p_g(J+2);
         u_s(J+2) =u_g(J+2);
+%         p_s(J+2) =p_s(J+1);
+%         u_s(J+2) =u_s(J+1);
         lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
+%         lo_s(J+2)=lo_s(J+1)+(p_s(J+2)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
         p_s(J+3) =p_g(J+3);
         u_s(J+3) =u_g(J+3);
         lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
-        lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
+%         lo_s(J+3)=lo_s(J+1)+(p_s(J+3)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
+%         p_s(J) =p_s(J+1);
+%         u_s(J) =u_s(J+1);
+%         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
     for i=(J-2):(J+3)
         E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
@@ -145,7 +169,7 @@ while Time<Tend && isreal(Time)
 %     else
 %         phi_s(J+1)=phi(J+1);
 %         phi_g(J+1)=phi(J+1);
-%     end        
+%     end     
     %compute U in next step
     for i=1:(J+1)
         U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));
@@ -171,8 +195,9 @@ while Time<Tend && isreal(Time)
             break;
         end
     end
+    count=count+1;
     Time=Time+d_t
-% if Time > 25*d_t
+% if Time > 20*d_t
 %     break;
 % end
 end
@@ -202,8 +227,8 @@ col = '.b';
 figure(1);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(W_exact(:,1)),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(lo),col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density','FontWeight','bold');
 subplot(2,2,2);
