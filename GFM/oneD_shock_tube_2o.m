@@ -10,8 +10,8 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.9;
-%Alpha=1.9;
-Alpha=0;
+Alpha=1;
+%Alpha=0;
 %state value
 Time=0;
 Tend=0.1;
@@ -23,6 +23,9 @@ W_int_s=zeros(4,N+1);
 W_int_g=zeros(4,N+1);
 phi_s=zeros(1,N+1);
 phi_g=zeros(1,N+1);
+dlo  =zeros(1,N);
+du   =zeros(1,N);
+dp   =zeros(1,N);
 dlo_s=zeros(1,N);
 du_s =zeros(1,N);
 dp_s =zeros(1,N);
@@ -33,7 +36,11 @@ dphi =zeros(1,N);
 U_phi=zeros(1,N);
 lo_g =zeros(1,N);
 lo_s =zeros(1,N);
-load ./data/test4.mat;
+u_g =zeros(1,N);
+u_s =zeros(1,N);
+p_g =zeros(1,N);
+p_s =zeros(1,N);
+load ./data/test1.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -50,11 +57,11 @@ for i=1:N
     if phi(i)<0.0
       E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
       U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
-      U_phi(i)=lo_s(i)*phi(i);
+%       U_phi(i)=lo_s(i)*phi(i);
     else
       E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
       U_g(:,i)=[lo_g(i);lo_g(i)*u_g(i);E_g(i)];
-      U_phi(i)=lo_g(i)*phi(i);
+%       U_phi(i)=lo_g(i)*phi(i);
     end
 end
 for i=1:N-1
@@ -111,29 +118,52 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:(J+2)
-        dlo_s(:,i)=minmod(Alpha,(lo_s(:,i)-lo_s(:,i-1))/d_x,(lo_s(:,i+1)-lo_s(:,i-1))/2.0/d_x,(lo_s(:,i+1)-lo_s(:,i))/d_x);
-        du_s(:,i) =minmod(Alpha,(u_s(:,i) -u_s(:,i-1) )/d_x,(u_s(:,i+1) -u_s(:,i-1) )/2.0/d_x,(u_s(:,i+1) -u_s(:,i) )/d_x);
-        dp_s(:,i) =minmod(Alpha,(p_s(:,i) -p_s(:,i-1) )/d_x,(p_s(:,i+1) -p_s(:,i-1) )/2.0/d_x,(p_s(:,i+1) -p_s(:,i) )/d_x);
-%         dlo_s(:,i)=minmod(Alpha,(lo_s(:,i)-lo_s(:,i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(:,i+1)-lo_s(:,i))/d_x);
-%         du_s(:,i) =minmod(Alpha,(u_s(:,i) -u_s(:,i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(:,i+1) -u_s(:,i) )/d_x);
-%         dp_s(:,i) =minmod(Alpha,(p_s(:,i) -p_s(:,i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(:,i+1) -p_s(:,i) )/d_x);
+        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/2.0/d_x,(lo_s(i+1)-lo_s(i))/d_x);
+        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_s(i+1) -u_s(i-1) )/2.0/d_x,(u_s(i+1) -u_s(i) )/d_x);
+        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_s(i+1) -p_s(i-1) )/2.0/d_x,(p_s(i+1) -p_s(i) )/d_x);
+%         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(i+1)-lo_s(i))/d_x);
+%         du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(i+1) -u_s(i) )/d_x);
+%         dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(i+1) -p_s(i) )/d_x);
     end
     for i=(J-1):(N-1)
-        dlo_g(:,i)=minmod(Alpha,(lo_g(:,i)-lo_g(:,i-1))/d_x,(lo_g(:,i+1)-lo_g(:,i-1))/2.0/d_x,(lo_g(:,i+1)-lo_g(:,i))/d_x);
-        du_g(:,i) =minmod(Alpha,(u_g(:,i) -u_g(:,i-1) )/d_x,(u_g(:,i+1) -u_g(:,i-1) )/2.0/d_x,(u_g(:,i+1) -u_g(:,i) )/d_x);
-        dp_g(:,i) =minmod(Alpha,(p_g(:,i) -p_g(:,i-1) )/d_x,(p_g(:,i+1) -p_g(:,i-1) )/2.0/d_x,(p_g(:,i+1) -p_g(:,i) )/d_x);
-%         dlo_g(:,i)=minmod(Alpha,(lo_g(:,i)-lo_g(:,i-1))/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(:,i+1)-lo_g(:,i))/d_x);
-%         du_g(:,i) =minmod(Alpha,(u_g(:,i) -u_g(:,i-1) )/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(:,i+1) -u_g(:,i) )/d_x);
-%         dp_g(:,i) =minmod(Alpha,(p_g(:,i) -p_g(:,i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(:,i+1) -p_g(:,i) )/d_x);
+        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(lo_g(i+1)-lo_g(i-1))/2.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(u_g(i+1) -u_g(i-1) )/2.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
+        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(p_g(i+1) -p_g(i-1) )/2.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
+%         dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+%         du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(i+1) -u_g(i) )/d_x);
+%         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
+% for i=1:J
+%     lo(i)=lo_s(i);
+%     u(i) =u_s(i);
+%     p(i) =p_s(i);
+% end
+% for i=(J+1):N
+%     lo(i)=lo_g(i);
+%     u(i) =u_g(i);
+%     p(i) =p_g(i);
+% end
+% for i=2:(N-1)
+%    dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/d_x,(lo(i+1)-lo(i-1))/2.0/d_x,(lo(i+1)-lo(i))/d_x);
+%    du(i) =minmod(Alpha,(u(i) -u(i-1) )/d_x,(u(i+1) -u(i-1) )/2.0/d_x,(u(i+1) -u(i) )/d_x);
+%    dp(i) =minmod(Alpha,(p(i) -p(i-1) )/d_x,(p(i+1) -p(i-1) )/2.0/d_x,(p(i+1) -p(i) )/d_x);
+% end
+% for i=2:(N-1)
+%     dlo_g(i)=dlo(i);
+%     du_g(i) =du(i);
+%     dp_g(i) =dp(i);
+%     dlo_s(i)=dlo(i);
+%     du_s(i) =du(i);
+%     dp_s(i) =dp(i);
+% end
     for i=2:(N-1)
-        dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(phi(:,i+1) -phi(:,i-1) )/2.0/d_x,(phi(:,i+1) -phi(:,i) )/d_x);
+        dphi(i) =minmod(Alpha,(phi(i) -phi(i-1) )/d_x,(phi(i+1) -phi(i-1) )/2.0/d_x,(phi(i+1) -phi(i) )/d_x);
     end
 %     for i=2:J
-%         dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(W_int_s(4,i+1)-W_int_s(4,i))/d_x,(phi(:,i+1) -phi(:,i) )/d_x);        
+%         dphi(i) =minmod(Alpha,(phi(i) -phi(i-1) )/d_x,(W_int_s(4,i+1)-W_int_s(4,i))/d_x,(phi(i+1) -phi(i) )/d_x);        
 %     end
 %     for i=(J+1):(N-1)
-%         dphi(:,i) =minmod(Alpha,(phi(:,i) -phi(:,i-1) )/d_x,(W_int_g(4,i+1)-W_int_g(4,i))/d_x,(phi(:,i+1) -phi(:,i) )/d_x);                
+%         dphi(i) =minmod(Alpha,(phi(i) -phi(i-1) )/d_x,(W_int_g(4,i+1)-W_int_g(4,i))/d_x,(phi(i+1) -phi(i) )/d_x);                
 %     end
     %CFL condition
     for i=1:J
@@ -215,7 +245,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact4.mat;
+load ./data/exact1.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
@@ -226,8 +256,8 @@ col = '.b';
 figure(1);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,log(W_exact(:,1)),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,log(lo),col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density','FontWeight','bold');
 subplot(2,2,2);
