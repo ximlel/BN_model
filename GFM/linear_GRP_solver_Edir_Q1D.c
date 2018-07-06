@@ -207,9 +207,9 @@ atc=eps,t_=-0.0  P1D GRP solver
 void linear_GRP_solver_Edir_Q1D
 (double *wave_speed, double *D, double *U, double *U_star, double *input)
 {
- const double lambda_u=0.0, lambda_v=0.0;
+ double lambda_u=0.0, lambda_v=0.0;
  double rho_L, rho_R, d_rho_L, d_rho_R, t_rho_L, t_rho_R, u_L, u_R, d_u_L, d_u_R, t_u_L, t_u_R, v_L, v_R, d_v_L, d_v_R, t_v_L, t_v_R, p_L, p_R, d_p_L, d_p_R, t_p_L, t_p_R, phi_L, phi_R, d_phi_L, d_phi_R, t_phi_L, t_phi_R;
- const double z_L=0.0, z_R=0.0, d_z_L=0.0, d_z_R=0.0, t_z_L=0.0, t_z_R=0.0;
+ double z_L=0.0, z_R=0.0, d_z_L=0.0, d_z_R=0.0, t_z_L=0.0, t_z_R=0.0;
  double gammaL, gammaR, eps, atc;
  rho_L=input[0];
  rho_R=input[1];
