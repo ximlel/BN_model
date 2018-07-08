@@ -40,7 +40,7 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test3.mat;
+load ./data/test55.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -51,11 +51,13 @@ for i=1:N
     else
         if x(i)>=x0
           lo_g(i)=lo_R_0;
+          u_g(i) =u_R_0;
+          p_g(i) =p_R_0;
         else
-          lo_g(i)=lo_M_0;
+          lo_s(i)=lo_M_0;
+          u_s(i) =u_R_0;
+          p_s(i) =p_R_0;
         end
-        u_g(i) =u_R_0;
-        p_g(i) =p_R_0;
     end
     phi(i)=sign(x(i)-x0);
     if phi(i)<0.0
@@ -101,7 +103,7 @@ while Time<Tend && isreal(Time)
 %         lo_g(J-2)=lo_g(J)+(p_g(J-2)-p_g(J))/gama_g/p_g(J)*lo_g(J);
 %         p_g(J+1) =p_s(J);
 %         u_g(J+1) =u_s(J);
-%         lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
+        lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
         p_s(J+2) =p_g(J+2);
         u_s(J+2) =u_g(J+2);
 %         p_s(J+2) =p_s(J+1);
@@ -116,7 +118,7 @@ while Time<Tend && isreal(Time)
 %         lo_s(J+3)=lo_s(J+1)+(p_s(J+3)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
 %         p_s(J) =p_s(J+1);
 %         u_s(J) =u_s(J+1);
-%         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
+        lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
     for i=(J-2):(J+3)
         E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
@@ -237,7 +239,7 @@ while Time<Tend && isreal(Time)
     end
     count=count+1;
     Time=Time+d_t
-% if Time > 100*d_t
+% if Time > 6*d_t
 %     break;
 % end
 end
@@ -256,7 +258,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact3.mat;
+load ./data/exact55.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
@@ -267,8 +269,8 @@ col = '.b';
 figure(1);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(W_exact(:,1)),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(lo),col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density','FontWeight','bold');
 subplot(2,2,2);
@@ -279,8 +281,8 @@ xlabel('Position','FontWeight','bold');
 ylabel('Velocity','FontWeight','bold');
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(W_exact(:,3)),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,log(p),col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Pressure','FontWeight','bold');
 subplot(2,2,4);

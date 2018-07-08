@@ -16,7 +16,7 @@ x0    =0.2;
 N_T   =200;
 Tend  =0.0411;
 save test1.mat
-%% test2
+%% test11
 clear
 gama_s=1.6667;
 mu_s2 =(gama_s-1)/(gama_s+1);
@@ -32,7 +32,7 @@ x0s   =0.2;
 x0    =0.2;
 N_T   =200;
 Tend  =0.0136;
-save test2.mat
+save test11.mat
 %% test3
 clear
 gama_s=1.6667;
@@ -50,6 +50,23 @@ x0    =0.3;
 N_T   =350;
 Tend  =0.033;
 save test3.mat
+%% test33
+clear
+gama_s=1.6667;
+mu_s2 =(gama_s-1)/(gama_s+1);
+gama_g=1.4;
+p_R_0 =1;
+lo_R_0=1;
+u_R_0 =0;
+lo_M_0=0.1;
+p_L_0 =100;
+lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
+u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
+x0s   =0.295;
+x0    =0.3;
+N_T   =350;
+Tend  =0.033;
+save test33.mat
 %% test4
 clear
 gama_s=5/3;
@@ -84,20 +101,37 @@ x0    =0.1;
 N_T   =200;
 Tend  =0.1;
 save test5.mat
-%% test6
+%% test55
 clear
 gama_s=1.6667;
 mu_s2 =(gama_s-1)/(gama_s+1);
 gama_g=1.4;
 p_R_0 =1;
-lo_R_0=1;
+lo_R_0=0.1;
 u_R_0 =0;
-lo_M_0=0.1;
-p_L_0 =100;
+lo_M_0=2500;
+p_L_0 =10000;
 lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
 u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
-x0s   =0.295;
-x0    =0.3;
-N_T   =350;
-Tend  =0.033;
-save test6.mat
+x0s   =0.1;
+x0    =0.1;
+N_T   =200;
+Tend  =0.1;
+save test55.mat
+%% test555
+clear
+gama_s=1.6667;
+mu_s2 =(gama_s-1)/(gama_s+1);
+gama_g=1.4;
+p_R_0 =1;
+lo_R_0=0.1;
+u_R_0 =0;
+lo_M_0=2500;
+p_L_0 =10000;
+lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
+u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
+x0s   =0.095;
+x0    =0.1;
+N_T   =200;
+Tend  =0.1;
+save test555.mat
