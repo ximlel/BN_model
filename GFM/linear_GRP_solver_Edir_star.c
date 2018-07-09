@@ -373,7 +373,7 @@ void linear_GRP_solver_Edir_Q1D
 					detA = a_L*b_R - b_L*a_R;
 					u_t_mat = (b_R*d_L - b_L*d_R)/detA;
 					p_t_mat = (a_L*d_R - a_R*d_L)/detA;
-
+					D_star[6]= u_t_mat;
 
 //					if(u_star < lambda_u) //the direction is between the contact discontinuety and the 3-wave
 						{
@@ -532,7 +532,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     m = mxGetM(prhs[0]);
     n = mxGetN(prhs[0]);
      
-    plhs[0] = mxCreateDoubleMatrix(26,1,mxREAL);
+    plhs[0] = mxCreateDoubleMatrix(27,1,mxREAL);
     double *A;
     A = mxGetPr(plhs[0]);
      
