@@ -135,5 +135,5 @@ x0    =0.1;
 N_T   =200;
 Tend  =0.1;
 put_out=linear_GRP_solver_Edir_Q1D([lo_L_0,lo_M_0,0,0,0,0,u_L_0,u_R_0,0,0,0,0,-0,-0,0,0,0,0,p_L_0,p_R_0,0,0,0,0,0,0,0,0,0,0,gama_s,gama_g,1e-9,1e-9]);	
-Tend  =Tend + d_x/put_out(2);
+Tend  =Tend + (1/N_T)/put_out(2);
 save test555.mat
