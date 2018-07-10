@@ -104,37 +104,43 @@ while Time<Tend && isreal(Time)
         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),dp_g(J),du_g(J),dlo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1),dp_s(J+1),du_s(J+1),dlo_s(J+1),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);
-        p_g(J-1) =p_s(J-1);
-        u_g(J-1) =u_s(J-1);
-%         p_g(J-1) =p_g(J);
-%         u_g(J-1) =u_g(J);
-        lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
-%         lo_g(J-1)=lo_g(J)+(p_g(J-1)-p_g(J))/gama_g/p_g(J)*lo_g(J);
-        p_g(J-2) =p_s(J-2);
-        u_g(J-2) =u_s(J-2);
-%         p_g(J-2) =p_g(J);
-%         u_g(J-2) =u_g(J);
-        lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
-%         lo_g(J-2)=lo_g(J)+(p_g(J-2)-p_g(J))/gama_g/p_g(J)*lo_g(J);
-%         p_g(J+1) =p_s(J);
-%         u_g(J+1) =u_s(J);
-%         lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
-        p_s(J+2) =p_g(J+2);
-        u_s(J+2) =u_g(J+2);
-%         p_s(J+2) =p_s(J+1);
-%         u_s(J+2) =u_s(J+1);
-        lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
-%         lo_s(J+2)=lo_s(J+1)+(p_s(J+2)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
-        p_s(J+3) =p_g(J+3);
-        u_s(J+3) =u_g(J+3);
-%         p_s(J+3) =p_s(J+1);
-%         u_s(J+3) =u_s(J+1);
-        lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
-%         lo_s(J+3)=lo_s(J+1)+(p_s(J+3)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
-%         p_s(J) =p_s(J+1);
-%         u_s(J) =u_s(J+1);
-%         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
+        [p_g(J),u_g(J),lo_g(J),dp_g(J),du_g(J),dlo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1),dp_s(J+1),du_s(J+1),dlo_s(J+1),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);    
+% dp_g(J)=0;
+% du_g(J)=0;
+% dlo_g(J)=0;
+% dp_s(J+1)=0;
+% du_s(J+1)=0;
+% dlo_s(J+1)=0;
+%         p_g(J-1) =p_s(J-1);
+%         u_g(J-1) =u_s(J-1);
+% %         p_g(J-1) =p_g(J);
+% %         u_g(J-1) =u_g(J);
+%         lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
+% %         lo_g(J-1)=lo_g(J)+(p_g(J-1)-p_g(J))/gama_g/p_g(J)*lo_g(J);
+%         p_g(J-2) =p_s(J-2);
+%         u_g(J-2) =u_s(J-2);
+% %         p_g(J-2) =p_g(J);
+% %         u_g(J-2) =u_g(J);
+%         lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
+% %         lo_g(J-2)=lo_g(J)+(p_g(J-2)-p_g(J))/gama_g/p_g(J)*lo_g(J);
+% %         p_g(J+1) =p_s(J);
+% %         u_g(J+1) =u_s(J);
+% %         lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
+%         p_s(J+2) =p_g(J+2);
+%         u_s(J+2) =u_g(J+2);
+% %         p_s(J+2) =p_s(J+1);
+% %         u_s(J+2) =u_s(J+1);
+%         lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
+% %         lo_s(J+2)=lo_s(J+1)+(p_s(J+2)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
+%         p_s(J+3) =p_g(J+3);
+%         u_s(J+3) =u_g(J+3);
+% %         p_s(J+3) =p_s(J+1);
+% %         u_s(J+3) =u_s(J+1);
+%         lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
+% %         lo_s(J+3)=lo_s(J+1)+(p_s(J+3)-p_s(J+1))/gama_s/p_s(J+1)*lo_s(J+1);
+% %         p_s(J) =p_s(J+1);
+% %         u_s(J) =u_s(J+1);
+% %         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
     for i=(J-2):J
         E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
@@ -146,13 +152,13 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     i=J;
-        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(i+1)-lo_s(i))/d_x);
-        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(i+1) -u_s(i) )/d_x);
-        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(i+1) -p_s(i) )/d_x);
+        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(i+1)-lo_s(i))*2/d_x);
+        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(i+1) -u_s(i) )*2/d_x);
+        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(i+1) -p_s(i) )*2/d_x);
     i=J+1;
-        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(i+1)-lo_g(i))/d_x);
-        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(i+1) -u_g(i) )/d_x);
-        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
+        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))*2/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )*2/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(i+1) -u_g(i) )/d_x);
+        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )*2/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
 % for i=1:J
 %     lo(i)=lo_s(i);
 %     u(i) =u_s(i);
@@ -212,12 +218,18 @@ while Time<Tend && isreal(Time)
             if i==J
                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i)-0.5*d_x*dlo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)-0.5*d_x*du_s(i),du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)-0.5*d_x*dp_s(i),dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i)  -    d_x*dlo_g(i)  ,lo_g(i)-    d_x*dlo_g(i),dlo_g(i)  ,dlo_g(i),u_g(i)  -    d_x*du_g(i)  ,u_g(i)-    d_x*du_g(i),du_g(i)  ,du_g(i),p_g(i)  -    d_x*dp_g(i)  ,p_g(i)-    d_x*dp_g(i),dp_g(i),  dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
+%                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(J),lo_g(J),dlo_g(J),dlo_g(J),u_g(J),u_g(J),du_g(J),du_g(J),p_g(J),p_g(J),dp_g(J),dp_g(J),phi(J),phi(J),dphi(J),dphi(J),gama_g,d_t);
             elseif i==J+1
                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i)                 ,dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)                ,du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)                ,dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)                   ,lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1)                  ,u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)                  ,p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
+%                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver((p_s(i-1)/p_s(i))^(1/gama_s)*lo_s(i),lo_s(i)         ,dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)                ,du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)                ,dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
+%                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)     ,(p_g(i)/p_g(i-1))^(1/gama_g)*lo_g(i-1),dlo_g(i-1),dlo_g(i),u_g(i-1)                  ,u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)                  ,p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
+%                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(J+1),lo_s(J+1),dlo_s(J+1),dlo_s(J+1),u_s(J+1),u_s(J+1),du_s(J+1),du_s(J+1),p_s(J+1),p_s(J+1),dp_s(J+1),dp_s(J+1),phi(J+1),phi(J+1),dphi(J+1),dphi(J+1),gama_s,d_t);
+%                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(J),lo_g(J),dlo_g(J),dlo_g(J),u_g(J),u_g(J),du_g(J),du_g(J),p_g(J),p_g(J),dp_g(J),dp_g(J),phi(J),phi(J),dphi(J),dphi(J),gama_g,d_t);
             elseif i==J+2
-                [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+    d_x*dlo_s(i-1),lo_s(i-1)+d_x*dlo_s(i-1),dlo_s(i-1),dlo_s(i-1),u_s(i-1)+    d_x*du_s(i-1),u_s(i-1)-d_x*du_s(i-1),du_s(i-1),du_s(i-1),p_s(i-1)+    d_x*dp_s(i-1),p_s(i-1)+d_x*dp_s(i-1),dp_s(i-1),dp_s(i-1),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)+0.5*d_x*dlo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i)  ,u_g(i-1)+0.5*d_x*du_g(i-1),u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i)  ,p_g(i-1)+0.5*d_x*dp_g(i-1),p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i)  ,phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t); 
+                [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+    d_x*dlo_s(i-1),lo_s(i-1)+d_x*dlo_s(i-1),dlo_s(i-1),dlo_s(i-1),u_s(i-1)+    d_x*du_s(i-1),u_s(i-1)+d_x*du_s(i-1),du_s(i-1),du_s(i-1),p_s(i-1)+    d_x*dp_s(i-1),p_s(i-1)+d_x*dp_s(i-1),dp_s(i-1),dp_s(i-1),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
+%                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(J+1),lo_s(J+1),dlo_s(J+1),dlo_s(J+1),u_s(J+1),u_s(J+1),du_s(J+1),du_s(J+1),p_s(J+1),p_s(J+1),dp_s(J+1),dp_s(J+1),phi(J+1),phi(J+1),dphi(J+1),dphi(J+1),gama_s,d_t);
             end
          end
     end
@@ -229,7 +241,7 @@ while Time<Tend && isreal(Time)
 %         phi_g(J+1)=phi(J+1);
 %     end
     %compute U in next step
-    x0=x0+u_s(J+1)*d_t+0.5*u_mat*d_t^2;
+    u_last=u_s(J+1);
     for i=1:(J+1)
         U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));
         [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U_s(:,i),gama_s);
@@ -237,7 +249,6 @@ while Time<Tend && isreal(Time)
 %           phi(i)  =phi(i)+d_t/d_x*(u_s(i)+0.5*d_t*(-dp_s(i)/lo_s(i)-u_s(i)*du_s(i)))*(phi_s(i)-phi_s(i+1));
 %           U_phi(i)=U_phi(i)+d_t/d_x*(phi_s(i)-phi_s(i+1));
 %         	phi(i)=U_phi(i)/lo_s(i);
-          phi(i)=x(i)-x0;
         end
     end
     for i=J:N
@@ -247,8 +258,15 @@ while Time<Tend && isreal(Time)
 %            phi(i)  =phi(i)+d_t/d_x*(u_g(i)+0.5*d_t*(-dp_g(i)/lo_g(i)-u_g(i)*du_g(i)))*(phi_g(i)-phi_g(i+1));
 %            U_phi(i)=U_phi(i)+d_t/d_x*(phi_g(i)-phi_g(i+1));
 %            phi(i)=U_phi(i)/lo_g(i);
-           phi(i)=x(i)-x0;
         end
+    end
+    if u_last>0.0
+        x0=x0+0.5*(u_last+u_s(J+1))*d_t;
+    else
+        x0=x0+0.5*(u_last+u_g(J)  )*d_t;
+    end
+    for i=1:N
+        phi(i)=x(i)-x0;
     end
     for i=1:N-1
         if (phi(i)*phi(i+1))<0.0
@@ -258,7 +276,7 @@ while Time<Tend && isreal(Time)
     end
     count=count+1;
     Time=Time+d_t
-% if Time > 1*d_t
+% if Time > 4*d_t
 %     break;
 % end
 end

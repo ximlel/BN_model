@@ -401,6 +401,8 @@ void linear_GRP_solver_Edir_Q1D
 									D[4] = D[4] + lambda_u*d_z_R;
 									D[5] = -U[1]*d_phi_R*U[0]/rho_R;
 									D[5] = D[5] + lambda_u*d_phi_R;
+									rho_x=-rho_star_R*pow(c_star_R/c_R, (1.0+zetaR)/zetaR)*(d_p_R - d_rho_R*c_R*c_R)/rho_R/ c_star_R/c_star_R;
+									D_star[2]=rho_x;
 								}
 							else //the 3-wave is a shock
 								{
@@ -458,6 +460,8 @@ void linear_GRP_solver_Edir_Q1D
 									D[4] = D[4] + lambda_u*d_z_L;
 									D[5] = -U[1]*d_phi_L*U[0]/rho_L;
 									D[5] = D[5] + lambda_u*d_phi_L;
+									rho_x=-rho_star_L*pow(c_star_L/c_L, (1.0+zetaL)/zetaL)*(d_p_L - d_rho_L*c_L*c_L)/rho_L/ c_star_L/c_star_L;
+									D_star[0]=rho_x;
 								}
 							else //the 1-wave is a shock
 								{

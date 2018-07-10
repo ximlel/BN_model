@@ -40,7 +40,7 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test55.mat;
+load ./data/test555.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -104,7 +104,7 @@ while Time<Tend && isreal(Time)
 %         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
      if phi(J)<0.0
-        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
+        [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal_ori(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
         p_g(J-1) =p_s(J-1);
         u_g(J-1) =u_s(J-1);
 %         p_g(J-1) =p_g(J);
@@ -135,7 +135,6 @@ while Time<Tend && isreal(Time)
 %         p_s(J) =p_s(J+1);
 %         u_s(J) =u_s(J+1);
 %         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
-%         [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g,lo_s(J),u_s(J),p_s(J),lo_g(J+1),u_g(J+1),p_g(J+1));        
      end
     for i=(J-2):J
         E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
@@ -284,7 +283,7 @@ for i=1:N
      W_exact(i,3) = p_ex(ceil(i/(N/200)));
 end
 %plot
-col = '.m';
+col = '.r';
 figure(1);
 subplot(2,2,1);
 hold on
