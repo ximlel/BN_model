@@ -218,6 +218,10 @@ while Time<Tend && isreal(Time)
             if i>=J
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)+0.5*d_x*dlo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1)+0.5*d_x*du_g(i-1),u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)+0.5*d_x*dp_g(i-1),p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
+%             if i==J+1
+%                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(J+1),lo_s(J+1),dlo_s(J+1),dlo_s(J+1),u_s(J+1),u_s(J+1),du_s(J+1),du_s(J+1),p_s(J+1),p_s(J+1),dp_s(J+1),dp_s(J+1),phi(J+1),phi(J+1),dphi(J+1),dphi(J+1),gama_s,d_t);
+%                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(J),lo_g(J),dlo_g(J),dlo_g(J),u_g(J),u_g(J),du_g(J),du_g(J),p_g(J),p_g(J),dp_g(J),dp_g(J),phi(J),phi(J),dphi(J),dphi(J),gama_g,d_t);
+%             end
          end
     end
 %     if u_g(J)>0

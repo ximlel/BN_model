@@ -137,3 +137,23 @@ Tend  =0.1;
 put_out=linear_GRP_solver_Edir_Q1D([lo_L_0,lo_M_0,0,0,0,0,u_L_0,u_R_0,0,0,0,0,-0,-0,0,0,0,0,p_L_0,p_R_0,0,0,0,0,0,0,0,0,0,0,gama_s,gama_g,1e-9,1e-9]);	
 Tend  =Tend + (1/N_T)/put_out(2);
 save test555.mat
+
+%% test5555 %same gama
+clear
+gama_s=1.4;
+mu_s2 =(gama_s-1)/(gama_s+1);
+gama_g=1.4;
+p_R_0 =1;
+lo_R_0=0.1;
+u_R_0 =0;
+lo_M_0=2500;
+p_L_0 =10000;
+lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
+u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
+x0s   =0.02;
+x0    =0.1;
+N_T   =200;
+Tend  =0.1;
+put_out=linear_GRP_solver_Edir_Q1D([lo_L_0,lo_M_0,0,0,0,0,u_L_0,u_R_0,0,0,0,0,-0,-0,0,0,0,0,p_L_0,p_R_0,0,0,0,0,0,0,0,0,0,0,gama_s,gama_g,1e-9,1e-9]);	
+Tend  =Tend + (0.1-0.02)/put_out(2);
+save test5555.mat

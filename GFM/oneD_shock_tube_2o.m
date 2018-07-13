@@ -260,11 +260,12 @@ while Time<Tend && isreal(Time)
 %            phi(i)=U_phi(i)/lo_g(i);
         end
     end
-    if u_last>0.0
-        x0=x0+0.5*(u_last+u_s(J+1))*d_t;
-    else
-        x0=x0+0.5*(u_last+u_g(J)  )*d_t;
-    end
+%     if u_last>0.0
+%         x0=x0+0.5*(u_last+u_s(J+1))*d_t;
+%     else
+%         x0=x0+0.5*(u_last+u_g(J)  )*d_t;
+%     end
+    x0=x0+u_last*d_t;  
     for i=1:N
         phi(i)=x(i)-x0;
     end
