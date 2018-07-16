@@ -10,7 +10,7 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.7;
-Alpha=1.9;
+Alpha=1.0;
 %Alpha=0;
 %state value
 Time=0;
