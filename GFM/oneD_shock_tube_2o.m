@@ -40,7 +40,7 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test555.mat;
+load ./data/test4.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -296,7 +296,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact55.mat;
+load ./data/exact4.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
