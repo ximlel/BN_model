@@ -39,8 +39,8 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test5.mat;
-EXACT_LOCAT='./data/exact5.mat';
+load ./data/test4.mat;
+EXACT_LOCAT='./data/exact4.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -84,22 +84,25 @@ while Time<Tend && isreal(Time)
     u_g(J+1) =u_s(J-1);
     p_g(J+1) =p_s(J-1);
     %reconstruction (minmod limiter)
-    for i=2:(J-1)
+    for i=2:(J-2)
         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/2.0/d_x,(lo_s(i+1)-lo_s(i))/d_x);
         du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_s(i+1) -u_s(i-1) )/2.0/d_x,(u_s(i+1) -u_s(i) )/d_x);
         dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_s(i+1) -p_s(i-1) )/2.0/d_x,(p_s(i+1) -p_s(i) )/d_x);
-%         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(W_int_s(1,i+1)-W_int_s(1,i))/d_x,(lo_s(i+1)-lo_s(i))/d_x);
-%         du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(W_int_s(2,i+1)-W_int_s(2,i))/d_x,(u_s(i+1) -u_s(i) )/d_x);
-%         dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(W_int_s(3,i+1)-W_int_s(3,i))/d_x,(p_s(i+1) -p_s(i) )/d_x);
     end
-    for i=(J+2):(N-1)
+    for i=(J+3):(N-1)
         dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(lo_g(i+1)-lo_g(i-1))/2.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
         du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(u_g(i+1) -u_g(i-1) )/2.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(p_g(i+1) -p_g(i-1) )/2.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
-%         dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(W_int_g(1,i+1)-W_int_g(1,i))/d_x,(lo_g(i+1)-lo_g(i))/d_x);
-%         du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(W_int_g(2,i+1)-W_int_g(2,i))/d_x,(u_g(i+1) -u_g(i) )/d_x);
-%         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(W_int_g(3,i+1)-W_int_g(3,i))/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
+    i=J-1;
+        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/4.0/d_x,(lo_s(i+1)-lo_s(i))/3.0/d_x);
+        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_s(i+1) -u_s(i-1) )/4.0/d_x,(u_s(i+1) -u_s(i) )/3.0/d_x);
+        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_s(i+1) -p_s(i-1) )/4.0/d_x,(p_s(i+1) -p_s(i) )/3.0/d_x);
+    i=J+2;
+        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/3.0/d_x,(lo_g(i+1)-lo_g(i-1))/4.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/3.0/d_x,(u_g(i+1) -u_g(i-1) )/4.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
+        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/3.0/d_x,(p_g(i+1) -p_g(i-1) )/4.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
+        
     [p_g(J+1),u_g(J+1),lo_g(J+1),dp_g(J+1),du_g(J+1),dlo_g(J+1),p_s(J),u_s(J),lo_s(J),dp_s(J),du_s(J),dlo_s(J),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);
     %CFL condition
     for i=1:J
