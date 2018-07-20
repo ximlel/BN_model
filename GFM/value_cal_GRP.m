@@ -1,4 +1,4 @@
-function [p_M,lo_M,u_M]=value_cal_GRP(lo,u,p,dlo,du,dp,gama,d_t)
+function [p_M,u_M,lo_M]=value_cal_GRP(lo,u,p,dlo,du,dp,gama,d_t)
     global ep;
     put_out=linear_GRP_solver_Edir_Q1D([lo,lo,dlo,dlo,0,0,u,u,du,du,0,0,-0,-0,0,0,0,0,p,p,dp,dp,0,0,-0,-0,0,0,0,0,gama,gama,ep,ep]);		
     lo_M = put_out(9)  + d_t*put_out(3);	

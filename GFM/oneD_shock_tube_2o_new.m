@@ -10,7 +10,7 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.7;
-Alpha=1.0;
+Alpha=1.9;
 %Alpha=0;
 %state value
 Time=0;
@@ -39,7 +39,7 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test4.mat;
+load ./data/test55.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -110,7 +110,7 @@ while Time<Tend && isreal(Time)
     d_t=CFL*d_x/max(S);
     if Time+d_t >= Tend
         d_t = Tend-Time+eps;
-    end
+    end    
     [p_sM,u_sM,lo_sM]=value_cal_GRP(lo_s(J),u_s(J),p_s(J),dlo_s(J),du_s(J),dp_s(J),gama_s,d_t);
     [p_gM,u_gM,lo_gM]=value_cal_GRP(lo_g(J+1),u_g(J+1),p_g(J+1),dlo_g(J+1),du_g(J+1),dp_g(J+1),gama_g,d_t);
     for i=(J-2):(J+1)
@@ -208,7 +208,7 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact4.mat;
+load ./data/exact55.mat;
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
