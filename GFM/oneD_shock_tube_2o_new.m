@@ -39,8 +39,8 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test4.mat;
-EXACT_LOCAT='./data/exact4.mat';
+load ./data/test55.mat;
+EXACT_LOCAT='./data/exact55.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -77,12 +77,6 @@ end
 %Godunov's Method
 count=1;
 while Time<Tend && isreal(Time)
-    lo_s(J)  =lo_g(J+2);
-    u_s(J)   =u_g(J+2);
-    p_s(J)   =p_g(J+2);
-    lo_g(J+1)=lo_s(J-1);
-    u_g(J+1) =u_s(J-1);
-    p_g(J+1) =p_s(J-1);
     %reconstruction (minmod limiter)
     for i=2:(J-2)
         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/2.0/d_x,(lo_s(i+1)-lo_s(i))/d_x);
@@ -95,15 +89,15 @@ while Time<Tend && isreal(Time)
         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(p_g(i+1) -p_g(i-1) )/2.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
     i=J-1;
-        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/4.0/d_x,(lo_s(i+1)-lo_s(i))/3.0/d_x);
-        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_s(i+1) -u_s(i-1) )/4.0/d_x,(u_s(i+1) -u_s(i) )/3.0/d_x);
-        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_s(i+1) -p_s(i-1) )/4.0/d_x,(p_s(i+1) -p_s(i) )/3.0/d_x);
+        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_g(i+3)-lo_s(i-1))/3.0/d_x,(lo_g(i+3)-lo_s(i))/2.0/d_x);
+        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_g(i+3) -u_s(i-1) )/3.0/d_x,(u_g(i+3) -u_s(i) )/2.0/d_x);
+        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_g(i+3) -p_s(i-1) )/3.0/d_x,(p_g(i+3) -p_s(i) )/2.0/d_x);
     i=J+2;
-        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/3.0/d_x,(lo_g(i+1)-lo_g(i-1))/4.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
-        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/3.0/d_x,(u_g(i+1) -u_g(i-1) )/4.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
-        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/3.0/d_x,(p_g(i+1) -p_g(i-1) )/4.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
+        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_s(i-3))/2.0/d_x,(lo_g(i+1)-lo_s(i-3))/3.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+        du_g(i) =minmod(Alpha,(u_g(i) -u_s(i-3) )/2.0/d_x,(u_g(i+1) -u_s(i-3) )/3.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
+        dp_g(i) =minmod(Alpha,(p_g(i) -p_s(i-3) )/2.0/d_x,(p_g(i+1) -p_s(i-3) )/3.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
         
-    [p_g(J+1),u_g(J+1),lo_g(J+1),dp_g(J+1),du_g(J+1),dlo_g(J+1),p_s(J),u_s(J),lo_s(J),dp_s(J),du_s(J),dlo_s(J),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);
+    [p_g(J+1),u_g(J+1),lo_g(J+1),dp_g(J+1),du_g(J+1),dlo_g(J+1),p_s(J),u_s(J),lo_s(J),dp_s(J),du_s(J),dlo_s(J),u_mat]=ghost_cal_GRP(lo_s(J-1)+d_x*dlo_s(J-1),u_s(J-1)+d_x*du_s(J-1),p_s(J-1)+d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-d_x*dlo_g(J+2),u_g(J+2)-d_x*du_g(J+2),p_g(J+2)-d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);
     %CFL condition
     for i=1:J
         S(i)=abs(u_s(i))+sqrt(gama_s*p_s(i)/lo_s(i));
@@ -142,15 +136,10 @@ while Time<Tend && isreal(Time)
          elseif i==N+1
             [F_g(:,N+1),W_int_g(:,N+1),phi_g(N+1)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(N),0,0,phi(N),phi(N),0,0,gama_g,d_t);
          else
-            if i<=J-1
+            if i<=J
                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i)-0.5*d_x*dlo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)-0.5*d_x*du_s(i),du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)-0.5*d_x*dp_s(i),dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
-            elseif i>=J+3
+            elseif i>=J+2
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)+0.5*d_x*dlo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1)+0.5*d_x*du_g(i-1),u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)+0.5*d_x*dp_g(i-1),p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
-            end
-            if i==J
-                [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i),du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i),dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
-            elseif i==J+2
-                [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),  dlo_g(i-1),dlo_g(i),u_g(i-1),u_g(i)-0.5*d_x*du_g(i),  du_g(i-1),du_g(i),p_g(i-1),p_g(i)-0.5*d_x*dp_g(i),  dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t); 
             end
          end
     end
