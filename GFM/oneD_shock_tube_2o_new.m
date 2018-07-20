@@ -82,7 +82,7 @@ while Time<Tend && isreal(Time)
     p_s(J)   =p_g(J+2);
     lo_g(J+1)=lo_s(J-1);
     u_g(J+1) =u_s(J-1);
-    p_g(J+1) =p_s(J-1); 
+    p_g(J+1) =p_s(J-1);
     %reconstruction (minmod limiter)
     for i=2:(J-1)
         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/2.0/d_x,(lo_s(i+1)-lo_s(i))/d_x);
@@ -112,8 +112,8 @@ while Time<Tend && isreal(Time)
     if Time+d_t >= Tend
         d_t = Tend-Time+eps;
     end    
-    [p_sM,u_sM,lo_sM]=value_cal_GRP(lo_s(J),u_s(J),p_s(J),dlo_s(J),du_s(J),dp_s(J),gama_s,d_t);
-    [p_gM,u_gM,lo_gM]=value_cal_GRP(lo_g(J+1),u_g(J+1),p_g(J+1),dlo_g(J+1),du_g(J+1),dp_g(J+1),gama_g,d_t);
+    [p_sM,u_sM,lo_sM]=value_cal_GRP(lo_s(J),u_s(J),p_s(J),dlo_s(J),du_s(J),dp_s(J),gama_s,0,d_t);
+    [p_gM,u_gM,lo_gM]=value_cal_GRP(lo_g(J+1),u_g(J+1),p_g(J+1),dlo_g(J+1),du_g(J+1),dp_g(J+1),gama_g,0,d_t);
     for i=(J-2):(J+1)
         E_g(i)=p_gM/(gama_g-1)+0.5*lo_gM*u_gM^2;
         U_g(:,i)=[lo_gM;lo_gM*u_gM;E_g(i)];
@@ -215,11 +215,12 @@ for i=1:N
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
      W_exact(i,3) = p_ex(ceil(i/(N/200)));
 end
+% W_exact(:,1)=log(W_exact(:,1));
+% W_exact(:,3)=log(W_exact(:,3));
+% lo=log(lo);
+% p=log(p);
+
 %plot
-W_exact(:,1)=log(W_exact(:,1));
-W_exact(:,3)=log(W_exact(:,3));
-lo=log(lo);
-p=log(p);
 col = '.b';
 figure(1);
 subplot(2,2,1);
