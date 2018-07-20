@@ -39,7 +39,8 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test55.mat;
+load ./data/test5.mat;
+EXACT_LOCAT='./data/exact5.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -208,19 +209,23 @@ W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=phi';
-load ./data/exact55.mat;
+load(EXACT_LOCAT);
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
      W_exact(i,2) = u_ex(ceil(i/(N/200)));
      W_exact(i,3) = p_ex(ceil(i/(N/200)));
 end
 %plot
+W_exact(:,1)=log(W_exact(:,1));
+W_exact(:,3)=log(W_exact(:,3));
+lo=log(lo);
+p=log(p);
 col = '.b';
 figure(1);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,log(W_exact(:,1)),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,log(lo),col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Density','FontWeight','bold');
 subplot(2,2,2);
@@ -231,8 +236,8 @@ xlabel('Position','FontWeight','bold');
 ylabel('Velocity','FontWeight','bold');
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,log(W_exact(:,3)),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,log(p),col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Pressure','FontWeight','bold');
 subplot(2,2,4);
