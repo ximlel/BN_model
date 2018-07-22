@@ -39,8 +39,8 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test1.mat;
-EXACT_LOCAT='./data/exact1.mat';
+load ./data/test55.mat;
+EXACT_LOCAT='./data/exact55.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -89,32 +89,32 @@ while Time<Tend && isreal(Time)
         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(p_g(i+1) -p_g(i-1) )/2.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
     end
     if phi(J)<0.0 && J~=J_bak
-%             [p_g(J),u_g(J),lo_g(J),dp_g(J),du_g(J),dlo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1),dp_s(J+1),du_s(J+1),dlo_s(J+1),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);    
-            [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
-            u_mat=0;
+            [p_g(J),u_g(J),lo_g(J),dp_g(J),du_g(J),dlo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1),dp_s(J+1),du_s(J+1),dlo_s(J+1),u_mat]=ghost_cal_GRP(lo_s(J-1)+0.5*d_x*dlo_s(J-1),u_s(J-1)+0.5*d_x*du_s(J-1),p_s(J-1)+0.5*d_x*dp_s(J-1),dlo_s(J-1),du_s(J-1),dp_s(J-1),gama_s,lo_g(J+2)-0.5*d_x*dlo_g(J+2),u_g(J+2)-0.5*d_x*du_g(J+2),p_g(J+2)-0.5*d_x*dp_g(J+2),dlo_g(J+2),du_g(J+2),dp_g(J+2),gama_g);    
+%             [p_g(J),u_g(J),lo_g(J),p_s(J+1),u_s(J+1),lo_s(J+1)]=ghost_cal(lo_s(J-1),u_s(J-1),p_s(J-1),gama_s,lo_g(J+2),u_g(J+2),p_g(J+2),gama_g);
+%             u_mat=0;
             p_g(J-1) =p_g(J);
             u_g(J-1) =u_g(J);
             lo_g(J-1)=(p_g(J-1)/p_g(J))^(1/gama_g)*lo_g(J);
             p_g(J-2) =p_g(J);
             u_g(J-2) =u_g(J);
             lo_g(J-2)=(p_g(J-2)/p_g(J))^(1/gama_g)*lo_g(J);
-            p_g(J+1) =p_g(J);
-            u_g(J+1) =u_g(J);
-            lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
+%             p_g(J+1) =p_g(J);
+%             u_g(J+1) =u_g(J);
+%             lo_g(J+1)=(p_g(J+1)/p_g(J))^(1/gama_g)*lo_g(J);
             p_s(J+2) =p_s(J+1);
             u_s(J+2) =u_s(J+1);
             lo_s(J+2)=(p_s(J+2)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
             p_s(J+3) =p_s(J+1);
             u_s(J+3) =u_s(J+1);
             lo_s(J+3)=(p_s(J+3)/p_s(J+1))^(1/gama_s)*lo_s(J+1);
-            p_s(J)   =p_s(J+1);
-            u_s(J)   =u_s(J+1);
-            lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
-        for i=(J-2):J+1
+%             p_s(J)   =p_s(J+1);
+%             u_s(J)   =u_s(J+1);
+%             lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
+        for i=(J-2):J
             E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
             U_g(:,i)=[lo_g(i);lo_g(i)*u_g(i);E_g(i)];
         end
-        for i=(J):(J+3)
+        for i=(J+1):(J+3)
             E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
             U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
         end
@@ -166,16 +166,16 @@ while Time<Tend && isreal(Time)
          elseif i==N+1
             [F_g(:,N+1),W_int_g(:,N+1),phi_g(N+1)]=GRP_solver(lo_g(N),lo_g(N),0,0,u_g(N),u_g(N),0,0,p_g(N),p_g(N),0,0,phi(N),phi(N),0,0,gama_g,d_t);
          else
-            if i<=J
+            if i<=J+1
                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i)-0.5*d_x*dlo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)-0.5*d_x*du_s(i),du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)-0.5*d_x*dp_s(i),dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
             end
-            if i>=J+2
+            if i>=J+1
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)+0.5*d_x*dlo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1)+0.5*d_x*du_g(i-1),u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)+0.5*d_x*dp_g(i-1),p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
-            if (i==J+1 || i==J+2) && J~=J_bak
+            if (i==J+2) && J~=J_bak
                 [F_s(:,i),W_int_s(:,i),phi_s(i)]=GRP_solver(lo_s(i-1)+0.5*d_x*dlo_s(i-1),lo_s(i)-0.5*d_x*dlo_s(i),dlo_s(i-1),dlo_s(i),u_s(i-1)+0.5*d_x*du_s(i-1),u_s(i)-0.5*d_x*du_s(i),du_s(i-1),du_s(i),p_s(i-1)+0.5*d_x*dp_s(i-1),p_s(i)-0.5*d_x*dp_s(i),dp_s(i-1),dp_s(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_s,d_t);
             end
-            if (i==J+1 || i==J) && J~=J_bak
+            if (i==J) && J~=J_bak
                 [F_g(:,i),W_int_g(:,i),phi_g(i)]=GRP_solver(lo_g(i-1)+0.5*d_x*dlo_g(i-1),lo_g(i)-0.5*d_x*dlo_g(i),dlo_g(i-1),dlo_g(i),u_g(i-1)+0.5*d_x*du_g(i-1),u_g(i)-0.5*d_x*du_g(i),du_g(i-1),du_g(i),p_g(i-1)+0.5*d_x*dp_g(i-1),p_g(i)-0.5*d_x*dp_g(i),dp_g(i-1),dp_g(i),phi(i-1)+0.5*d_x*dphi(i-1),phi(i)-0.5*d_x*dphi(i),dphi(i-1),dphi(i),gama_g,d_t);
             end
          end
