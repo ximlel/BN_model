@@ -214,10 +214,10 @@ while Time<Tend && isreal(Time)
             break;
         end
     end
-    if J~=J_bak
+%     if J~=J_bak
         [lo_s(J),u_s(J),p_s(J)]=primitive_comp(U_s(:,J),gama_s);
         [lo_g(J+1),u_g(J+1),p_g(J+1)]=primitive_comp(U_g(:,J+1),gama_g);
-    end
+%     end
     count=count+1;
     Time=Time+d_t
 % if Time > 1*d_t
