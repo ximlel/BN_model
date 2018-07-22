@@ -9,7 +9,7 @@ x_min=0;
 x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
-CFL=0.7;
+CFL=0.5;
 Alpha=1.9;
 %Alpha=0;
 %state value
@@ -40,8 +40,8 @@ u_g =zeros(1,N);
 u_s =zeros(1,N);
 p_g =zeros(1,N);
 p_s =zeros(1,N);
-load ./data/test5.mat;
-EXACT_LOCAT='./data/exact5.mat';
+load ./data/test55.mat;
+EXACT_LOCAT='./data/exact55.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -138,13 +138,13 @@ while Time<Tend && isreal(Time)
 %         u_s(J) =u_s(J+1); 
 %         lo_s(J)  =(p_s(J)  /p_s(J+1))^(1/gama_s)*lo_s(J+1);
      end
-%     for i=(J-2):(J+1)
-    for i=(J-2):J
+    for i=(J-2):(J+1)
+%     for i=(J-2):J
         E_g(i)=p_g(i)/(gama_g-1)+0.5*lo_g(i)*u_g(i)^2;
         U_g(:,i)=[lo_g(i);lo_g(i)*u_g(i);E_g(i)];
     end
-%     for i=J:(J+3)
-    for i=(J+1):(J+3)
+    for i=J:(J+3)
+%     for i=(J+1):(J+3)
         E_s(i)=p_s(i)/(gama_s-1)+0.5*lo_s(i)*u_s(i)^2;
         U_s(:,i)=[lo_s(i);lo_s(i)*u_s(i);E_s(i)];
     end
@@ -183,13 +183,19 @@ while Time<Tend && isreal(Time)
         end
     end
     i=J;
-        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))*2/d_x,dlo_s(i+1));%,(lo_s(i+1)-lo_s(i))/d_x);
-        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )*2/d_x,du_s(i+1) );%,(u_s(i+1) -u_s(i) )/d_x);
-        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )*2/d_x,dp_s(i+1) );%,(p_s(i+1) -p_s(i) )/d_x);
+%         dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,dlo_s(i+1));%,(lo_s(i+1)-lo_s(i))/d_x);
+%         du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,du_s(i+1) );%,(u_s(i+1) -u_s(i) )/d_x);
+%         dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,dp_s(i+1) );%,(p_s(i+1) -p_s(i) )/d_x);       
+        dlo_s(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(lo_s(i+1)-lo_s(i-1))/2.0/d_x,(lo_s(i+1)-lo_s(i))/d_x);
+        du_s(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(u_s(i+1) -u_s(i-1) )/2.0/d_x,(u_s(i+1) -u_s(i) )/d_x);
+        dp_s(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(p_s(i+1) -p_s(i-1) )/2.0/d_x,(p_s(i+1) -p_s(i) )/d_x);
     i=J+1;
-        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,dlo_g(i-1));%,(lo_g(i+1)-lo_g(i))*2/d_x);
-        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,du_g(i-1) );%,(u_g(i+1) -u_g(i) )*2/d_x);
-        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,dp_g(i-1) );%,(p_g(i+1) -p_g(i) )*2/d_x);
+%         dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,dlo_g(i-1));%,(lo_g(i+1)-lo_g(i))*2/d_x);
+%         du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,du_g(i-1) );%,(u_g(i+1) -u_g(i) )*2/d_x);
+%         dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,dp_g(i-1) );%,(p_g(i+1) -p_g(i) )*2/d_x);
+        dlo_g(i)=minmod(Alpha,(lo_g(i)-lo_g(i-1))/d_x,(lo_g(i+1)-lo_g(i-1))/2.0/d_x,(lo_g(i+1)-lo_g(i))/d_x);
+        du_g(i) =minmod(Alpha,(u_g(i) -u_g(i-1) )/d_x,(u_g(i+1) -u_g(i-1) )/2.0/d_x,(u_g(i+1) -u_g(i) )/d_x);
+        dp_g(i) =minmod(Alpha,(p_g(i) -p_g(i-1) )/d_x,(p_g(i+1) -p_g(i-1) )/2.0/d_x,(p_g(i+1) -p_g(i) )/d_x);
 
 % for i=1:J
 %     lo(i)=lo_s(i);
@@ -251,6 +257,7 @@ while Time<Tend && isreal(Time)
 %         phi_g(J+1)=phi(J+1);
 %     end
     %compute U in next step
+%    x0=x0+4.77193740045318*d_t
     x0=x0+u_s(J+1)*d_t+0.5*u_mat*d_t^2;
     for i=1:(J+1)
         if i<=J
@@ -261,7 +268,7 @@ while Time<Tend && isreal(Time)
           phi(i)=x(i)-x0;
         else
 %           U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_g(:,i+1));
-          U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));      
+%           U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));      
         end
 %         if i<J
 %             U_s(:,i)=U_s(:,i)+d_t/d_x*(F_s(:,i)-F_s(:,i+1));
@@ -277,23 +284,25 @@ while Time<Tend && isreal(Time)
            phi(i)=x(i)-x0;
         else
 %            U_g(:,i)=U_g(:,i)+d_t/d_x*(F_s(:,i)-F_g(:,i+1));
-           U_g(:,i)=U_g(:,i)+d_t/d_x*(F_g(:,i)-F_g(:,i+1));        
+%            U_g(:,i)=U_g(:,i)+d_t/d_x*(F_g(:,i)-F_g(:,i+1));        
         end
 %         if i>J+1
 %            U_g(:,i)=U_g(:,i)+d_t/d_x*(F_g(:,i)-F_g(:,i+1));
 %         end
         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
     end
-%     for i=(J-2):J
-%         E_g(i)=p_gM/(gama_g-1)+0.5*lo_gM*u_gM^2;
+    for i=(J-2):(J+1)
+        E_g(i)=p_gM/(gama_g-1)+0.5*lo_gM*u_gM^2;
 %         U_g(:,i)=[lo_gM;lo_gM*u_gM;E_g(i)];
-%         [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
-%     end
-%     for i=(J+1):(J+3)
-%         E_s(i)=p_sM/(gama_s-1)+0.5*lo_sM*u_sM^2;
+        U_g(:,i)=U_g(:,J+1);
+        [lo_g(i),u_g(i),p_g(i)]=primitive_comp(U_g(:,i),gama_g);
+    end
+    for i=(J):(J+3)
+        E_s(i)=p_sM/(gama_s-1)+0.5*lo_sM*u_sM^2;
 %         U_s(:,i)=[lo_sM;lo_sM*u_sM;E_s(i)];
-%         [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U_s(:,i),gama_s);
-%     end
+        U_s(:,i)=U_s(:,J);
+        [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U_s(:,i),gama_s);
+    end
     for i=1:N-1
         if (phi(i)*phi(i+1))<0.0
             J=i;
