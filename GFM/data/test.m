@@ -11,8 +11,8 @@ lo_M_0=1;
 p_L_0 =100;
 lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
 u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
-x0s   =0.2;
-x0    =0.2;
+x0s   =1.2;
+x0    =1.2;
 N_T   =200;
 Tend  =0.0411;
 save test1.mat
@@ -113,8 +113,8 @@ lo_M_0=2500;
 p_L_0 =10000;
 lo_L_0=lo_M_0/(p_R_0+mu_s2*p_L_0)*(p_L_0+mu_s2*p_R_0);
 u_L_0 =u_R_0+sqrt((1/lo_L_0-1/lo_M_0)*(p_R_0-p_L_0));
-x0s   =0.1;
-x0    =0.1;
+x0s   =1.1;
+x0    =1.1;
 N_T   =200;
 Tend  =0.1;
 save test55.mat
