@@ -17,8 +17,11 @@ Time=0;
 Tend=0.1;
 U=zeros(3,N);
 F=zeros(3,N+1);
-W_int_L=zeros(4,N);
-W_int_R=zeros(4,N);
+u_MID=zeros(3,N+1);
+W_int_L=zeros(3,N);
+W_int_R=zeros(3,N);
+W_int_Rtmp=zeros(3);
+W_int_Ltmp=zeros(3);
 dlo  =zeros(1,N);
 du   =zeros(1,N);
 dp   =zeros(1,N);
@@ -48,16 +51,19 @@ for i=1:N
     end
     mass(i)=lo(i)*d_x;
     E(i)=p(i)/(gama(i)-1)+0.5*lo(i)*u(i)^2;
-    U(:,i)=[lo(i);lo(i)*u(i);E(i)];
+    U(:,i)=[lo(i);lo(i)*u(i);E(i)]*d_x;
+end
+for i=1:(N+1)
+    x_int(i)=x_min+(i-1)*d_x; 
 end
 %Godunov's Method
 count=1;
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:(N-1)
-        dlo(i)=minmod(Alpha,(lo_s(i)-lo_s(i-1))/d_x,(W_int_R(1,i)-W_int_L(1,i))/d_x,(lo_s(i+1)-lo_s(i))/d_x);
-        du(i) =minmod(Alpha,(u_s(i) -u_s(i-1) )/d_x,(W_int_R(2,i)-W_int_L(2,i))/d_x,(u_s(i+1) -u_s(i) )/d_x);
-        dp(i) =minmod(Alpha,(p_s(i) -p_s(i-1) )/d_x,(W_int_R(3,i)-W_int_L(3,i))/d_x,(p_s(i+1) -p_s(i) )/d_x);
+        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/d_x,(W_int_R(1,i)-W_int_L(1,i))/d_x,(lo(i+1)-lo(i))/d_x);
+        du(i) =minmod(Alpha,(u(i) -u(i-1) )/d_x,(W_int_R(2,i)-W_int_L(2,i))/d_x,(u(i+1) -u(i) )/d_x);
+        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/d_x,(W_int_R(3,i)-W_int_L(3,i))/d_x,(p(i+1) -p(i) )/d_x);
     end
     %CFL condition
     for i=1:N
@@ -71,18 +77,20 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-            [F(:,1),W_int_Rtmp,W_int_L(:,1)]=GRP_solver(lo(1),lo(1),0,0,u(1),u(1),0,0,p(1),p(1),0,0,gama(N),gama(N),d_t);
+            [F(:,1),u_MID(1),W_int_Rtmp,W_int_L(:,1)]=GRP_solver_LAG(lo(1),lo(1),0,0,u(1),u(1),0,0,p(1),p(1),0,0,gama(N),gama(N),d_t);
          elseif i==N+1
-            [F(:,N+1),W_int_R(:,N),W_int_Ltmp]=GRP_solver(lo(N),lo(N),0,0,u(N),u(N),0,0,p(N),p(N),0,0,gama(N),gama(N),d_t);
+            [F(:,N+1),u_MID(N+1),W_int_R(:,N),W_int_Ltmp]=GRP_solver_LAG(lo(N),lo(N),0,0,u(N),u(N),0,0,p(N),p(N),0,0,gama(N),gama(N),d_t);
          else
-            [F(:,i),W_int_R(:,i-1),W_int_L(:,i)]=GRP_solver(lo(i-1)+0.5*d_x*dlo(i-1),lo(i)-0.5*d_x*dlo(i),dlo(i-1),dlo(i),u(i-1)+0.5*d_x*du(i-1),u(i)-0.5*d_x*du(i),du(i-1),du(i),p(i-1)+0.5*d_x*dp(i-1),p(i)-0.5*d_x*dp(i),dp(i-1),dp(i),gama(i-1),gama(i),d_t);
+            [F(:,i),u_MID(i),W_int_R(:,i-1),W_int_L(:,i)]=GRP_solver_LAG(lo(i-1)+0.5*d_x*dlo(i-1),lo(i)-0.5*d_x*dlo(i),dlo(i-1),dlo(i),u(i-1)+0.5*d_x*du(i-1),u(i)-0.5*d_x*du(i),du(i-1),du(i),p(i-1)+0.5*d_x*dp(i-1),p(i)-0.5*d_x*dp(i),dp(i-1),dp(i),gama(i-1),gama(i),d_t);
          end
     end
     %compute U in next step
-    x0=x0+u_s(J+1)*d_t;
-    for i=1:(J+1)
-        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1));
-        [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U_s(:,i),gama(i));
+    for i=1:(N+1)
+        x_int(i)=x_int(i)+u_MID(i)*d_t;
+    end
+    for i=1:N
+        U(:,i)=U(:,i)+d_t*(F(:,i)-F(:,i+1));
+        [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U(:,i)/(x_int(i+1)-x_int(i)),gama(i));
     end
     count=count+1;
     Time=Time+d_t
@@ -130,6 +138,6 @@ ylabel('Pressure','FontWeight','bold');
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
-plot(x,gamma,col,'LineWidth',1.0);
+plot(x,gama,col,'LineWidth',1.0);
 xlabel('Position','FontWeight','bold');
 ylabel('Gamma','FontWeight','bold');

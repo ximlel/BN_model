@@ -374,6 +374,7 @@ void linear_GRP_solver_Edir_Q1D
 					u_t_mat = (b_R*d_L - b_L*d_R)/detA;
 					p_t_mat = (a_L*d_R - a_R*d_L)/detA;
 					D_star[6]= u_t_mat;
+					D_star[7]= p_t_mat;
 
 //					if(u_star < lambda_u) //the direction is between the contact discontinuety and the 3-wave
 						{
@@ -403,6 +404,7 @@ void linear_GRP_solver_Edir_Q1D
 									D[5] = D[5] + lambda_u*d_phi_R;
 									rho_x=-rho_star_R*pow(c_star_R/c_R, (1.0+zetaR)/zetaR)*(d_p_R - d_rho_R*c_R*c_R)/rho_R/ c_star_R/c_star_R;
 									D_star[2]=rho_x;
+									D_star[9]=D[2]+u_star*rho_x;
 								}
 							else //the 3-wave is a shock
 								{
@@ -425,6 +427,7 @@ void linear_GRP_solver_Edir_Q1D
 									rho_x = (f + H1*(p_t_mat - rho_star_R*SmUs*u_t_mat) - D[0]) / (SmUR+u_R);//shk_spd;
 									D[0] = D[0] + lambda_u*rho_x;
 									D_star[2]=rho_x;
+									D_star[9]=D[2]+u_star*rho_x;
 
 									D[2] = -U[1] * SmUR * d_v_R / SmUs;
 									D[2] = D[2] + lambda_u*d_v_R;
@@ -462,6 +465,7 @@ void linear_GRP_solver_Edir_Q1D
 									D[5] = D[5] + lambda_u*d_phi_L;
 									rho_x=-rho_star_L*pow(c_star_L/c_L, (1.0+zetaL)/zetaL)*(d_p_L - d_rho_L*c_L*c_L)/rho_L/ c_star_L/c_star_L;
 									D_star[0]=rho_x;
+									D_star[8]=D[0]+u_star*rho_x;
 								}
 							else //the 1-wave is a shock
 								{
@@ -485,6 +489,7 @@ void linear_GRP_solver_Edir_Q1D
 									rho_x = (f + H1*(p_t_mat - rho_star_L*SmUs*u_t_mat) - D[0]) / (SmUL+u_L);
 									D[0] = D[0] + lambda_u*rho_x;
 									D_star[0]=rho_x;
+									D_star[8]=D[0]+u_star*rho_x;
 
 									D[2] = -U[1] * SmUL * d_v_L / SmUs;
 									D[2] = D[2] + lambda_u*d_v_L;
@@ -536,7 +541,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     m = mxGetM(prhs[0]);
     n = mxGetN(prhs[0]);
      
-    plhs[0] = mxCreateDoubleMatrix(27,1,mxREAL);
+    plhs[0] = mxCreateDoubleMatrix(30,1,mxREAL);
     double *A;
     A = mxGetPr(plhs[0]);
      
