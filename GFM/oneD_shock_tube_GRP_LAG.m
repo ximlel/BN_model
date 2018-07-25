@@ -10,7 +10,7 @@ x_max=1;
 N=200;
 d_x=(x_max-x_min)/N;
 CFL=0.7;
-Alpha=1.9;
+Alpha=1.0;
 %Alpha=0;
 %state value
 Time=0;
@@ -26,8 +26,8 @@ dlo  =zeros(1,N);
 du   =zeros(1,N);
 dp   =zeros(1,N);
 gama =zeros(1,N);
-load ./data/test5.mat;
-EXACT_LOCAT='./data/exact5.mat';
+load ./data/test1.mat;
+EXACT_LOCAT='./data/exact1.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -49,7 +49,6 @@ for i=1:N
           gama(i)=gama_s;
         end
     end
-    mass(i)=lo(i)*d_x;
     E(i)=p(i)/(gama(i)-1)+0.5*lo(i)*u(i)^2;
     U(:,i)=[lo(i);lo(i)*u(i);E(i)]*d_x;
 end
@@ -60,10 +59,11 @@ end
 count=1;
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
+
     for i=2:(N-1)
-        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/d_x,(W_int_R(1,i)-W_int_L(1,i))/d_x,(lo(i+1)-lo(i))/d_x);
-        du(i) =minmod(Alpha,(u(i) -u(i-1) )/d_x,(W_int_R(2,i)-W_int_L(2,i))/d_x,(u(i+1) -u(i) )/d_x);
-        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/d_x,(W_int_R(3,i)-W_int_L(3,i))/d_x,(p(i+1) -p(i) )/d_x);
+        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+        du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
+        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
     end
     %CFL condition
     for i=1:N
@@ -81,7 +81,9 @@ while Time<Tend && isreal(Time)
          elseif i==N+1
             [F(:,N+1),u_MID(N+1),W_int_R(:,N),W_int_Ltmp]=GRP_solver_LAG(lo(N),lo(N),0,0,u(N),u(N),0,0,p(N),p(N),0,0,gama(N),gama(N),d_t);
          else
-            [F(:,i),u_MID(i),W_int_R(:,i-1),W_int_L(:,i)]=GRP_solver_LAG(lo(i-1)+0.5*d_x*dlo(i-1),lo(i)-0.5*d_x*dlo(i),dlo(i-1),dlo(i),u(i-1)+0.5*d_x*du(i-1),u(i)-0.5*d_x*du(i),du(i-1),du(i),p(i-1)+0.5*d_x*dp(i-1),p(i)-0.5*d_x*dp(i),dp(i-1),dp(i),gama(i-1),gama(i),d_t);
+            d_xL=(x_int(i)-x_int(i-1));
+            d_xR=(x_int(i+1)-x_int(i));
+            [F(:,i),u_MID(i),W_int_R(:,i-1),W_int_L(:,i)]=GRP_solver_LAG(lo(i-1)+0.5*d_xL*dlo(i-1),lo(i)-0.5*d_xR*dlo(i),dlo(i-1),dlo(i),u(i-1)+0.5*d_xL*du(i-1),u(i)-0.5*d_xR*du(i),du(i-1),du(i),p(i-1)+0.5*d_xL*dp(i-1),p(i)-0.5*d_xR*dp(i),dp(i-1),dp(i),gama(i-1),gama(i),d_t);
          end
     end
     %compute U in next step
@@ -89,12 +91,15 @@ while Time<Tend && isreal(Time)
         x_int(i)=x_int(i)+u_MID(i)*d_t;
     end
     for i=1:N
+        x(i)=0.5*(x_int(i)+x_int(i+1)); 
+    end
+    for i=1:N
         U(:,i)=U(:,i)+d_t*(F(:,i)-F(:,i+1));
         [lo_s(i),u_s(i),p_s(i)]=primitive_comp(U(:,i)/(x_int(i+1)-x_int(i)),gama(i));
     end
     count=count+1;
     Time=Time+d_t
-% if Time > 1*d_t
+% if Time > 2*d_t
 %     break;
 % end
 end

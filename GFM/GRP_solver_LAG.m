@@ -1,4 +1,4 @@
-function [F,u_MID,W_int_L,W_int_R,phi]=GRP_solver_LAG(lo_L,lo_R,dlo_L,dlo_R,u_L,u_R,du_L,du_R,p_L,p_R,dp_L,dp_R,gamaL,gamaR,d_t)
+function [F,u_MID,W_int_L,W_int_R]=GRP_solver_LAG(lo_L,lo_R,dlo_L,dlo_R,u_L,u_R,du_L,du_R,p_L,p_R,dp_L,dp_R,gamaL,gamaR,d_t)
     global ep;
     F=zeros(3,1);
     put_out=linear_GRP_solver_Edir_star([lo_L,lo_R,dlo_L,dlo_R,0,0,u_L,u_R,du_L,du_R,0,0,-0,-0,0,0,0,0,p_L,p_R,dp_L,dp_R,0,0,-0,-0,0,0,0,0,gamaL,gamaR,ep,ep]);		
