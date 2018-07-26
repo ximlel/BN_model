@@ -60,12 +60,15 @@ count=1;
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:(N-1)
-%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
-%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
-%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
-        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(lo(i+1)-lo(i-1))/(x(i+1)-x(i-1)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
-        du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(u(i+1) -u(i-1) )/(x(i+1)-x(i-1)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
-        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(p(i+1) -p(i-1))/(x(i+1)-x(i-1)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
+        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+        du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
+        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
+%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(lo(i+1)-lo(i-1))/(x(i+1)-x(i-1)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(u(i+1) -u(i-1) )/(x(i+1)-x(i-1)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
+%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(p(i+1) -p(i-1) )/(x(i+1)-x(i-1)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
+%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x_int(i)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x_int(i+1)-x(i)));
+%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x_int(i)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x_int(i+1)-x(i)));
+%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x_int(i)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x_int(i+1)-x(i)));
     end
     %CFL condition
     for i=2:(N-1)
