@@ -111,6 +111,13 @@ double Riemann_solver_exact(double * U_star, double * P_star, double gammaL, dou
   }
   gap = fabs(v_L - v_R);
 
+if (fabs(u_L - u_R) < tol && fabs(p_L - p_R) < tol)
+{
+  *P_star = 0.5*(p_L + p_R);
+  *U_star = 0.5*(u_L + u_R);
+
+  return fabs(u_L - u_R);
+}
 
   //=======THE NEWTON ITERATION=======
   while((gap > tol) && (n != N))

@@ -1,6 +1,6 @@
 function C = minmod(Alpha,A,C,B)
 %MINMOD FUNCTION
-if nargin < 3
+if nargin < 4
     B=sign(A)*1e30;
 end
 for i=1:size(C,1)

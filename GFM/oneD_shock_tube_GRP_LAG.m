@@ -7,17 +7,17 @@ global ep;
 ep=1e-9;
 x_min=0;
 x_max=2;
-N=200;
+N=400;
 d_x=(x_max-x_min)/N;
-CFL=0.5;
-Alpha=1.0;
+CFL=0.45;
+Alpha=1;
 %Alpha=0;
 %state value
 Time=0;
 Tend=0.1;
 U=zeros(3,N);
 F=zeros(3,N+1);
-u_MID=zeros(3,N+1);
+u_MID=zeros(1,N+1);
 W_int_L=zeros(3,N);
 W_int_R=zeros(3,N);
 W_int_tmp=zeros(3);
@@ -26,8 +26,8 @@ du   =zeros(1,N);
 dp   =zeros(1,N);
 gama =zeros(1,N);
 dxS  =1e10*ones(1,N);
-load ./data/test55.mat;
-EXACT_LOCAT='./data/exact55.mat';
+load ./data/test111.mat;
+EXACT_LOCAT='./data/exact1.mat';
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -60,15 +60,23 @@ count=1;
 while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:(N-1)
-        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
-        du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
-        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
-%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(lo(i+1)-lo(i-1))/(x(i+1)-x(i-1)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
-%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(u(i+1) -u(i-1) )/(x(i+1)-x(i-1)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
-%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(p(i+1) -p(i-1) )/(x(i+1)-x(i-1)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
+%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
+%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
+        dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(lo(i+1)-lo(i-1))/(x(i+1)-x(i-1)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+        du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x(i-1)),(u(i+1) -u(i-1) )/(x(i+1)-x(i-1)),(u(i+1) -u(i) )/(x(i+1)-x(i)));
+        dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x(i-1)),(p(i+1) -p(i-1) )/(x(i+1)-x(i-1)),(p(i+1) -p(i) )/(x(i+1)-x(i)));
 %         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x_int(i)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x_int(i+1)-x(i)));
 %         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x_int(i)),(W_int_R(2,i)-W_int_L(2,i))/(x_int(i+1)-x_int(i)),(u(i+1) -u(i) )/(x_int(i+1)-x(i)));
 %         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x_int(i)),(W_int_R(3,i)-W_int_L(3,i))/(x_int(i+1)-x_int(i)),(p(i+1) -p(i) )/(x_int(i+1)-x(i)));
+%         dlo(i)=minmod(Alpha,(lo(i)-lo(i-1))/(x(i)-x_int(i)),(lo(i+1)-lo(i-1))/(x(i+1)-x(i-1)),(lo(i+1)-lo(i))/(x_int(i+1)-x(i)));
+%         du(i) =minmod(Alpha,(u(i) -u(i-1) )/(x(i)-x_int(i)),(u(i+1) -u(i-1) )/(x(i+1)-x(i-1)),(u(i+1) -u(i) )/(x_int(i+1)-x(i)));
+%         dp(i) =minmod(Alpha,(p(i) -p(i-1) )/(x(i)-x_int(i)),(p(i+1) -p(i-1) )/(x(i+1)-x(i-1)),(p(i+1) -p(i) )/(x_int(i+1)-x(i)));
+% if i==220
+%    dlo(i)=0;%minmod(1,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+% elseif i==221
+%    dlo(i)=0;%minmod(1,(lo(i)-lo(i-1))/(x(i)-x(i-1)),(W_int_R(1,i)-W_int_L(1,i))/(x_int(i+1)-x_int(i)),(lo(i+1)-lo(i))/(x(i+1)-x(i)));
+% end
     end
     %CFL condition
     for i=2:(N-1)
@@ -105,25 +113,25 @@ while Time<Tend && isreal(Time)
     end
     count=count+1;
     Time=Time+d_t
-if Time > 100000*d_t
-    break;
-end
+% if Time > 2*d_t
+%     break;
+% end
 end
 W_exact = zeros(N,4);
 W_exact(:,1)=lo';
 W_exact(:,2)=u';
 W_exact(:,3)=p';
 W_exact(:,4)=gama';
-load(EXACT_LOCAT);
-for i=1:N
-     W_exact(i,1) = lo_ex(ceil(i/(N/200)));
-     W_exact(i,2) = u_ex(ceil(i/(N/200)));
-     W_exact(i,3) = p_ex(ceil(i/(N/200)));
-end
-W_exact(:,1)=log(W_exact(:,1));
-W_exact(:,3)=log(W_exact(:,3));
-lo=log(lo);
-p=log(p);
+% load(EXACT_LOCAT);
+% for i=1:N
+%      W_exact(i,1) = lo_ex(ceil(i/(N/200)));
+%      W_exact(i,2) = u_ex(ceil(i/(N/200)));
+%      W_exact(i,3) = p_ex(ceil(i/(N/200)));
+% end
+% W_exact(:,1)=log(W_exact(:,1));
+% W_exact(:,3)=log(W_exact(:,3));
+% lo=log(lo);
+% p=log(p);
 
 %plot
 col = '.b';

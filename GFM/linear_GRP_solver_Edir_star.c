@@ -111,6 +111,13 @@ double Riemann_solver_exact(double * U_star, double * P_star, double gammaL, dou
   }
   gap = fabs(v_L - v_R);
 
+if (fabs(u_L - u_R) < tol && fabs(p_L - p_R) < tol)
+{
+  *P_star = 0.5*(p_L + p_R);
+  *U_star = 0.5*(u_L + u_R);
+
+  return fabs(u_L - u_R);
+}
 
   //=======THE NEWTON ITERATION=======
   while((gap > tol) && (n != N))
@@ -404,7 +411,8 @@ void linear_GRP_solver_Edir_Q1D
 									D[5] = D[5] + lambda_u*d_phi_R;
 									rho_x=-rho_star_R*pow(c_star_R/c_R, (1.0+zetaR)/zetaR)*(d_p_R - d_rho_R*c_R*c_R)/rho_R/ c_star_R/c_star_R;
 									D_star[2]=rho_x;
-									D_star[9]=D[2]+u_star*rho_x;
+									//D_star[9]=D[2]+u_star*rho_x;
+									D_star[9]=C*C*p_t_mat;
 								}
 							else //the 3-wave is a shock
 								{
@@ -427,7 +435,8 @@ void linear_GRP_solver_Edir_Q1D
 									rho_x = (f + H1*(p_t_mat - rho_star_R*SmUs*u_t_mat) - D[0]) / (SmUR+u_R);//shk_spd;
 									D[0] = D[0] + lambda_u*rho_x;
 									D_star[2]=rho_x;
-									D_star[9]=D[2]+u_star*rho_x;
+									//D_star[9]=D[2]+u_star*rho_x;
+									D_star[9]=C*C*p_t_mat;
 
 									D[2] = -U[1] * SmUR * d_v_R / SmUs;
 									D[2] = D[2] + lambda_u*d_v_R;
@@ -465,7 +474,8 @@ void linear_GRP_solver_Edir_Q1D
 									D[5] = D[5] + lambda_u*d_phi_L;
 									rho_x=-rho_star_L*pow(c_star_L/c_L, (1.0+zetaL)/zetaL)*(d_p_L - d_rho_L*c_L*c_L)/rho_L/ c_star_L/c_star_L;
 									D_star[0]=rho_x;
-									D_star[8]=D[0]+u_star*rho_x;
+									//D_star[8]=D[0]+u_star*rho_x;
+									D_star[8]=C*C*p_t_mat;
 								}
 							else //the 1-wave is a shock
 								{
@@ -489,7 +499,8 @@ void linear_GRP_solver_Edir_Q1D
 									rho_x = (f + H1*(p_t_mat - rho_star_L*SmUs*u_t_mat) - D[0]) / (SmUL+u_L);
 									D[0] = D[0] + lambda_u*rho_x;
 									D_star[0]=rho_x;
-									D_star[8]=D[0]+u_star*rho_x;
+									//D_star[8]=D[0]+u_star*rho_x;
+									D_star[8]=C*C*p_t_mat;
 
 									D[2] = -U[1] * SmUL * d_v_L / SmUs;
 									D[2] = D[2] + lambda_u*d_v_L;
