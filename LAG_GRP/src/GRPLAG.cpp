@@ -17,7 +17,7 @@
 #define CFL (0.45) // CFL condition
 #define M (1.)    // m=1 planar; m=2 cylindrical; m=3 spherical
 #define Epsilon (1.) // r_0=Epsilon*dr
-#include "./initdata_simple.h"
+#include "./initdata.h"
 #define Md Ncell+5 // max vector dimension
 #define Mt Tcell+5  // max theta dimension
 #include "./inp.h"
@@ -26,7 +26,7 @@
 int main()
 {	//parameters
 	double GammaL=GAMMAL, GammaR=GAMMAR;
-	double DL=DL0,DR=DR0,DM=DM0,UL=UL0,UR=UR0,VL,VR,PL=PL0,PR=PR0;//D:Density;U,V:Velocity;P:Pressure
+	double DL=DL0,DR=DR0,DM=DM0,UL=UL0,UR=UR0,PL=PL0,PR=PR0;//D:Density;U,V:Velocity;P:Pressure
 	double CL,CR;//Sound speed
 	CL=sqrt(GammaL*PL/DL);
 	CR=sqrt(GammaR*PR/DR);
@@ -36,39 +36,31 @@ int main()
 			return 0;
 		}
 	double dt; //delta_t
-	static double F2[Md],F3[Md],E[Md],Speed1[Md],Speed2[Md];
+	static double F1[Md],F2[Md],F3[Md],E[Md],Speed1[Md],Speed2[Md];
 	//flux, conservative variable and wave speed
 	static double dRc[Md];//(derivative)centers distance
 	double PM,UM,DML,DMR,Smax_deltar,time=0.;//P_star, U_star, rho_starL, roh_starR, max wave speed
-	double dr,r;//initial d_raidus
+	double dr;//initial d_raidus
 	double dtheta,dtheta_plot;//initial d_angle
 	dtheta=0.5*pi/Tcell;
 	dtheta_plot=0.5*pi/Tcell_plot;
-	static double RR[Md],DD[Md],UU[Md],PP[Md],CC[Md],GammaGamma[Md];//centroidal radius and variable in cells
-	static double DdrL[Md],DdrR[Md],Ddr[Md];//distance from boundary to center in a cell
-	static double Rb[Md],Lb[Md];//radius and length of outer cell boundary
-	static double Rbh[Md],Lbh[Md];//h: half time step
-	double Rb_NStep,Lb_NStep;
-	//static double Rb_side[Md],Lb_side[Md],Rbh_side[Md],Lbh_side[Md],Sh[Md];
+	static double RR[Md],DD[Md],_1_DD[Md],UU[Md],PP[Md],CC[Md],GammaGamma[Md];//centroidal radius and variable in cells
+	static double DdrL[Md],DdrR[Md];//distance from boundary to center in a cell
+	static double Rb[Md];//radius of outer cell boundary
 	static double mass[Md],vol[Md];
-	FILE *out,*outs;
+	FILE *outs;
 	//MKDIR(DATAOUT);
-	char file_data[FILENAME_MAX];
-	double plot_t=D_PLOT_T;
 	int i,j,k;
 
-	static double DmD[Md],DmU[Md],DmP[Md],TmV[Md];
-	double slopeL,slopeR,DDL,DDR,DUL,DUR,DPL,DPR,TVL,TVR;//spacial derivative
-	double C_star,DtU,DtP,DtDL,DtDR,TDSL,TDSR,DpsiL,DphiR,Us,Ps,Ds;//GRP variables
-	static double Umin[Md],VLmin[Md],Pmin[Md],DLmin[Md],DRmin[Md];
-	double sD,sU,sP,sV,C_starL,C_starR;
-	static double F2P[Md];
-	static double rb[Md][Mt],zb[Md][Mt],DD2[Md][Mt],UUxi2[Md][Mt],PP2[Md][Mt],GammaGamma2[Md][Mt];
-	double VIP_lim, Vave[4][2], V0[2], Vp1[2], Vp2[2], Vp3[2];//VIP limiter
+	static double DmD[Md],DmU[Md],DmP[Md];
+	double DDL,DDR,DUL,DUR,DPL,DPR;//spacial derivative
+	double DtU,DtP,DtDL,DtDR,TDSL,TDSR,Us,Ps;//GRP variables
+	static double Umin[Md],Pmin[Md],DLmin[Md],DRmin[Md];
+	double sD,sU,sP;
 	int wrong_idx = 0;
 
-	
-	dr=(double)Domlen/Ncell;	
+
+	dr=(double)Domlen/Ncell;
 	for(i=0;i<=Ncell;i++)//center cell is cell 0
 		Rb[i]=i*dr;//cell boundary
 	for(i=0;i<Ncell;i++)//center cell is cell 0
@@ -96,6 +88,7 @@ int main()
 					PP[i]=PR;
 					GammaGamma[i]=GammaR;
 				}
+			_1_DD[i]=1./DD[i];
 			CC[i]=sqrt(GammaGamma[i]*PP[i]/DD[i]);
 			E[i]=0.5*UU[i]*UU[i]+PP[i]/(DD[i]*(GammaGamma[i]-1.));
 		}//initial value
@@ -159,7 +152,7 @@ int main()
 							UL=UU[i-1]+DdrL[i-1]*DUL;
 							UR=UU[i]  -DdrR[i]  *DUR;
 							PL=PP[i-1]+DdrL[i-1]*DPL;
-							PR=PP[i]  -DdrR[i]  *DPR;							
+							PR=PP[i]  -DdrR[i]  *DPR;
 						}
 					CL=sqrt(GammaL*PL/DL);
 					CR=sqrt(GammaR*PR/DR);
@@ -221,7 +214,7 @@ int main()
 							UL=UU[i-1]+DdrL[i-1]*DUL;
 							UR=UU[i]  -DdrR[i]  *DUR;
 							PL=PP[i-1]+DdrL[i-1]*DPL;
-							PR=PP[i]  -DdrR[i]  *DPR;							
+							PR=PP[i]  -DdrR[i]  *DPR;
 						}
 					CL=sqrt(GammaL*PL/DL);
 					CR=sqrt(GammaR*PR/DR);
@@ -229,9 +222,10 @@ int main()
 					//Riemann_solver_exact(PM,UM,DML,DMR,DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR);
 					TDSL=-CL*CL/(DL*(GammaL-1.))*DDL+1./(DL*(GammaL-1.))*DPL;
 					TDSR=-CR*CR/(DR*(GammaR-1.))*DDR+1./(DR*(GammaR-1.))*DPR;
-				   	GRPsolverSLag(DtDL,DtDR,DtU,DtP,UM,PM,DL,DR,UL,UR,PL,PR,DDL,DDR,DUL,DUR,DPL,DPR,TDSL,TDSR,0.0,0.0,1,GammaL,GammaR);
+				  GRPsolverSLag(DtDL,DtDR,DtU,DtP,UM,PM,DL,DR,UL,UR,PL,PR,DDL,DDR,DUL,DUR,DPL,DPR,TDSL,TDSR,0.0,0.0,1,GammaL,GammaR);
 					Us=UM+0.5*dt*DtU;
 					Ps=PM+0.5*dt*DtP;
+					F1[i]=Us;
 					F2[i]=Ps;
 					F3[i]=Ps*Us;
 					Umin[i] =UM +dt*DtU;
@@ -246,7 +240,6 @@ int main()
 					DdrL[i]=Rb[i+1]-RR[i];
 					DdrR[i]=RR[i]-Rb[i];
 					vol[i] =DdrL[i]+DdrR[i];
-					DD[i]=mass[i]/vol[i];
 					if(i>=1)
 						dRc[i] =RR[i]-RR[i-1];
 					if(vol[i]<0.)
@@ -257,8 +250,11 @@ int main()
 				}
 			for(i=0;i<Ncell;i++)
 				{
+					_1_DD[i]=_1_DD[i]-dt/mass[i]*(F1[i+1]-F1[i]);
 					UU[i]=UU[i]-dt/mass[i]*(F2[i+1]-F2[i]);
 					E[i] =E[i] -dt/mass[i]*(F3[i+1]-F3[i]);
+					DD[i]=1./_1_DD[i];
+//          DD[i]=mass[i]/vol[i];
 					PP[i]=(E[i]-0.5*UU[i]*UU[i])*(GammaGamma[i]-1.)*DD[i];
 					if(ISNAN(PP[i])||ISNAN(UU[i])||ISNAN(DD[i]))
 						{
@@ -295,8 +291,7 @@ int main()
 
 			time=time+dt;
 			printf("Time[%10d]=%e,dt=%e\n",k,time,dt);
-
-			if(time-Timeout>EPS)
+			if(time-Timeout>-EPS)
 				break;
 		}//end k
 
