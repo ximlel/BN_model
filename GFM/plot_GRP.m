@@ -1,6 +1,6 @@
 x_min=0;
 x_max=2;
-N=400;
+N=4000;
 d_x=(x_max-x_min)/N;
 EXACT_LOCAT='./data/exact1.mat';
 W_exact = zeros(N,4);
@@ -8,7 +8,6 @@ W_exact = zeros(N,4);
 % W_exact(:,2)=u';
 % W_exact(:,3)=p';
 % W_exact(:,4)=gama';
-EXACT_LOCAT='./data/exact1.mat';
 load(EXACT_LOCAT);
 for i=1:N
      W_exact(i,1) = lo_ex(ceil(i/(N/200)));

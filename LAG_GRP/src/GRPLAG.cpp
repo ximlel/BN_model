@@ -250,7 +250,7 @@ int main()
 				}
 			for(i=0;i<Ncell;i++)
 				{
-					_1_DD[i]=_1_DD[i]-dt/mass[i]*(F1[i+1]-F1[i]);
+					_1_DD[i]=_1_DD[i]+dt/mass[i]*(F1[i+1]-F1[i]);
 					UU[i]=UU[i]-dt/mass[i]*(F2[i+1]-F2[i]);
 					E[i] =E[i] -dt/mass[i]*(F3[i+1]-F3[i]);
 					DD[i]=1./_1_DD[i];
