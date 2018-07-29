@@ -79,8 +79,9 @@ dkms.conf
 *.app
 
 
-
 # ======================MATLAB project==================
+
+datas_fin.m
 
 # mexFunction
 *.mexa64

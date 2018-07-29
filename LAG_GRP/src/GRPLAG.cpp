@@ -218,8 +218,8 @@ int main()
 						}
 					CL=sqrt(GammaL*PL/DL);
 					CR=sqrt(GammaR*PR/DR);
-					StarPU(PM,UM,DML,DMR,DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR);
-					//Riemann_solver_exact(PM,UM,DML,DMR,DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR);
+					//StarPU(PM,UM,DML,DMR,DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR);
+					Riemann_solver_exact(PM,UM,DML,DMR,DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR);
 					TDSL=-CL*CL/(DL*(GammaL-1.))*DDL+1./(DL*(GammaL-1.))*DPL;
 					TDSR=-CR*CR/(DR*(GammaR-1.))*DDR+1./(DR*(GammaR-1.))*DPR;
 				  GRPsolverSLag(DtDL,DtDR,DtU,DtP,UM,PM,DL,DR,UL,UR,PL,PR,DDL,DDR,DUL,DUR,DPL,DPR,TDSL,TDSR,0.0,0.0,1,GammaL,GammaR);
@@ -254,7 +254,7 @@ int main()
 					UU[i]=UU[i]-dt/mass[i]*(F2[i+1]-F2[i]);
 					E[i] =E[i] -dt/mass[i]*(F3[i+1]-F3[i]);
 					DD[i]=1./_1_DD[i];
-//          DD[i]=mass[i]/vol[i];
+//					DD[i]=mass[i]/vol[i];
 					PP[i]=(E[i]-0.5*UU[i]*UU[i])*(GammaGamma[i]-1.)*DD[i];
 					if(ISNAN(PP[i])||ISNAN(UU[i])||ISNAN(DD[i]))
 						{
