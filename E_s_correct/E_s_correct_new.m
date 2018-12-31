@@ -1,9 +1,14 @@
 %comput Roe mean
 function [phi_s_out,dE_g]=E_s_correct(S_sM,lo_g1,u_g1,p_g1,lo_s1,p_s1,phi_s1,lo_g2,u_g2,p_g2,lo_s2,p_s2,phi_s2,ratio_t_x)
+
+
 global gama_s gama_g p0;
+gama_g = 1.4;
+gama_s = 3.0;
+p0 = 3.0;
 phi_g1 = 1.0-phi_s1;
 phi_g2 = 1.0-phi_s2;
-KL = ratio_t_x*S_sM;
+KL = 0.3;%ratio_t_x*S_sM;
 KR = 1.0-KL;
 phi_sM = KL*phi_s1+KR*phi_s2;
 lo_sM  = (KL*phi_s1*lo_s1+KR*phi_s2*lo_s2)/phi_sM;

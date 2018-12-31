@@ -1,0 +1,25 @@
+##############Remarks to solution##############
+###############################################
+Domain  
+0	 % a: left interval bound
+1	 % b: right interval bound
+0.5	 % Position of diaphragm
+300	 % Number of cells
+0.1	 % Output time
+Phase constants  
+1.4	 % Gamma for the solid phase
+0	 % Pi for the solid phase
+1.4	 % Gamma for the gas phase
+0	 % Pi for the gas phase
+Parameters at U0 (left of solid contact)  
+0.301	 % Solid volume fraction left
+2	 % Solid density at U0       
+0.3	 % Solid velocity at U0      
+5	 % Solid pressure at U0      
+1	 % Gas density at U0         
+0.5	 % Gas velocity at U0        
+0.1	 % Gas pressure at  U0       
+Some parameters at U1 (right of solid contact)  
+0.3	 % Solid volume fraction right
+1	 % Solid density behind the solid contact
+Waves  

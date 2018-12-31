@@ -1,0 +1,27 @@
+Domain  
+0	 ! a: left interval bound
+1	 ! b: right interval bound
+0.5	 ! Position of diaphragm
+300	 ! Number of cells
+0.1	 ! Output time
+Phase constants  
+1.4	 ! Gamma for the solid phase
+0	 ! Pi for the solid phase
+1.4	 ! Gamma for the gas phase
+0	 ! Pi for the gas phase
+Parameters at the left state  
+0.301	 ! Solid volume fraction
+2	 ! Solid density        
+0.3	 ! Solid velocity       
+5	 ! Solid pressure       
+1	 ! Gas density          
+0.5	 ! Gas velocity         
+0.1	 ! Gas pressure         
+Parameters at the right state  
+0.3	 ! Solid volume fraction
+1	 ! Solid density        
+0.3	 ! Solid velocity       
+5.016333200100366	 ! Solid pressure       
+1.000570311207123	 ! Gas density          
+0.4996004513399397	 ! Gas velocity         
+0.1000798526750951	 ! Gas pressure         
