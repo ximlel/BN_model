@@ -52,18 +52,12 @@ for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
     if i<round(N*x0/(x_max-x_min))
         U(:,i) =U_L_0;
-        U_lo_sL(i) =phi_sL_0*lo_sL_0;
-        U_lo_sR(i) =phi_sL_0*lo_sL_0;
         Alpha(i) =phi_sL_0;
     elseif i>round(N*x0/(x_max-x_min))
         U(:,i) =U_R_0;
-        U_lo_sL(i) =phi_sR_0*lo_sR_0;
-        U_lo_sR(i) =phi_sR_0*lo_sR_0;
         Alpha(i+1) =phi_sR_0;
     else
         U(:,i) =0.5*(U_L_0+U_R_0);
-        U_lo_sL(i) =phi_sL_0*lo_sL_0;
-        U_lo_sR(i) =phi_sR_0*lo_sR_0;
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -72,17 +66,8 @@ end
 while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
-      if i==1
-          x_delta_L=0.5*d_x;
-          x_delta_R=0.5*(x(2)-x(1));          
-      elseif i==N
-          x_delta_L=0.5*(x(N)-x(N-1));
-          x_delta_R=0.5*d_x;
-      else
-          x_delta_L=0.5*(x(i)-x(i-1));
-          x_delta_R=0.5*(x(i+1)-x(i));
-      end
-        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),U_lo_sL(i),U_lo_sR(i),Alpha(i),Alpha(i+1),x_delta_L/(x_delta_L+x_delta_R),x_delta_R/(x_delta_L+x_delta_R));
+        x_s(i)=x(i);
+        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),0.5,0.5);
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
         a_gR(i)=sqrt(gama_g*p_gR(i)/lo_gR(i));
@@ -133,16 +118,14 @@ while Time<Tend && isreal(Time)
         U_lo_sR(i)=U_lo_sR(i)*x_delta+d_t*(-F(4,i+1));
     end
     for i=1:N
-        x(i)=x(i)+u_sL(i)*d_t;
+        x_s(i)=x_s(i)+u_sL(i)*d_t;
     end
     for i=1:N
-      if i==1
-          x_delta=0.5*(x(2)-x(1)+d_x);
-      elseif i==N
-          x_delta=0.5*(x(N)-x(N-1)+d_x);
-      else
-          x_delta=0.5*(x(i+1)-x(i-1));
-      end
+        area_L=0.5+(x_s(i)-x(i))/d_x;
+        area_R=1.0-beta_L;          
+        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),area_L,area_R);
+    end
+    for i=1:N
         U(:,i)=U(:,i)/x_delta;
         U_lo_sL(i)=U_lo_sL(i)/x_delta;
         U_lo_sR(i)=U_lo_sR(i)/x_delta;

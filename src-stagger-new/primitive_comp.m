@@ -1,5 +1,5 @@
 %compute flux
-function [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=primitive_comp(U,U_lo_sL,U_lo_sR,phi_sL,phi_sR,area_L,area_R);
+function [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=primitive_comp(U,phi_sL,phi_sR,area_L,area_R)
 phi_gL=1-phi_sL;
 phi_gR=1-phi_sR;
 global gama_s gama_g;
