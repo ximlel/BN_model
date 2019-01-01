@@ -7,7 +7,7 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-14;
+ep=1e-9;
 x_min=0;
 x_max=1;
 N=300*1;
@@ -19,7 +19,6 @@ Time=0;
 Tend=0.1;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
-Alpha_last=zeros(1,N+1);
 U=zeros(6,N);
 F=zeros(6,N+1);
 U_lo_sL=zeros(1,N);
@@ -39,7 +38,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test1.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -51,7 +50,6 @@ U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
-    x_s(i)=x(i);
     if i<round(N*x0/(x_max-x_min))
         U(:,i) =U_L_0;
         Alpha(i) =phi_sL_0;
@@ -79,9 +77,6 @@ while Time<Tend && isreal(Time)
     d_t=CFL*d_x/Smax;
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;
-    end
-    if Time > 1.01*d_t
-        break;
     end
     %Riemann problem:compute flux
     for i=1:N+1
@@ -129,8 +124,7 @@ while Time<Tend && isreal(Time)
           end
       end
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
-        x_s(i)=x_s(i)+u_sL(i)*d_t;
-        area_L=0.5+(x_s(i)-x(i))/d_x;
+        area_L=0.5+u_sL(i)*d_t/d_x;
         area_R=1.0-area_L;
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),area_L,area_R);
         phi_sL=Alpha_next(i);
@@ -148,7 +142,7 @@ while Time<Tend && isreal(Time)
     end
     Alpha=Alpha_next;
     Time=Time+d_t
-%     if Time > 0.99*d_t
+%     if Time > 1.01*d_t
 %         break;
 %     end
 end
@@ -176,9 +170,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test1.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
 col = ':.b';
