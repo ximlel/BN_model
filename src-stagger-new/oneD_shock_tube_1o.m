@@ -7,18 +7,19 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-9;
+ep=1e-14;
 x_min=0;
 x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.2;
+CFL=0.6;
 %state value
 Time=0;
 Tend=0.1;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
+Alpha_last=zeros(1,N+1);
 U=zeros(6,N);
 F=zeros(6,N+1);
 U_lo_sL=zeros(1,N);
@@ -38,7 +39,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test3.mat;
+load ../test/test1.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -50,6 +51,7 @@ U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
+    x_s(i)=x(i);
     if i<round(N*x0/(x_max-x_min))
         U(:,i) =U_L_0;
         Alpha(i) =phi_sL_0;
@@ -62,11 +64,11 @@ for i=1:N
         Alpha(i+1) =phi_sR_0;
     end
 end
+Alpha_next=Alpha;
 %Godunov's Method
 while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
-        x_s(i)=x(i);
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),0.5,0.5);
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
@@ -78,19 +80,39 @@ while Time<Tend && isreal(Time)
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;
     end
+    if Time > 1.01*d_t
+        break;
+    end
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
         if i==1
-            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,u_sL(1));
-            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,u_sL(1));
+            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,0.0);
+            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,0.0);
         elseif i==N+1
-            F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,u_sL(N));
-            F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,u_sL(N));
+            F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,0.0);
+            F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,0.0);
         else
-            F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.5*(u_sL(i-1)+u_sL(i)));
-            F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.5*(u_sL(i-1)+u_sL(i)));
+            F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.0);
+            F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.0);
         end
+    end
+    for i=1:N
+        if i<N
+            rho_s(i) =0.5*(lo_sR(i)+lo_sL(i+1));
+            arho_s(i)=0.5*(lo_sR(i)+lo_sL(i+1))*Alpha(i+1);           
+        end
+        F_rho_s(i) =lo_sL(i)*u_sL(i);
+        if u_sL(i)>0
+            F_arho_s(i)=  Alpha(i)*lo_sL(i)*u_sL(i);
+        else
+            F_arho_s(i)=Alpha(i+1)*lo_sR(i)*u_sR(i);
+        end
+    end
+    for i=1:N-1
+        arho_s(i)=arho_s(i)+d_t/d_x*(F_arho_s(i)-F_arho_s(i+1));
+        rho_s(i) = rho_s(i)+d_t/d_x*(F_rho_s(i) -F_rho_s(i+1));
+        Alpha_next(i+1)=arho_s(i)/rho_s(i);
     end
     %compute U in next step
     for i=1:N
@@ -106,34 +128,29 @@ while Time<Tend && isreal(Time)
               S=S_tmp;
           end
       end
-      if i==1
-          x_delta=0.5*(x(2)-x(1)+d_x);
-      elseif i==N
-          x_delta=0.5*(x(N)-x(N-1)+d_x);
-      else
-          x_delta=0.5*(x(i+1)-x(i-1));
-      end
-        U(:,i)=U(:,i)*x_delta+d_t*(F(:,i)-F(:,i+1))+d_t*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
-        U_lo_sL(i)=U_lo_sL(i)*x_delta+d_t*(F(4,i));
-        U_lo_sR(i)=U_lo_sR(i)*x_delta+d_t*(-F(4,i+1));
-    end
-    for i=1:N
+        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
         x_s(i)=x_s(i)+u_sL(i)*d_t;
-    end
-    for i=1:N
         area_L=0.5+(x_s(i)-x(i))/d_x;
-        area_R=1.0-beta_L;          
+        area_R=1.0-area_L;
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),area_L,area_R);
+        phi_sL=Alpha_next(i);
+        phi_sR=Alpha_next(i+1);
+        [lo_gL(i),u_gL(i),p_gL(i),p_sL(i)]=Riemann_inv(Alpha(i),  lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),phi_sL);   
+        [lo_gR(i),u_gR(i),p_gR(i),p_sR(i)]=Riemann_inv(Alpha(i+1),lo_gR(i),u_gR(i),p_gR(i),u_sR(i),p_sR(i),phi_sR);   
+        phi_gL=1.0-phi_sL;
+        phi_gR=1.0-phi_sR;
+        E_gL=p_gL(i)/(gama_g-1)+0.5*lo_gL(i)*u_gL(i)^2;
+        E_sL=(p_sL(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sL(i)*u_sL(i)^2;
+        U(:,i)=       0.5*[phi_gL*lo_gL(i);phi_gL*lo_gL(i)*u_gL(i);phi_gL*E_gL;phi_sL*lo_sL(i);phi_sL*lo_sL(i)*u_sL(i);phi_sL*E_sL];
+        E_gR=p_gR(i)/(gama_g-1)+0.5*lo_gR(i)*u_gR(i)^2;
+        E_sR=(p_sR(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sR(i)*u_sR(i)^2;
+        U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
     end
-    for i=1:N
-        U(:,i)=U(:,i)/x_delta;
-        U_lo_sL(i)=U_lo_sL(i)/x_delta;
-        U_lo_sR(i)=U_lo_sR(i)/x_delta;
-    end
+    Alpha=Alpha_next;
     Time=Time+d_t
-% if Time > 0.5*d_t
-%    break;
-% end
+%     if Time > 0.99*d_t
+%         break;
+%     end
 end
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
@@ -159,9 +176,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test3.exact;
+load ../test/test1.exact;
 for i=1:N
-     W_exact(i,:) = test3(ceil(i/(N/300)),:);
+     W_exact(i,:) = test1(ceil(i/(N/300)),:);
 end
 %plot
 col = ':.b';

@@ -172,6 +172,6 @@ out_vel_u=W_0(2);
 out_p=W_0(3);
 out_E=out_p/(gama-1)+1/2*out_lo*out_vel_u^2;
 out_W_exact=[out_lo;out_vel_u;out_p];
-out_flux=[out_lo*(out_vel_u-ratio_x_t);out_lo*out_vel_u*(out_vel_u-ratio_x_t)+out_p;out_E*(out_vel_u-ratio_x_t)+out_p*out_vel_u];
+out_flux=[out_lo*out_vel_u;out_lo*out_vel_u*out_vel_u+out_p;out_E*out_vel_u+out_p*out_vel_u];
 out_flux=A*out_flux;
 end
