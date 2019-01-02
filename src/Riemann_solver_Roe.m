@@ -95,7 +95,7 @@ F0=[phi_g0*lo_g0*u_g0;phi_g0*lo_g0*u_g0^2+phi_g0*p_g0;phi_g0*(gama_g/(gama_g-1.0
     phi_s0*lo_s0*u_s0;phi_s0*lo_s0*u_s0^2+phi_s0*p_s0;phi_s0*(gama_s/(gama_s-1.0)*(p_s0+p0)+0.5*lo_s0*u_s0^2)*u_s0;0.0];
 out_flux_L=F0;
 out_flux_R=F0;
-rat = 1;
+rat = 0;
 if u_wave_s > 0.0
     out_flux_R=out_flux_R-[0;0;0;0;0;0;u_wave_s]*d_u_s(4);
     %out_flux_R=out_flux_R-[0;p_g0-p_g1;u_s0*p_g0-u_wave_s*p_g1;0;p_g1-p_g0;u_wave_s*p_g1-u_s0*p_g0;u_s0-u_wave_s]*d_u_s(4);
