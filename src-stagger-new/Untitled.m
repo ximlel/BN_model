@@ -1,0 +1,12 @@
+clear;
+clc;
+load ../test/test5.exact;
+W_exact = test5;
+x=W_exact(120:121,2);
+phi_s=W_exact(120:121,2);
+lo_s=W_exact(120:121,3);
+u_s=W_exact(120:121,4);
+p_s=W_exact(120:121,5);
+lo_g=W_exact(120:121,6);
+u_g=W_exact(120:121,7);
+p_g=W_exact(120:121,8);
