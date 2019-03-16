@@ -26,23 +26,23 @@ A=zeros(1,N+1);
 U=zeros(3,N);
 F=zeros(3,N+1);
 %initial condition
-lo_L_0  =169.34;
-u_L_0   =0;
-p_L_0   =2.96e8;
-lo_R_0  =0.76278;
-u_R_0   =0;
-p_R_0   =1e5;
-phi_L_0 =1.0;
-phi_R_0 =0.25;
-
-% lo_L_0  =151.13;
-% u_L_0   =212.31;
-% p_L_0   =2.4836e8;
-% lo_R_0  =95.199;
-% u_R_0   =1348.2;
-% p_R_0   =1.4067e8;
+% lo_L_0  =169.34;
+% u_L_0   =0;
+% p_L_0   =2.96e8;
+% lo_R_0  =0.76278;
+% u_R_0   =0;
+% p_R_0   =1e5;
 % phi_L_0 =1.0;
 % phi_R_0 =0.25;
+
+lo_L_0  =151.13;
+u_L_0   =212.31;
+p_L_0   =2.4836e8;
+lo_R_0  =95.199;
+u_R_0   =1348.2;
+p_R_0   =1.4067e8;
+phi_L_0 =1.0;
+phi_R_0 =0.25;
 
 % lo_L_0  =1.0555;
 % u_L_0   =-1.0651;
@@ -131,7 +131,7 @@ p  = 0.5*(p_L +p_R);
 u  = 0.5*(u_L +u_R);
 eta= 0.5*(p_L./lo_L.^gama+p_R./lo_R.^gama);
 W_exact = zeros(N,4);
-W_exact(:,1)=A(1:N)';
+W_exact(:,1)=eta';%A(1:N)';
 W_exact(:,2)=p';
 W_exact(:,3)=lo';
 W_exact(:,4)=u';
@@ -142,30 +142,42 @@ W_exact(:,4)=u';
 
 %plot
 col = '-m';
-figure(1);
+h=figure(1);
+set(h,'position',[100 100 600 450]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Density','FontWeight','bold');
-subplot(2,2,2);
-hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,u,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Velocity','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,lo,'xr','MarkerSize',4);%col,'LineWidth',1.0);
+%xlabel('Position','FontWeight','bold');
+%ylabel('Density','FontWeight','bold');
+ylim([90 160])
+title('密度');
+set(gca,'box','on');
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Pressure','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,u,'xr','MarkerSize',4);%col,'LineWidth',1.0);
+%xlabel('Position','FontWeight','bold');
+%ylabel('Velocity','FontWeight','bold');
+title('速度');
+set(gca,'box','on');
+subplot(2,2,2);
+hold on
+plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,p,'xr','MarkerSize',4);%,col,'LineWidth',1.0);
+%xlabel('Position','FontWeight','bold');
+%ylabel('Pressure','FontWeight','bold');
+title('压力');
+set(gca,'box','on');
 subplot(2,2,4);
 hold on
-% plot(x_min:d_x:x_max-d_x,W_exact(:,1),'k','LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,W_exact(:,1),'b','LineWidth',0.4);
 % plot(x_min:d_x:x_max-d_x,A(1:N),col,'LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,eta,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Entropy','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,eta,'xr','MarkerSize',4);%,col,'LineWidth',1.0);
+%xlabel('Position','FontWeight','bold');
+%ylabel('Entropy','FontWeight','bold');
+title('熵');
+set(gca,'box','on');
+ylim([5.08*10^5 5.2*10^5])
+%ylim([0 12*10^5])
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
