@@ -109,11 +109,12 @@ load ../test/test4.exact;
 for i=1:N
      W_exact(i,:) = test4(ceil(i/(N/300)),:);
 end
+
 %plot
-col = '.b';
-%col = 'xr';
+%col = '+k';
+col = 'or';
 h1=figure(1);
-set(h1,'position',[100 100 600 450]);
+set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',0.4);
@@ -145,7 +146,7 @@ plot(x_min:d_x:x_max-d_x,phi_s,col,'MarkerSize',3);
 % ylabel('Porosity-solid','FontWeight','bold');
 title('固体相—体积分数')
 h2=figure(2);
-set(h2,'position',[100 100 600 450]);
+set(h2,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',0.4);
@@ -175,7 +176,7 @@ plot(x_min:d_x:x_max-d_x,p_g./lo_g.^gama_g,col,'MarkerSize',4);
 % ylabel('Entropy-gas','FontWeight','bold');
 title('气体相—熵')
 h3=figure(3)
-set(h3,'position',[100 100 600 450]);
+set(h3,'position',[100 100 800 600]);
 subplot(3,1,1);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',0.4);

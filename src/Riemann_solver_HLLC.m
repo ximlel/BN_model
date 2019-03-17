@@ -98,8 +98,8 @@ if S_sM > 0.0
     out_flux_R=out_flux_R-(1-rat)*[0;p_gR;u_sR*p_gR;0;-p_gR;-u_sR*p_gR;u_sR-S_sM]*d_u_s;
 %    [phi_s_out,dE_g] = E_s_correct(S_sM,lo_g1,u_g1,p_g1,lo_s1,p_s1,phi_s1,lo_g2,u_g2,p_g2,lo_s2,p_s2,phi_s2,ratio_t_x);
 %    out_flux_R=out_flux_R+[0;0;dE_g;0;0;-dE_g;0]/ratio_t_x;
-    [phi_s_out,dE_g,dm_g] = E_s_correct2(S_sM,lo_g1,u_g1,p_g1,lo_s1,p_s1,phi_s1,lo_g2,u_g2,p_g2,lo_s2,p_s2,phi_s2,ratio_t_x);
-    out_flux_R=out_flux_R+[0;dm_g;dE_g;0;-dm_g;-dE_g;0]/ratio_t_x;
+%%    [phi_s_out,dE_g,dm_g] = E_s_correct2(S_sM,lo_g1,u_g1,p_g1,lo_s1,p_s1,phi_s1,lo_g2,u_g2,p_g2,lo_s2,p_s2,phi_s2,ratio_t_x);
+%%    out_flux_R=out_flux_R+[0;dm_g;dE_g;0;-dm_g;-dE_g;0]/ratio_t_x;
     %out_flux_R=out_flux_R-(1-rat)*[0;1;S_sM;0;-1;-S_sM;0]*(phi_g1*p_g1+phi_g1*lo_g1*(u_g1-S_sM)^2-phi_g2*p_g2-phi_g2*lo_g2*(u_g2-S_sM)^2);
     %out_flux_R=out_flux_R-(1-rat)*[0;p_g2;S_sM*p_g2;0;-p_g2;-S_sM*p_g2;0]*d_u_s;
     %out_flux_R=out_flux_R+1.0/(gama-1.0)*S_sM*[0;0;1;0;0;-1;0]*(p_s2-p_s1)*d_u_s;
@@ -111,9 +111,9 @@ else
 %    [phi_s_out,dE_g] = E_s_correct(-S_sM,lo_g2,-u_g2,p_g2,lo_s2,p_s2,phi_s2,lo_g1,-u_g1,p_g1,lo_s1,p_s1,phi_s1,ratio_t_x);
 %    phi_s_out = -phi_s_out;
 %    out_flux_L=out_flux_L-[0;0;dE_g;0;0;-dE_g;0]/ratio_t_x;
-    [phi_s_out,dE_g,dm_g] = E_s_correct2(-S_sM,lo_g2,-u_g2,p_g2,lo_s2,p_s2,phi_s2,lo_g1,-u_g1,p_g1,lo_s1,p_s1,phi_s1,ratio_t_x);
-    phi_s_out = -phi_s_out;
-    out_flux_L=out_flux_L-[0;dm_g;dE_g;0;-dm_g;-dE_g;0]/ratio_t_x;
+%%    [phi_s_out,dE_g,dm_g] = E_s_correct2(-S_sM,lo_g2,-u_g2,p_g2,lo_s2,p_s2,phi_s2,lo_g1,-u_g1,p_g1,lo_s1,p_s1,phi_s1,ratio_t_x);
+%%    phi_s_out = -phi_s_out;
+%%    out_flux_L=out_flux_L-[0;dm_g;dE_g;0;-dm_g;-dE_g;0]/ratio_t_x;
     %out_flux_L=out_flux_L+(1-rat)*[0;1;S_sM;0;-1;-S_sM;0]*(phi_g1*p_g1+phi_g1*lo_g1*(u_g1-S_sM)^2-phi_g2*p_g2-phi_g2*lo_g2*(u_g2-S_sM)^2);
     %out_flux_L=out_flux_L+(1-rat)*[0;p_g1;S_sM*p_g1;0;-p_g1;-S_sM*p_g1;0]*d_u_s;
     %out_flux_L=out_flux_L-1.0/(gama-1.0)*S_sM*[0;0;1;0;0;-1;0]*(p_s2-p_s1)*d_u_s;

@@ -36,7 +36,7 @@ FR=zeros(7,N+1);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test10.mat;
+load ../test/test_my1.mat;
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -85,16 +85,16 @@ while Time<Tend && isreal(Time)
          else
              [phi_s_out,FL(:,i),FR(:,i)]=Riemann_solver_HLLC(lo_g(i-1),lo_g(i),p_g(i-1),p_g(i),u_g(i-1),u_g(i),lo_s(i-1),lo_s(i),p_s(i-1),p_s(i),u_s(i-1),u_s(i),phi_s(i-1),phi_s(i),d_t/d_x);
          end
-         if phi_s_out > 0.0 && i<N+1
-             U(7,i) = phi_s_out;
-         elseif phi_s_out <= 0.0 && i>1
-             U(7,i-1) = -phi_s_out;
-         end
+%          if phi_s_out > 0.0 && i<N+1
+%              U(7,i) = phi_s_out;
+%          elseif phi_s_out <= 0.0 && i>1
+%              U(7,i-1) = -phi_s_out;
+%          end
     end
     %compute U in next step
     for i=1:N
-        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
-%        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
+%        U(1:6,i)=U(1:6,i)+d_t/d_x*(FR(1:6,i)-FL(1:6,i+1));
+        U(:,i)=U(:,i)+d_t/d_x*(FR(:,i)-FL(:,i+1));
         [lo_g(i),u_g(i),p_g(i),phi_g(i),lo_s(i),u_s(i),p_s(i),phi_s(i)]=primitive_comp(U(:,i));
     end
     Time=Time+d_t
@@ -110,83 +110,98 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-% load ../test/test_new1_pi.exact;
-% for i=1:N
-%      W_exact(i,:) = test_new1_pi(ceil(i/(N/300)),:);
-% end
+load ../test/test_my1.exact;
+for i=1:N
+     W_exact(i,:) = test_my1(ceil(i/(N/300)),:);
+end
 
 %plot
-col = ':.m';
-figure(1);
+%col = '+k';
+col = 'or';
+h1=figure(1);
+set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo_s,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Density-solid','FontWeight','bold');
-ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
+plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,lo_s,col,'MarkerSize',3);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Density-solid','FontWeight','bold');
+% ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
+title('固体相—密度')
 subplot(2,2,2);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,u_s,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Velocity-solid','FontWeight','bold');
-ylim([min(u_s)-0.00001 max(u_s)+0.00001])
+plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,u_s,col,'MarkerSize',3);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Velocity-solid','FontWeight','bold');
+% ylim([min(u_s)-0.00001 max(u_s)+0.00001])
+title('固体相—速度')
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,5),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p_s,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Pressure-solid','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,5),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,p_s,col,'MarkerSize',3);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Pressure-solid','FontWeight','bold');
+title('固体相—压力')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,phi_s,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Porosity-solid','FontWeight','bold');
-figure(2);
+plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,phi_s,col,'MarkerSize',3);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Porosity-solid','FontWeight','bold');
+title('固体相—体积分数')
+h2=figure(2);
+set(h2,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,lo_g,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Density-gas','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,lo_g,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Density-gas','FontWeight','bold');
+title('气体相—密度')
 subplot(2,2,2);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,7),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,u_g,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Velocity-gas','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,7),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,u_g,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Velocity-gas','FontWeight','bold');
+title('气体相—速度')
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p_g,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Pressure-gas','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,W_exact(:,8),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,p_g,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Pressure-gas','FontWeight','bold');
+title('气体相—压力')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,p_g./lo_g.^gama_g,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Entropy-gas','FontWeight','bold');
-figure(3)
+plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,p_g./lo_g.^gama_g,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Entropy-gas','FontWeight','bold');
+title('气体相—熵')
+h3=figure(3)
+set(h3,'position',[100 100 800 600]);
 subplot(3,1,1);
 hold on
-plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,phi_g.*lo_g.*(u_g-u_s),col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Riemann_inv-Q','FontWeight','bold');
-ylim([min(phi_g.*lo_g.*(u_g-u_s))-0.00001 max(phi_g.*lo_g.*(u_g-u_s))+0.00001])
+plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,phi_g.*lo_g.*(u_g-u_s),col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Riemann_inv-Q','FontWeight','bold');
+% ylim([min(phi_g.*lo_g.*(u_g-u_s))-0.00001 max(phi_g.*lo_g.*(u_g-u_s))+0.00001])
+title('黎曼不变量—Q')
 subplot(3,1,2);
 hold on
-plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Riemann_inv-P','FontWeight','bold');
-ylim([min(phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s)-0.00001 max(phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s)+0.00001])
+plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Riemann_inv-P','FontWeight','bold');
+% ylim([min(phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s)-0.00001 max(phi_g.*lo_g.*(u_g-u_s).^2+phi_g.*p_g+phi_s.*p_s)+0.00001])
+title('黎曼不变量—P')
 subplot(3,1,3);
 hold on
-plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,0.5*(u_g-u_s).^2+gama_g/(gama_g-1)*p_g./lo_g,col,'LineWidth',1.0);
-xlabel('Position','FontWeight','bold');
-ylabel('Riemann_inv-H','FontWeight','bold');
+plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,0.5*(u_g-u_s).^2+gama_g/(gama_g-1)*p_g./lo_g,col,'MarkerSize',4);
+% xlabel('Position','FontWeight','bold');
+% ylabel('Riemann_inv-H','FontWeight','bold');
+title('黎曼不变量—H')
