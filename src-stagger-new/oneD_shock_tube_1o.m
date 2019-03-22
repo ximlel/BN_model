@@ -38,7 +38,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test1.mat;
+load ../test/test4.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -48,12 +48,12 @@ E_gR_0=p_gR_0/(gama_g-1)+0.5*lo_gR_0*u_gR_0^2;
 E_sR_0=(p_sR_0+gama_s*p0)/(gama_s-1)+0.5*lo_sR_0*u_sR_0^2;
 U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0;phi_sR_0*lo_sR_0*u_sR_0;phi_sR_0*E_sR_0];
 
-% E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
-% E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
-% U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
-% E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
-% E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
-% U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
+E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
+E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
+U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
+E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
+E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
+U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -64,8 +64,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-        U(:,i) =0.5*(U_L_0+U_R_0);
-%        U(:,i) =0.5*(U_L_1+U_R_1);
+%        U(:,i) =0.5*(U_L_0+U_R_0);
+        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -178,15 +178,15 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test1.exact;
+load ../test/test4.exact;
 for i=1:N
-     W_exact(i,:) = test1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test4(ceil(i/(N/300)),:);
 end
 %plot
 %col = '+k';
 %col = 'or';
-%col = '*m';
-col = '+b';
+col = '*m';
+%col = '+b';
 h1=figure(1);
 set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);

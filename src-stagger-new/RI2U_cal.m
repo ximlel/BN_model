@@ -10,16 +10,16 @@ global ep;
     H=RI(5);
     eta_g=RI(6);
     it_max = 500;
-    k = 0; err = 1e50;
+    k = 0; err1 = 1e50;
     lo_g=lo_g_start;
-    while (k<it_max && err>ep)
+    while (k<it_max && err1>ep)
         fun  = H-0.5*(Q/phi_g)^2/lo_g^2-gama_g/(gama_g-1.0)*eta_g*lo_g^(gama_g-1.0);
         dfun = (Q/phi_g)^2/lo_g^3-gama_g*eta_g*lo_g^(gama_g-2.0);
-        [lo_g, err] = NewtonRapshon(fun,dfun,lo_g,ep);
+        [lo_g, err1] = NewtonRapshon(fun,dfun,lo_g,ep);
         k=k+1;
     end
     if k>=it_max
-        err
+        err1
     end
     p_g = lo_g^gama_g*eta_g;
     u_g = Q/phi_g/lo_g+u_s;

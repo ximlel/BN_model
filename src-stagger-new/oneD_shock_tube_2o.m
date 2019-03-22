@@ -42,7 +42,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test1.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -52,12 +52,12 @@ E_gR_0=p_gR_0/(gama_g-1)+0.5*lo_gR_0*u_gR_0^2;
 E_sR_0=(p_sR_0+gama_s*p0)/(gama_s-1)+0.5*lo_sR_0*u_sR_0^2;
 U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0;phi_sR_0*lo_sR_0*u_sR_0;phi_sR_0*E_sR_0];
 
-% E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
-% E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
-% U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
-% E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
-% E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
-% U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
+E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
+E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
+U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
+E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
+E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
+U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -68,8 +68,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-        U(:,i) =0.5*(U_L_0+U_R_0);
-%        U(:,i) =0.5*(U_L_1+U_R_1);
+%        U(:,i) =0.5*(U_L_0+U_R_0);
+        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -94,30 +94,30 @@ while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N-1
         d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
-        %d_RI(:,i)=0;
+%        d_RI(:,i)=0;
     end
     for i=2:N
         d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
-        %d_Alpha(i)=0;
+%        d_Alpha(i)=0;
     end
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
              Alpha_int=Alpha(1);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i,lo_sL_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i,lo_sR_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
+             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(1),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
+             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(1),lo_sR_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
          elseif i==N+1
              Alpha_int=Alpha(N+1);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i,lo_sL_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i,lo_sR_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
+             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(N+1),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
+             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(N+1),lo_sR_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
          else
              Alpha_int=Alpha(i);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i,lo_sL_i]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI(:,i-1),0.5*(lo_gR(i-1)+lo_gL(i)));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i,lo_sR_i]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI(:,i),  0.5*(lo_gR(i-1)+lo_gL(i)));
+             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(i),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI(:,i-1),0.5*(lo_gR(i-1)+lo_gL(i)));
+             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(i),lo_sR_i]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI(:,i),  0.5*(lo_gR(i-1)+lo_gL(i)));
          end
-       F(1:3,1)=Riemann_solver_Exact(lo_gL_i,lo_gR_i,p_gL_i,p_gR_i,u_gL_i,u_gR_i,1-Alpha_int,gama_g,0.0);
-       F(4:6,1)=Riemann_solver_Exact(lo_sL_i,lo_sR_i,p_sL_i,p_sR_i,u_sL_i,u_sR_i,  Alpha_int,gama_s,0.0);
+       F(1:3,i)=Riemann_solver_Exact(lo_gL_i,lo_gR_i,p_gL_i,   p_gR_i,   u_gL_i,u_gR_i,1-Alpha_int,gama_g,0.0);
+       F(4:6,i)=Riemann_solver_Exact(lo_sL_i,lo_sR_i,p_sL_i(i),p_sR_i(i),u_sL_i,u_sR_i,  Alpha_int,gama_s,0.0);
     end
     for i=1:N
         if i<N
@@ -126,9 +126,9 @@ while Time<Tend && isreal(Time)
         end
         F_rho_s(i) =lo_sL(i)*u_sL(i);
         if u_sL(i)>0
-            F_arho_s(i)=  Alpha(i)*lo_sL(i)*u_sL(i);
+            F_arho_s(i)=  (Alpha(i)+0.5*d_x*d_Alpha(i))  *lo_sL(i)*u_sL(i);
         else
-            F_arho_s(i)=Alpha(i+1)*lo_sR(i)*u_sR(i);
+            F_arho_s(i)=(Alpha(i+1)-0.5*d_x*d_Alpha(i+1))*lo_sR(i)*u_sR(i);
         end
     end
     for i=1:N-1
@@ -141,7 +141,7 @@ while Time<Tend && isreal(Time)
       if abs(Alpha(i+1)-Alpha(i))<ep
           S=0.5*(p_gL(i)+p_gR(i))*(Alpha(i+1)-Alpha(i));
       else
-          S_tmp=Alpha(i+1)*p_sR(i)-Alpha(i)*p_sL(i);
+          S_tmp=Alpha(i+1)*p_sL_i(i+1)-Alpha(i)*p_sR_i(i);
           if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_gL(i),p_gR(i)))
               S=max(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
           elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_gL(i),p_gR(i)))
@@ -197,9 +197,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test1.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test1(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
 %col = '+k';
