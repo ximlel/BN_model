@@ -104,17 +104,17 @@ while Time<Tend && isreal(Time)
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
-             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,1));
-             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(RI(:,1));
              Alpha_int=Alpha(1);
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
          elseif i==N+1
-             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,N));
-             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=primitive_comp(RI(:,N));
              Alpha_int=Alpha(N+1);
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
          else
-             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,i-1)+0.5*d_x*d_RI(:,i-1));
-             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(RI(:,i)-0.5*d_x*d_RI(:,i));
              Alpha_int=Alpha(i);
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI(:,i-1),0.5*(lo_gR(i-1)+lo_gL(i)));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI(:,i),  0.5*(lo_gR(i-1)+lo_gL(i)));
          end
        F(1:3,1)=Riemann_solver_Exact(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,1-Alpha_int,gama_g,0.0);
        F(4:6,1)=Riemann_solver_Exact(lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,Alpha_int,gama_s,0.0);
