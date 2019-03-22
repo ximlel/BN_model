@@ -14,7 +14,7 @@ global ep;
     lo_g=lo_g_start;
     while (k<it_max && err>ep)
         fun  = H-0.5*(Q/phi_g)^2/lo_g^2-gama_g/(gama_g-1.0)*eta_g*lo_g^(gama_g-1.0);
-        dfun = (Q/phi_g)^2/lo_g^3-gama_g*eta*lo_g^(gama_g-2.0);
+        dfun = (Q/phi_g)^2/lo_g^3-gama_g*eta_g*lo_g^(gama_g-2.0);
         [lo_g, err] = NewtonRapshon(fun,dfun,lo_g,ep);
         k=k+1;
     end

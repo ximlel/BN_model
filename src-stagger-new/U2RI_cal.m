@@ -1,5 +1,5 @@
 %compute flux
-function RI=U2RI_cal(phi_s,lo_g,u_g,p_g,u_s,p_s)
+function RI=U2RI_cal(phi_s,lo_g,u_g,p_g,u_s,p_s,lo_s)
 global gama_g;
 global ep;
     phi_g=1.0-phi_s;
