@@ -1,6 +1,6 @@
 clear;
 clc;
-%1D shock_tube by 1-order staggered Schemes for BN model
+%1D shock_tube by 2-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
 gama_s=1.4;
@@ -14,6 +14,7 @@ N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.2;
+Alpha_GRP=1.0;
 %state value
 Time=0;
 Tend=0.1;
@@ -21,6 +22,9 @@ Tend=0.1;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
 F=zeros(6,N+1);
+RI=zeros(6,N); %Riemann invariants
+d_RI=zeros(6,N);
+d_Alpha=zeros(1,N+1);
 U_lo_sL=zeros(1,N);
 U_lo_sR=zeros(1,N);
 %initial condition
@@ -76,6 +80,7 @@ while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),0.5,0.5);
+        RI(:,i)=U2RI_cal(Alpha(i),lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),lo_sL(i));
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
         a_gR(i)=sqrt(gama_g*p_gR(i)/lo_gR(i));
@@ -86,19 +91,33 @@ while Time<Tend && isreal(Time)
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;
     end
+    %reconstruction (minmod limiter)
+    for i=2:N-1
+        d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
+        %d_RI(:,i)=0;
+    end
+    for i=2:N
+        d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
+        %d_Alpha(i)=0;
+    end
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
-        if i==1
-            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,0.0);
-            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,0.0);
-        elseif i==N+1
-            F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,0.0);
-            F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,0.0);
-        else
-            F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.0);
-            F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.0);
-        end
+         if i==1
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,1));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(RI(:,1));
+             Alpha_int=Alpha(1);
+         elseif i==N+1
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,N));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=primitive_comp(RI(:,N));
+             Alpha_int=Alpha(N+1);
+         else
+             [lo_gL,u_gL,p_gL,u_sL,p_sL,lo_sL]=RI2U_cal(RI(:,i-1)+0.5*d_x*d_RI(:,i-1));
+             [lo_gR,u_gR,p_gR,u_sR,p_sR,lo_sR]=RI2U_cal(RI(:,i)-0.5*d_x*d_RI(:,i));
+             Alpha_int=Alpha(i);
+         end
+       F(1:3,1)=Riemann_solver_Exact(lo_gL,lo_gR,p_gL,p_gR,u_gL,u_gR,1-Alpha_int,gama_g,0.0);
+       F(4:6,1)=Riemann_solver_Exact(lo_sL,lo_sR,p_sL,p_sR,u_sL,u_sR,Alpha_int,gama_s,0.0);
     end
     for i=1:N
         if i<N

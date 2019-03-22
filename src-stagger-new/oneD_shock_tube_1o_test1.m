@@ -1,6 +1,6 @@
 clear;
 clc;
-%1D shock_tube by HLLC Schemes for BN model
+%1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
 gama_s=1.4;
