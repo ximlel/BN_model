@@ -192,7 +192,7 @@ set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',0.4);
-plot(x,lo_s,col,'MarkerSize',3);
+plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
 % ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
@@ -200,7 +200,7 @@ title('固体相—密度')
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',0.4);
-plot(x,u_s,col,'MarkerSize',3);
+plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
 % ylim([min(u_s)-0.00001 max(u_s)+0.00001])
@@ -208,14 +208,14 @@ title('固体相—速度')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'k','LineWidth',0.4);
-plot(x,p_s,col,'MarkerSize',3);
+plot(x,p_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-solid','FontWeight','bold');
 title('固体相—压力')
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',0.4);
-plot(x,phi_s,col,'MarkerSize',3);
+plot(x,phi_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Porosity-solid','FontWeight','bold');
 title('固体相—体积分数')
@@ -224,28 +224,28 @@ set(h2,'position',[100 100 800 600]);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',0.4);
-plot(x,lo_g,col,'MarkerSize',3);
+plot(x,lo_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('气体相—密度')
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'k','LineWidth',0.4);
-plot(x,u_g,col,'MarkerSize',3);
+plot(x,u_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-gas','FontWeight','bold');
 title('气体相—速度')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'k','LineWidth',0.4);
-plot(x,p_g,col,'MarkerSize',3);
+plot(x,p_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-gas','FontWeight','bold');
 title('气体相—压力')
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',0.4);
-plot(x,eta,col,'MarkerSize',3);
+plot(x,eta,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Entropy-gas','FontWeight','bold');
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
@@ -255,7 +255,7 @@ set(h3,'position',[100 100 800 600]);
 subplot(3,1,1);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',0.4);
-plot(x,Q_inv,col,'MarkerSize',3);
+plot(x,Q_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-Q','FontWeight','bold');
 % ylim([min(Q_inv)-0.00001 max(Q_inv)+0.00001])
@@ -263,7 +263,7 @@ title('黎曼不变量—Q')
 subplot(3,1,2);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'k','LineWidth',0.4);
-plot(x,P_inv,col,'MarkerSize',3);
+plot(x,P_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-P','FontWeight','bold');
 % ylim([min(P_inv)-0.00001 max(P_inv)+0.00001])
@@ -271,7 +271,7 @@ title('黎曼不变量—P')
 subplot(3,1,3);
 hold on
 plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',0.4);
-plot(x,H_inv,col,'MarkerSize',3);
+plot(x,H_inv,col,'MarkerSize',4);
 % ylim([min(H_inv)-0.00001 max(H_inv)+0.00001])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-H','FontWeight','bold');

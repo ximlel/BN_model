@@ -14,7 +14,7 @@ N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.2;
-Alpha_GRP=1.0;
+Alpha_GRP=1.95;
 %state value
 Time=0;
 Tend=0.1;
@@ -42,7 +42,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test2.mat;
+load ../test/test1.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -52,12 +52,12 @@ E_gR_0=p_gR_0/(gama_g-1)+0.5*lo_gR_0*u_gR_0^2;
 E_sR_0=(p_sR_0+gama_s*p0)/(gama_s-1)+0.5*lo_sR_0*u_sR_0^2;
 U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0;phi_sR_0*lo_sR_0*u_sR_0;phi_sR_0*E_sR_0];
 
-E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
-E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
-U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
-E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
-E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
-U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
+% E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
+% E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
+% U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
+% E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
+% E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
+% U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -68,8 +68,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+        U(:,i) =0.5*(U_L_0+U_R_0);
+%        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -93,18 +93,16 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N-1
-% if Time/d_t < 50
-%     Alpha_GRP = 0;%Time/d_t/50;
+        d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
+% if Time < 100*d_t
+%    d_RI(:,i)=0;
 % end
-%        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
-         d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
     end
     for i=2:N
-% if Time/d_t < 50
-%     Alpha_GRP = 0;%Time/d_t/50;
+        d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
+% if Time < 100*d_t
+%    d_Alpha(i)=0;
 % end
-%        d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
-         d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
     end
     %Riemann problem:compute flux
     for i=1:N+1
@@ -203,15 +201,15 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test2.exact;
+load ../test/test1.exact;
 for i=1:N
-     W_exact(i,:) = test2(ceil(i/(N/300)),:);
+     W_exact(i,:) = test1(ceil(i/(N/300)),:);
 end
 %plot
 %col = '+k';
 %col = 'or';
-%col = '*m';
-col = '+b';
+col = '+m';
+%col = 'xb';
 h1=figure(1);
 set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);
@@ -220,7 +218,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
-% ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
+ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
 title('固体相—密度')
 subplot(2,2,2);
 hold on
@@ -228,7 +226,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
-% ylim([min(u_s)-0.00001 max(u_s)+0.00001])
+ylim([min(u_s)-0.00001 max(u_s)+0.00001])
 title('固体相—速度')
 subplot(2,2,3);
 hold on
@@ -273,7 +271,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',0.4)
 plot(x,eta,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Entropy-gas','FontWeight','bold');
-% ylim([min(eta)-0.00001 max(eta)+0.00001])
+ylim([min(eta)-0.00001 max(eta)+0.00001])
 title('气体相—熵')
 h3=figure(3)
 set(h3,'position',[100 100 800 600]);
@@ -283,7 +281,7 @@ plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:
 plot(x,Q_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-Q','FontWeight','bold');
-% ylim([min(Q_inv)-0.00001 max(Q_inv)+0.00001])
+ylim([min(Q_inv)-0.00001 max(Q_inv)+0.00001])
 title('黎曼不变量—Q')
 subplot(3,1,2);
 hold on
@@ -291,13 +289,13 @@ plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:
 plot(x,P_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-P','FontWeight','bold');
-% ylim([min(P_inv)-0.00001 max(P_inv)+0.00001])
+ylim([min(P_inv)-0.00001 max(P_inv)+0.00001])
 title('黎曼不变量—P')
 subplot(3,1,3);
 hold on
 plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',0.4);
 plot(x,H_inv,col,'MarkerSize',4);
-% ylim([min(H_inv)-0.00001 max(H_inv)+0.00001])
+ylim([min(H_inv)-0.00001 max(H_inv)+0.00001])
 % xlabel('Position','FontWeight','bold');
-% ylabel('Riemann_inv-H','FontWeight','bold');
+%ylabel('Riemann_inv-H','FontWeight','bold');
 title('黎曼不变量—H')
