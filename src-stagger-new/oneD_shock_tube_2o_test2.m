@@ -42,7 +42,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test4.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -99,17 +99,17 @@ while Time<Tend && isreal(Time)
 %     d_Alpha(i) = 0.0;
 % end
     end
-    HN=20;
+    HN=10;
     for i=HN+1:N-HN
 %        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
          d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
-%         if max(d_Alpha(i-HN:i+HN-1)>ep/100)||Time<0.017
+        if max(d_Alpha(i-HN:i+HN-1)>ep)
             d_RI(:,i)=0.0;
-%         end
+        end
     end
-    for i=2:N
-         d_Alpha(i)=0.0;
-    end
+%     for i=2:N
+%          d_Alpha(i)=0.0;
+%     end
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1
@@ -206,9 +206,9 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test4.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test4(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
 %col = '+k';

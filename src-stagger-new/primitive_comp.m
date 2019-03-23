@@ -36,7 +36,7 @@ p_sR  = (U6/phi_s - 0.5*lo_s*u_s^2)*(gama_s-1);
 %     p_sR    =12.85675006887399;
 % end
 fun  = zeros(1,4);
-it_max = 5000;
+it_max = 500;
 k = 0; err2 = 1e50;
 while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
     fun(1) = U3-area_L*phi_gL*(0.5*((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL)*((U2-area_R*phi_gR*lo_gR*u_gR)/(U1-area_R*phi_gR*lo_gR))^2+(p_gR/lo_gR^gama_g*((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL)^gama_g)/(gama_g-1))-area_R*phi_gR*(0.5*lo_gR*u_gR^2+p_gR/(gama_g-1));
@@ -60,6 +60,9 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
 end
 if k>=it_max
     err2
+    phi_sL
+    phi_sR
+    [lo_gR p_gR u_gR p_sR] 
 end
 lo_gL= (U1-area_R*phi_gR*lo_gR)/area_L/phi_gL;
 u_gL = (U2-area_R*phi_gR*lo_gR*u_gR)/(U1-area_R*phi_gR*lo_gR);
