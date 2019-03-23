@@ -214,7 +214,7 @@ end
 %col = '+k';
 %col = 'or';
 %col = '*m';
-col = '+b';
+col = 'xb';
 h1=figure(1);
 set(h1,'position',[100 100 800 600]);
 subplot(2,2,1);

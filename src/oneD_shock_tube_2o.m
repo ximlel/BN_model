@@ -125,7 +125,7 @@ end
 %plot
 %col = '+k';
 %col = 'or';
-col = '*m';
+col = '+m';
 %col = '+b';
 h1=figure(1);
 set(h1,'position',[100 100 800 600]);
