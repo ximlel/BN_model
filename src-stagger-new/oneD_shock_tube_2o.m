@@ -93,19 +93,19 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N
-%        d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
-         d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
+        d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
+%         d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
 % if Time/d_t < 50
 %     d_Alpha(i) = 0.0;
 % end
     end
     HN=20;
     for i=HN+1:N-HN
-%        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
-         d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
-%         if max(d_Alpha(i-HN:i+HN-1)>ep/100)||Time<0.017
+        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
+%         d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
+         if max(d_Alpha(i-HN:i+HN-1)>ep)||Time<0.02
             d_RI(:,i)=0.0;
-%         end
+         end
     end
     for i=2:N
          d_Alpha(i)=0.0;
@@ -211,15 +211,15 @@ for i=1:N
      W_exact(i,:) = test4(ceil(i/(N/300)),:);
 end
 %plot
-%col = '+k';
+col = '+k';
 %col = 'or';
 %col = '*m';
-col = 'xb';
+%col = 'xb';
 h1=figure(1);
-set(h1,'position',[100 100 800 600]);
+set(h1,'position',[100 100 1500 1000]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
@@ -227,7 +227,7 @@ plot(x,lo_s,col,'MarkerSize',4);
 title('Solid density')
 subplot(2,2,2);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,4),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
@@ -235,54 +235,54 @@ plot(x,u_s,col,'MarkerSize',4);
 title('Solid velocity')
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,5),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-solid','FontWeight','bold');
 title('Solid pressure')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,2),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,phi_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Porosity-solid','FontWeight','bold');
 title('Solid volume fraction')
 h2=figure(2);
-set(h2,'position',[100 100 800 600]);
+set(h2,'position',[100 100 1500 1000]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,6),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 plot(x,lo_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
 subplot(2,2,2);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,7),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-gas','FontWeight','bold');
 title('Gas velocity')
 subplot(2,2,3);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-gas','FontWeight','bold');
 title('Gas pressure')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'b','LineWidth',0.4);
 plot(x,eta,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Entropy-gas','FontWeight','bold');
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
 title('Gas entropy')
 h3=figure(3)
-set(h3,'position',[100 100 800 600]);
+set(h3,'position',[100 100 1500 1000]);
 subplot(3,1,1);
 hold on
-plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'b','LineWidth',0.4);
 plot(x,Q_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-Q','FontWeight','bold');
@@ -290,7 +290,7 @@ plot(x,Q_inv,col,'MarkerSize',4);
 title('Riemann invariants Q')
 subplot(3,1,2);
 hold on
-plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)).^2+(1-W_exact(:,2)).*W_exact(:,8)+W_exact(:,2).*W_exact(:,5),'b','LineWidth',0.4);
 plot(x,P_inv,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Riemann_inv-P','FontWeight','bold');
@@ -298,7 +298,7 @@ plot(x,P_inv,col,'MarkerSize',4);
 title('Riemann invariants P')
 subplot(3,1,3);
 hold on
-plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'k','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,0.5*(W_exact(:,7)-W_exact(:,4)).^2+gama_g/(gama_g-1)*W_exact(:,8)./W_exact(:,6),'b','LineWidth',0.4);
 plot(x,H_inv,col,'MarkerSize',4);
 % ylim([min(H_inv)-0.00001 max(H_inv)+0.00001])
 % xlabel('Position','FontWeight','bold');
