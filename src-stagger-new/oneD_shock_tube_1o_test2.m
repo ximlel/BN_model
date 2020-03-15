@@ -1,20 +1,19 @@
 clear;
 clc;
-%1D shock_tube by 2-order staggered Schemes for BN model
+%1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
 gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-11;
+ep=1e-9;
 x_min=0;
 x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.2;
-Alpha_GRP=1.0;
 %state value
 Time=0;
 Tend=0.1;
@@ -22,9 +21,6 @@ Tend=0.1;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
 F=zeros(6,N+1);
-RI=zeros(6,N); %Riemann invariants
-d_RI=zeros(6,N);
-d_Alpha=zeros(1,N+1);
 U_lo_sL=zeros(1,N);
 U_lo_sR=zeros(1,N);
 %initial condition
@@ -42,7 +38,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test4.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -80,7 +76,6 @@ while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),0.5,0.5);
-        RI(:,i)=U2RI_cal(Alpha(i),lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),lo_sL(i));
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));
         a_gR(i)=sqrt(gama_g*p_gR(i)/lo_gR(i));
@@ -91,42 +86,19 @@ while Time<Tend && isreal(Time)
     if Time+d_t >= Tend
         d_t = Tend-Time+1e-10;
     end
-    %reconstruction (minmod limiter)
-    for i=2:N
-        d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
-%         d_Alpha(i)=minmod(Alpha_GRP*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_GRP*(Alpha(:,i+1)-Alpha(:,i))/d_x);
-% if Time/d_t < 50
-%     d_Alpha(i) = 0.0;
-% end
-    end
-    HN=20;
-    for i=HN+1:N-HN
-        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
-%         d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
-         if max(d_Alpha(i-HN:i+HN-1)>ep)||Time<0.02
-            d_RI(:,i)=0.0;
-         end
-    end
-    for i=2:N
-         d_Alpha(i)=0.0;
-    end
+    %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
-         if i==1
-             Alpha_int=Alpha(1);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(1),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(1),lo_sR_i]=RI2U_cal(Alpha_int,RI(:,1),lo_gL(1));
-         elseif i==N+1
-             Alpha_int=Alpha(N+1);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(N+1),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(N+1),lo_sR_i]=RI2U_cal(Alpha_int,RI(:,N),lo_gR(N));
-         else
-             Alpha_int=Alpha(i);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(i),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI(:,i-1),lo_gR(i-1));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(i),lo_sR_i]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI(:,i),  lo_gL(i));
-         end
-       F(1:3,i)=Riemann_solver_Exact(lo_gL_i,lo_gR_i,p_gL_i,   p_gR_i,   u_gL_i,u_gR_i,1-Alpha_int,gama_g,0.0);
-       F(4:6,i)=Riemann_solver_Exact(lo_sL_i,lo_sR_i,p_sL_i(i),p_sR_i(i),u_sL_i,u_sR_i,  Alpha_int,gama_s,0.0);
+        if i==1
+            F(1:3,1)=Riemann_solver_Exact(lo_gL(1),lo_gL(1),p_gL(1),p_gL(1),u_gL(1),u_gL(1),1-Alpha(1),gama_g,0.0);
+            F(4:6,1)=Riemann_solver_Exact(lo_sL(1),lo_sL(1),p_sL(1),p_sL(1),u_sL(1),u_sL(1),Alpha(1),gama_s,0.0);
+        elseif i==N+1
+            F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,0.0);
+            F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,0.0);
+        else
+            F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.0);
+            F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.0);
+        end
     end
     for i=1:N
         if i<N
@@ -135,9 +107,9 @@ while Time<Tend && isreal(Time)
         end
         F_rho_s(i) =lo_sL(i)*u_sL(i);
         if u_sL(i)>0
-            F_arho_s(i)=  (Alpha(i)+0.5*d_x*d_Alpha(i))  *lo_sL(i)*u_sL(i);
+            F_arho_s(i)=  Alpha(i)*lo_sL(i)*u_sL(i);
         else
-            F_arho_s(i)=(Alpha(i+1)-0.5*d_x*d_Alpha(i+1))*lo_sR(i)*u_sR(i);
+            F_arho_s(i)=Alpha(i+1)*lo_sR(i)*u_sR(i);
         end
     end
     for i=1:N-1
@@ -150,14 +122,14 @@ while Time<Tend && isreal(Time)
       if abs(Alpha(i+1)-Alpha(i))<ep
           S=0.5*(p_gL(i)+p_gR(i))*(Alpha(i+1)-Alpha(i));
       else
-          S_tmp=Alpha(i+1)*p_sL_i(i+1)-Alpha(i)*p_sR_i(i);
-%           if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_gL(i),p_gR(i)))
-%               S=max(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
-%           elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_gL(i),p_gR(i)))
-%               S=min(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
-%           else
+          S_tmp=Alpha(i+1)*p_sR(i)-Alpha(i)*p_sL(i);
+          if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_gL(i),p_gR(i)))
+              S=max(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
+          elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_gL(i),p_gR(i)))
+              S=min(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
+          else
               S=S_tmp;
-%           end
+          end
       end
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
         area_L=0.5+u_sL(i)*d_t/d_x;
@@ -178,7 +150,7 @@ while Time<Tend && isreal(Time)
     end
     Alpha=Alpha_next;
     Time=Time+d_t
-%     if Time > 100*d_t
+%     if Time > 10*d_t
 %         break;
 %     end
 end
@@ -206,24 +178,25 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test4.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test4(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
-col = '+k';
+%col = '+k';
 %col = 'or';
 %col = '*m';
-%col = 'xb';
+col = 'xr';
+POS = [50 50 1200 800];
 h1=figure(1);
-set(h1,'position',[100 100 1500 1000]);
+set(h1,'position',POS);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
-% ylim([min(lo_s)-0.00001 max(lo_s)+0.00001])
+ylim([0 2.5])
 title('Solid density')
 subplot(2,2,2);
 hold on
@@ -231,12 +204,13 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
-% ylim([min(u_s)-0.00001 max(u_s)+0.00001])
+ylim([-1 1.5])
 title('Solid velocity')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
+ylim([0 6])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-solid','FontWeight','bold');
 title('Solid pressure')
@@ -244,15 +218,17 @@ subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,phi_s,col,'MarkerSize',4);
+ylim([0.1 0.2])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Porosity-solid','FontWeight','bold');
 title('Solid volume fraction')
 h2=figure(2);
-set(h2,'position',[100 100 1500 1000]);
+set(h2,'position',POS);
 subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 plot(x,lo_g,col,'MarkerSize',4);
+ylim([0.4 1.1])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
@@ -260,6 +236,7 @@ subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
+ylim([-1 2])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-gas','FontWeight','bold');
 title('Gas velocity')
@@ -267,19 +244,24 @@ subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
+ylim([0.5 3.03])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-gas','FontWeight','bold');
 title('Gas pressure')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'b','LineWidth',0.4);
-plot(x,eta,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Entropy-gas','FontWeight','bold');
+% plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'b','LineWidth',0.4);
+% plot(x,eta,col,'MarkerSize',4);
+% % xlabel('Position','FontWeight','bold');
+% % ylabel('Entropy-gas','FontWeight','bold');
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
-title('Gas entropy')
+% title('Gas entropy')
+plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
+plot(x,1.0-phi_s,col,'MarkerSize',4);
+ylim([0.8 0.9])
+title('Gas volume fraction')
 h3=figure(3)
-set(h3,'position',[100 100 1500 1000]);
+set(h3,'position',POS);
 subplot(3,1,1);
 hold on
 plot(x_min:d_x:x_max-d_x,(1-W_exact(:,2)).*W_exact(:,6).*(W_exact(:,7)-W_exact(:,4)),'b','LineWidth',0.4);

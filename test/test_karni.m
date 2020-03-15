@@ -1,0 +1,24 @@
+%test karni
+clear
+lo_gL_0   =2.933;
+u_gL_0    =0.4136;
+p_gL_0    =2.5;
+lo_sL_0   =0.5476;
+u_sL_0    =0;
+p_sL_0    =0.328;
+phi_sL_0  =0.3;
+lo_gM_0   =2.5154;
+u_gM_0    =0.248;
+p_gM_0    =2.0155;
+lo_sM_0   =0.5476;
+u_sM_0    =0;
+p_sM_0    =0.328;
+phi_sM_0  =0.3;
+lo_gR_0   =2.0462;
+u_gR_0    =0.7114;
+p_gR_0    =1.5096;
+lo_sR_0   =1.04;
+u_sR_0    =0;
+p_sR_0    =1.22;
+phi_sR_0  =0.7;
+save test_karni.mat

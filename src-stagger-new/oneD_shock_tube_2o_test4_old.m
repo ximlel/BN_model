@@ -103,13 +103,14 @@ while Time<Tend && isreal(Time)
     for i=HN+1:N-HN
 %        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
          d_RI(:,i)=minmod(Alpha_GRP*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_GRP*(RI(:,i+1)-RI(:,i))/d_x);
+%         if max(d_Alpha(i-HN:i+HN-1)>ep)||Time<0.02
 %         if max(d_Alpha(i-HN:i+HN-1)>ep/100)||Time<0.017
             d_RI(:,i)=0.0;
 %         end
     end
-    for i=2:N
-         d_Alpha(i)=0.0;
-    end
+%     for i=2:N
+%          d_Alpha(i)=0.0;
+%     end
     for i=1:N+1
         %flux on the boundary of i-1 and i
          if i==1

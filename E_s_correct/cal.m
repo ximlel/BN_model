@@ -18,4 +18,4 @@ u_sR    =0.3;
 p_sR    =12.85675006887399;
 phi_sR  =0.3;
 
-[phi_s_out,dE_g]=E_s_correct(u_sL,lo_gL,u_gL,p_gL,lo_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,p_sR,phi_sR,0.3/u_sL);
+[E_sum1,E_sum2]=E_s_correct_fin(u_sL,lo_gL,u_gL,p_gL,lo_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,p_sR,phi_sR,300/2400)
