@@ -15,7 +15,7 @@ d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.2;
 Alpha_G=1.0;
-Alpha_GRP=1.5;
+Alpha_GRP=1.7;
 %state value
 Time=0;
 Tend=0.1;
@@ -112,19 +112,31 @@ while Time<Tend && isreal(Time)
 % if Time/d_t < 50
 %     d_Alpha(i) = 0.0;
 % end
+    end   
+    if Time<0.05
+        HN=14;
+    elseif Time<0.1
+        HN=round(2+((0.1-Time)/0.05)^(1/4)*12);
+    else
+        HN=2;
     end
-    HN=14;
     for i=HN+1:N-HN
 %        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
         d_RI(:,i)=minmod(Alpha_G*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_G*(RI(:,i+1)-RI(:,i))/d_x);
-        dlo_s(i) =minmod(Alpha_GRP*(lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i-1))/2.0/d_x,Alpha_GRP*(lo_sL(i+1)-lo_sL(i))/d_x);
-        du_s(i)  =minmod(Alpha_GRP*(u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i-1) )/2.0/d_x,Alpha_GRP*(u_sL(i+1) -u_sL(i) )/d_x);
-        dp_s(i)  =minmod(Alpha_GRP*(p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i-1) )/2.0/d_x,Alpha_GRP*(p_sL(i+1) -p_sL(i) )/d_x);
-        dlo_g(i) =minmod(Alpha_GRP*(lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i-1))/2.0/d_x,Alpha_GRP*(lo_gL(i+1)-lo_gL(i))/d_x);
-        du_g(i)  =minmod(Alpha_GRP*(u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i-1) )/2.0/d_x,Alpha_GRP*(u_gL(i+1) -u_gL(i) )/d_x);
-        dp_g(i)  =minmod(Alpha_GRP*(p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i-1) )/2.0/d_x,Alpha_GRP*(p_gL(i+1) -p_gL(i) )/d_x);
+%         dlo_s(i) =minmod(Alpha_GRP*(lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i-1))/2.0/d_x,Alpha_GRP*(lo_sL(i+1)-lo_sL(i))/d_x);
+%         du_s(i)  =minmod(Alpha_GRP*(u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i-1) )/2.0/d_x,Alpha_GRP*(u_sL(i+1) -u_sL(i) )/d_x);
+%         dp_s(i)  =minmod(Alpha_GRP*(p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i-1) )/2.0/d_x,Alpha_GRP*(p_sL(i+1) -p_sL(i) )/d_x);
+%         dlo_g(i) =minmod(Alpha_GRP*(lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i-1))/2.0/d_x,Alpha_GRP*(lo_gL(i+1)-lo_gL(i))/d_x);
+%         du_g(i)  =minmod(Alpha_GRP*(u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i-1) )/2.0/d_x,Alpha_GRP*(u_gL(i+1) -u_gL(i) )/d_x);
+%         dp_g(i)  =minmod(Alpha_GRP*(p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i-1) )/2.0/d_x,Alpha_GRP*(p_gL(i+1) -p_gL(i) )/d_x);
+        dlo_s(i) =minmod2((lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i))/d_x);
+        du_s(i)  =minmod2((u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i) )/d_x);
+        dp_s(i)  =minmod2((p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i) )/d_x);
+        dlo_g(i) =minmod2((lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i))/d_x);
+        du_g(i)  =minmod2((u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i) )/d_x);
+        dp_g(i)  =minmod2((p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i) )/d_x);
         IDX(i)=0;
-         if max(dd_Alpha(i-HN:i+HN-1)>ep)%||Time<0.02
+         if max(dd_Alpha(i-HN:i+HN-1)>ep)
             d_RI(:,i)=0.0;
             IDX(i)=1;
         end
@@ -178,13 +190,13 @@ while Time<Tend && isreal(Time)
           S=0.5*(p_gL(i)+p_gR(i))*(Alpha(i+1)-Alpha(i));
       else
           S_tmp=Alpha(i+1)*p_sL_i(i+1)-Alpha(i)*p_sR_i(i);
-%           if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_gL(i),p_gR(i)))
-%               S=max(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
-%           elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_gL(i),p_gR(i)))
-%               S=min(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
-%           else
+          if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_gL(i),p_gR(i)))
+              S=max(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
+          elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_gL(i),p_gR(i)))
+              S=min(p_gL(i),p_gR(i))*(Alpha(i+1)-Alpha(i));
+          else
               S=S_tmp;
-%           end
+          end
       end
       if IDX(i) == 0
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1));
