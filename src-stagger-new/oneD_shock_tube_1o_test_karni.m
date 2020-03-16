@@ -7,17 +7,16 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-9;
+ep=1e-6;
 x_min=0;
 x_max=0.06;
 N=400*1;
 d_x=(x_max-x_min)/N;
 x0=0.03;
-x1=0.02;
+x1=0.01;
 CFL=0.2;
 %state value
 Time=0;
-Tend=0.015;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -40,6 +39,9 @@ U_lo_sR=zeros(1,N);
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
 load ../test/test_karni.mat;
+T0 = 0.02/(u_gM_0+sqrt(gama_g*p_gM_0/lo_gM_0)*sqrt((gama_g+1.0)/2.0/gama_g*p_gL_0/p_gM_0+(gama_g-1.0)/2.0/gama_g))
+%T0 = 0.02/(u_gL_0-sqrt(gama_g*p_gL_0/lo_gL_0)*sqrt((gama_g+1.0)/2.0/gama_g*p_gM_0/p_gL_0+(gama_g-1.0)/2.0/gama_g))
+Tend=T0+0.007;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 phi_gM_0=1.0-phi_sM_0;
@@ -181,17 +183,25 @@ Q_inv=0.5*(phi_gL.*lo_gL.*(u_gL-u_sL)+phi_gR.*lo_gR.*(u_gR-u_sR));
 P_inv=0.5*(phi_gL.*lo_gL.*(u_gL-u_sL).^2+phi_gL.*p_gL+phi_sL.*p_sL+phi_gR.*lo_gR.*(u_gR-u_sR).^2+phi_gR.*p_gR+phi_sR.*p_sR);
 H_inv=0.5*(0.5*(u_gL-u_sL).^2+gama_g/(gama_g-1)*p_gL./lo_gL+0.5*(u_gR-u_sR).^2+gama_g/(gama_g-1)*p_gR./lo_gR);
 W_exact = zeros(N,8);
-W_exact(:,2)=phi_s';
-W_exact(:,3)=lo_s';
-W_exact(:,4)=u_s';
-W_exact(:,5)=p_s';
-W_exact(:,6)=lo_g';
-W_exact(:,7)=u_g';
-W_exact(:,8)=p_g';
+% W_exact(:,2)=phi_s';
+% W_exact(:,3)=lo_s';
+% W_exact(:,4)=u_s';
+% W_exact(:,5)=p_s';
+% W_exact(:,6)=lo_g';
+% W_exact(:,7)=u_g';
+% W_exact(:,8)=p_g';
+load ../test/EXACT_karni.mat;
 % load ../test/test2.exact;
-% for i=1:N
-%      W_exact(i,:) = test2(ceil(i/(N/300)),:);
-% end
+for i=1:N
+     W_exact(i,1) = eta_g_E(ceil(i/(N/2000)));
+     W_exact(i,2) = eta_s_E(ceil(i/(N/2000)));
+     W_exact(i,3) =  lo_s_E(ceil(i/(N/2000)));
+     W_exact(i,4) =   u_s_E(ceil(i/(N/2000)));
+     W_exact(i,5) =   p_s_E(ceil(i/(N/2000)));
+     W_exact(i,6) =  lo_g_E(ceil(i/(N/2000)));
+     W_exact(i,7) =   u_g_E(ceil(i/(N/2000)));
+     W_exact(i,8) =   p_g_E(ceil(i/(N/2000)));
+end
 %plot
 %col = '+k';
 %col = 'or';
@@ -226,7 +236,7 @@ ylim([0.2 1.5])
 title('Solid pressure')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,5)./W_exact(:,3).^gama_s,'b','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,eta_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Entropy-gas','FontWeight','bold');
@@ -266,7 +276,7 @@ ylim([1.4 2.6])
 title('Gas pressure')
 subplot(2,2,4);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,8)./W_exact(:,6).^gama_g,'b','LineWidth',0.4);
+plot(x_min:d_x:x_max-d_x,W_exact(:,1),'b','LineWidth',0.4);
 plot(x,eta_g,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Entropy-gas','FontWeight','bold');
