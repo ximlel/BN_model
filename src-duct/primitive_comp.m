@@ -16,7 +16,7 @@ lo_R = U1/A;
 % end
 global ep;
 %it_max = 50;
-it_max = 500;
+it_max = 5000;
 k = 0; err = 1e50;
 while (k<it_max && err>ep && abs(A_L-A_R)>ep)
     fun = 0.5*U2^2/A_L^2/((2*U1-A_R*lo_R)/A_L)^2+gama/(gama-1)*((2*U3-0.5*U2^2/(2*U1-A_R*lo_R)-0.5*U2^2/A_R/lo_R)*(gama-1)/(A_L/lo_R^gama*((2*U1-A_R*lo_R)/A_L)^gama+A_R)/lo_R^gama*((2*U1-A_R*lo_R)/A_L)^gama)/((2*U1-A_R*lo_R)/A_L)-0.5*U2^2/A_R^2/lo_R^2-gama/(gama-1)*((2*U3-0.5*U2^2/(2*U1-A_R*lo_R)-0.5*U2^2/A_R/lo_R)*(gama-1)/(A_L/lo_R^gama*((2*U1-A_R*lo_R)/A_L)^gama+A_R))/lo_R;
