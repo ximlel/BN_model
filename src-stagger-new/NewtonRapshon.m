@@ -1,6 +1,6 @@
 function [x_star, err] = NewtonRapshon(fun,dfun,x0,ep)
 if norm(fun,inf) <= ep
-    d = 0;
+    d = 0.0;
 else
     d = -fun/dfun;
 end
