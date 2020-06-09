@@ -15,8 +15,7 @@ phi_g = 1-phi_s;
 lo_s  = U4/phi_s;
 u_s   = U5/U4;
 lo_gR = U1/phi_g;
-u_gR  = U2/U1;
-p_gR  = (U3/phi_g - 0.5*lo_gR*u_gR^2)*(gama_g-1);
+p_gR  = (U3/phi_g - 0.5*lo_gR*(U2/U1)^2)*(gama_g-1);
 
 % lo_gR = U1/phi_gR;
 % u_gR  = U2/U1;
@@ -53,9 +52,7 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
 end
 if k>=it_max
     err2
-    phi_sL
-    phi_sR
-    [lo_gR p_gR] 
+    [phi_sL, phi_sR; lo_gR, p_gR] 
 end
 Q = U2 - U1*u_s;
 lo_gL= (U1 - area_R*phi_gR*lo_gR)/area_L/phi_gL;

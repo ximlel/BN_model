@@ -7,7 +7,7 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-6;
+ep=1e-9;
 x_min=0;
 x_max=1;
 N=300*1;
@@ -23,22 +23,10 @@ U=zeros(6,N);
 F=zeros(6,N+1);
 U_lo_sL=zeros(1,N);
 U_lo_sR=zeros(1,N);
+W_int_s=zeros(4,N+1);
+W_int_g=zeros(4,N+1);
 %initial condition
-% lo_gL_0  =1;
-% u_gL_0   =2;
-% p_gL_0   =1;
-% lo_sL_0  =2;
-% u_sL_0   =0.3;
-% p_sL_0   =5;
-% phi_sL_0 =0.8;
-% lo_gR_0  =0.1941934235006083;
-% u_gR_0   =2.801188129642115;
-% p_gR_0   =0.1008157360849781;
-% lo_sR_0  =2;
-% u_sR_0   =0.3;
-% p_sR_0   =12.85675006887399;
-% phi_sR_0 =0.3;
-load ../test/test4.mat;
+load ../test/test_dele0.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -47,13 +35,6 @@ U_L_0=[phi_gL_0*lo_gL_0;phi_gL_0*lo_gL_0*u_gL_0;phi_gL_0*E_gL_0;phi_sL_0*lo_sL_0
 E_gR_0=p_gR_0/(gama_g-1)+0.5*lo_gR_0*u_gR_0^2;
 E_sR_0=(p_sR_0+gama_s*p0)/(gama_s-1)+0.5*lo_sR_0*u_sR_0^2;
 U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0;phi_sR_0*lo_sR_0*u_sR_0;phi_sR_0*E_sR_0];
-
-E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
-E_sL_1=(p_sL_1+gama_s*p0)/(gama_s-1)+0.5*lo_sL_1*u_sL_1^2;
-U_L_1=[phi_gL_0*lo_gL_1;phi_gL_0*lo_gL_1*u_gL_1;phi_gL_0*E_gL_1;phi_sL_0*lo_sL_1;phi_sL_0*lo_sL_1*u_sL_1;phi_sL_0*E_sL_1];
-E_gR_1=p_gR_1/(gama_g-1)+0.5*lo_gR_1*u_gR_1^2;
-E_sR_1=(p_sR_1+gama_s*p0)/(gama_s-1)+0.5*lo_sR_1*u_sR_1^2;
-U_R_1=[phi_gR_0*lo_gR_1;phi_gR_0*lo_gR_1*u_gR_1;phi_gR_0*E_gR_1;phi_sR_0*lo_sR_1;phi_sR_0*lo_sR_1*u_sR_1;phi_sR_0*E_sR_1];
 %test begin
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
@@ -64,8 +45,7 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+        U(:,i) =0.5*(U_L_0+U_R_0);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -180,10 +160,10 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test4.exact;
-for i=1:N
-     W_exact(i,:) = test4(ceil(i/(N/300)),:);
-end
+% load ../test/test1.exact;
+% for i=1:N
+%      W_exact(i,:) = test1(ceil(i/(N/300)),:);
+% end
 %plot
 %col = '+k';
 %col = 'or';
@@ -198,7 +178,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
-ylim([0.5 2.5])
+% ylim([1.96 2.01])
 title('Solid density')
 subplot(2,2,2);
 hold on
@@ -206,13 +186,13 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
-ylim([-1.2 0.2])
+% ylim([0.298 0.31])
 title('Solid velocity')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
-ylim([1 5])
+% ylim([4 14])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-solid','FontWeight','bold');
 title('Solid pressure')
@@ -220,7 +200,7 @@ subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,phi_s,col,'MarkerSize',4);
-ylim([0.1 0.7])
+% ylim([0.3 0.9])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Porosity-solid','FontWeight','bold');
 title('Solid volume fraction')
@@ -230,7 +210,7 @@ subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 plot(x,lo_g,col,'MarkerSize',4);
-ylim([0 7])
+% ylim([0 1])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
@@ -238,7 +218,7 @@ subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
-ylim([-0.8 -0.1])
+% ylim([2 3])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-gas','FontWeight','bold');
 title('Gas velocity')
@@ -246,7 +226,7 @@ subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
-ylim([0 1])
+% ylim([0 1])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-gas','FontWeight','bold');
 title('Gas pressure')
@@ -260,7 +240,7 @@ hold on
 % title('Gas entropy')
 plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
 plot(x,1.0-phi_s,col,'MarkerSize',4);
-ylim([0.5 1])
+% ylim([0.1 0.7])
 title('Gas volume fraction')
 h3=figure(3)
 set(h3,'position',POS);
