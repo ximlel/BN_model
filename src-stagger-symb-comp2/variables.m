@@ -6,7 +6,7 @@ fun(4) = U6-area_L*phi_sL*(0.5*lo_s*u_s^2  +p_sL/(gama_s-1))-area_R*phi_sR*(0.5*
 fun(5) = phi_gL*lo_gL*(u_gL-u_s)-phi_gR*lo_gR*(u_gR-u_s);
 fun(6) = phi_gL*lo_gL*(u_gL-u_s)^2+phi_gL*p_gL+phi_sL*p_sL-phi_gR*lo_gR*(u_gR-u_s)^2-phi_gR*p_gR-phi_sR*p_sR;
 
-Q = (U2-(U1+U4)*u_s);
+Q = (U2-U1*u_s);
 u_gR = (Q/phi_gR/lo_gR+u_s);
 lo_gL  = ((U1-area_R*phi_gR*lo_gR)/area_L/phi_gL);
 %u_gL  = Q/phi_gL/lo_gL+u_s;
