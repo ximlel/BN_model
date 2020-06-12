@@ -64,8 +64,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+        U(:,i) =0.5*(U_L_0+U_R_0);
+%        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
