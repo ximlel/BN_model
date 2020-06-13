@@ -34,12 +34,7 @@ p_gR  = (U3/phi_g - 0.5*lo_gR*(U2/U1)^2)*(gama_g-1);
 %     p_sR    =12.85675006887399;
 % end
 %Lagrangian
-sign = 1; % 1:f>0; -1:f<0
-c_k = 2; r = 2;
-gamma = 0.5;
-sigma = 0.25; beta = 0.5;
-omega_k = 0.1; vareps_k = 0.1;
-N = 2; M = 1;
+%N = 2; M = 1;
 %DxxL_c_k = zeros(N, N);
 %H_k = zeros(N, N);
 %N_k = zeros(N, M);
@@ -48,6 +43,12 @@ N = 2; M = 1;
 %D_L = zeros(N+M,1);
 %D_f = zeros(N,1);
 %h_k = zeros(N,1);
+sign = 1; % 1:f>0; -1:f<0
+c_k = 4;
+r = 4;
+gamma = 0.5;
+sigma = 0.01; beta = 0.1;
+omega_k = 0.1; vareps_k = 0.1;
 d_k = ones(N,1);
 x_k = [lo_gR;p_gR];
 lambda_k = 1.0;
@@ -73,7 +74,7 @@ if k>=it_max
     err2
     Newton_result=[phi_sL, phi_sR; lo_gR, p_gR]
     f=@(lo_gR,p_gR) ((U3 + (-0.1e1) * 0.5e0 * area_R * phi_gR * lo_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + (-0.1e1) * 0.5e0 * (-area_R * lo_gR * phi_gR + U1) * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2) * (gama_g - 1) - area_R * phi_gR * p_gR) / area_L / phi_gL / ((-area_R * lo_gR * phi_gR + U1) / area_L / phi_gL) ^ gama_g - p_gR / lo_gR ^ gama_g;
-    if f(lo_gR,p_gR)<0.0
+    if f(x_k(1),x_k(2))<0.0
         sign=-1;
     end
     h=@(lo_gR,p_gR) 0.5e0 * (-U1 * u_s + U2) ^ 2 * area_L ^ 2 / (-area_R * lo_gR * phi_gR + U1) ^ 2 + gama_g * ((U3 + (-0.1e1) * 0.5e0 * area_R * phi_gR * lo_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + (-0.1e1) * 0.5e0 * (-area_R * lo_gR * phi_gR + U1) * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2) * (gama_g - 1) - area_R * phi_gR * p_gR) / (gama_g - 1) / (-area_R * lo_gR * phi_gR + U1) + (-0.1e1) * 0.5e0 * (-U1 * u_s + U2) ^ 2 / phi_gR ^ 2 / lo_gR ^ 2 - gama_g * p_gR / (gama_g - 1) / lo_gR;
@@ -87,17 +88,18 @@ if k>=it_max
                         -gama_g * area_R ^ 2 * phi_gR ^ 2 / (gama_g - 1) / (-area_R * lo_gR * phi_gR + U1) ^ 2 + gama_g / (gama_g - 1) / lo_gR ^ 2,   0.0];
     while (l<it_max && norm(d_k)>ep)
         DxxL_c_k = sign*Dxxf(x_k(1),x_k(2))+(lambda_k+c_k*h(x_k(1),x_k(2)))*Dxxh(x_k(1),x_k(2))+c_k*Dxh(x_k(1),x_k(2))*Dxh(x_k(1),x_k(2))';
-        DxL_c_k = sign*Dxf(x_k(1),x_k(2))+lambda_k*Dxh(x_k(1),x_k(2))+c_k*h(x_k(1),x_k(2))*Dxh(x_k(1),x_k(2));
-        [L, DMC, P, D] = modchol_ldlt(DxxL_c_k);
+        [L, DMC, P, D] = modchol_ldlt(DxxL_c_k,1e-4*norm(DxxL_c_k,'fro'));
         LL = inv(P)*L*DMC*L'*inv(P');
+        DxL_c_k = sign*Dxf(x_k(1),x_k(2))+(lambda_k*+c_k*h(x_k(1),x_k(2)))*Dxh(x_k(1),x_k(2));
         d_k = -LL\DxL_c_k;
         x_k_b = x_k+d_k;
         H_k = sign*Dxxf(x_k(1),x_k(2))+lambda_k*Dxxh(x_k(1),x_k(2));
         N_k = Dxh(x_k(1),x_k(2));
         DxL = sign*Dxf(x_k(1),x_k(2))+lambda_k*Dxh(x_k(1),x_k(2));  
         x_k_w = x_k-LL\DxL;
-        tmp1 = N_k'*((H_k+c_k*(N_k*N_k'))\N_k);
-        tmp2 = h(x_k_w(1),x_k_w(2))-sign*N_k'*((H_k+c_k*(N_k*N_k'))\Dxf(x_k_w(1),x_k_w(2)));
+        HcNN = H_k+c_k*(N_k*N_k');
+        tmp1 = N_k'*(HcNN\N_k);
+        tmp2 = h(x_k_w(1),x_k_w(2))-sign*N_k'*(HcNN\Dxf(x_k_w(1),x_k_w(2)));
         lambda_k_b = tmp1\tmp2-c_k*h(x_k_w(1),x_k_w(2));
         DL_norm2 = norm(Dxf(x_k_b(1),x_k_b(2))+lambda_k_b*Dxh(x_k_b(1),x_k_b(2)))^2+h(x_k_b(1),x_k_b(2))^2;
         if DL_norm2 <= omega_k
@@ -109,7 +111,7 @@ if k>=it_max
             while(SUM<0)
                 L_c_k=sign*f(x_k(1),x_k(2))+lambda_k*h(x_k(1),x_k(2))+0.5*c_k*h(x_k(1),x_k(2))^2;
                 x_k_beta=x_k+beta^m_k*d_k;
-                L_c_k_beta=sign*f(x_k_beta(1),x_k_beta(2))+lambda_k*h(x_k_beta(1),x_k_beta(2))+0.5*c_k*h(x_beta(1),x_beta(2))^2;
+                L_c_k_beta=sign*f(x_k_beta(1),x_k_beta(2))+lambda_k*h(x_k_beta(1),x_k_beta(2))+0.5*c_k*h(x_k_beta(1),x_k_beta(2))^2;
                 SUM=L_c_k-L_c_k_beta+sigma*beta^m_k*d_k'*DxL_c_k;
                 m_k=m_k+1;
             end
@@ -129,6 +131,9 @@ if k>=it_max
         x_k(2)=max(x_k(2),ep);
         l=l+1;
     end
+    x_k(1)
+    x_k(2)
+    f(x_k(1),x_k(2))
 end
 Q = U2 - U1*u_s;
 lo_gL= (U1 - area_R*phi_gR*lo_gR)/area_L/phi_gL;
