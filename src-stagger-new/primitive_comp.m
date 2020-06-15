@@ -154,9 +154,9 @@ if k>=it_max
     x_k(1)
     x_k(2)
     f(x_k(1),x_k(2))
-    f(x_k(1),x_k(2)+0.001)
-    f(x_k(1)+0.001,x_k(2))
-    f(x_k(1)+0.001,x_k(2)+0.001)
+%     f(x_k(1),x_k(2)+0.001)
+%     f(x_k(1)+0.001,x_k(2))
+%     f(x_k(1)+0.001,x_k(2)+0.001)
 end
 Q = U2 - U1*u_s;
 lo_gL= (U1 - area_R*phi_gR*lo_gR)/area_L/phi_gL;
