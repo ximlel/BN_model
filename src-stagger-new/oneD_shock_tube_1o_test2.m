@@ -13,10 +13,10 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.2;
+CFL=0.1;
 %state value
 Time=0;
-Tend=0.0033;
+Tend=0.1;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -48,7 +48,7 @@ E_gR_0=p_gR_0/(gama_g-1)+0.5*lo_gR_0*u_gR_0^2;
 E_sR_0=(p_sR_0+gama_s*p0)/(gama_s-1)+0.5*lo_sR_0*u_sR_0^2;
 U_R_0=[phi_gR_0*lo_gR_0;phi_gR_0*lo_gR_0*u_gR_0;phi_gR_0*E_gR_0;phi_sR_0*lo_sR_0;phi_sR_0*lo_sR_0*u_sR_0;phi_sR_0*E_sR_0];
 
-[lo_gL_1,u_gL_1,p_gL_1,lo_sL_1,u_sL_1,p_sL_1,lo_gR_1,u_gR_1,p_gR_1,lo_sR_1,u_sR_1,p_sR_1]=Riemann_ave(lo_gL_0,u_gL_0,p_gL_0,lo_sL_0,u_sL_0,p_sL_0,phi_sL_0,lo_gR_0,u_gR_0,p_gR_0,lo_sR_0,u_sR_0,p_sR_0,phi_sR_0);
+%[lo_gL_1,u_gL_1,p_gL_1,lo_sL_1,u_sL_1,p_sL_1,lo_gR_1,u_gR_1,p_gR_1,lo_sR_1,u_sR_1,p_sR_1]=Riemann_ave(lo_gL_0,u_gL_0,p_gL_0,lo_sL_0,u_sL_0,p_sL_0,phi_sL_0,lo_gR_0,u_gR_0,p_gR_0,lo_sR_0,u_sR_0,p_sR_0,phi_sR_0);
 %[lo_gL_1,u_gL_1,p_gL_1,lo_sL_1,u_sL_1,p_sL_1,lo_gR_1,u_gR_1,p_gR_1,lo_sR_1,u_sR_1,p_sR_1]=primitive_ave(0.5*(U_L_0+U_R_0),phi_sL_0,phi_sR_0);
 
 E_gL_1=p_gL_1/(gama_g-1)+0.5*lo_gL_1*u_gL_1^2;
@@ -67,8 +67,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+        U(:,i) =0.5*(U_L_0+U_R_0);
+%        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end

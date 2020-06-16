@@ -85,9 +85,9 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
     dfun(2,1) = 0.10e1 * (-U1 * u_s + U2) ^ 2 * area_L ^ 2 * area_R * phi_gR / (-area_R * lo_gR * phi_gR + U1) ^ 3 + gama_g * ((-0.1e1) * 0.5e0 * area_R * phi_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + 0.10e1 * area_R * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) * (-U1 * u_s + U2) / lo_gR + 0.5e0 * area_R * phi_gR * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2 + (-0.1e1) * 0.10e1 * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) * (-U1 * u_s + U2) * area_L * area_R * phi_gR / (-area_R * lo_gR * phi_gR + U1)) / (-area_R * lo_gR * phi_gR + U1) + gama_g * ((U3 + (-0.1e1) * 0.5e0 * area_R * phi_gR * lo_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + (-0.1e1) * 0.5e0 * (-area_R * lo_gR * phi_gR + U1) * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2) * (gama_g - 0.1e1) - area_R * phi_gR * p_gR) * area_R * phi_gR / (gama_g - 0.1e1) / (-area_R * lo_gR * phi_gR + U1) ^ 2 + 0.10e1 * (-U1 * u_s + U2) ^ 2 / phi_gR ^ 2 / lo_gR ^ 3 + gama_g * p_gR / (gama_g - 0.1e1) / lo_gR ^ 2;
     dfun(2,2) = -gama_g * area_R * phi_gR / (gama_g - 1) / (-area_R * lo_gR * phi_gR + U1) - gama_g / (gama_g - 1) / lo_gR;
     [x_star, err2] = NewtonRapshon(fun,dfun',[lo_gR p_gR],ep);
-    lo_gR=max(x_star(1),ep);
-    lo_gR=min(lo_gR,U1/area_R/phi_gR-ep);
-    p_gR =max(x_star(2),ep);
+    lo_gR=max(x_star(1),1e-6);
+    lo_gR=min(lo_gR,U1/area_R/phi_gR-1e-6);
+    p_gR =max(x_star(2),1e-6);
     k=k+1;
 end
 if k>=it_max
@@ -146,9 +146,9 @@ if k>=it_max
             end
             x_k=x_k_b;
         end
-        x_k(1)=max(x_k(1),ep);
-        x_k(1)=min(x_k(1),U1/area_R/phi_gR-ep);
-        x_k(2)=max(x_k(2),ep);
+        x_k(1)=max(x_k(1),1e-6);
+        x_k(1)=min(x_k(1),U1/area_R/phi_gR-1e-6);
+        x_k(2)=max(x_k(2),1e-6);
         l=l+1;
     end
     x_k(1)

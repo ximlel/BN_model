@@ -1,5 +1,12 @@
-clear;
-clc;
+clc
+warning off 
+for IJ=1:100
+save myfile IJ;
+clear
+load myfile
+IJ
+%clear;
+%clc;
 %1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
@@ -16,7 +23,7 @@ x0=0.5;
 CFL=0.2;
 %state value
 Time=0;
-Tend=0.1;
+Tend=0.0001;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -27,6 +34,7 @@ W_int_s=zeros(4,N+1);
 W_int_g=zeros(4,N+1);
 %initial condition
 load ../test/test_dele0.mat;
+u_sR_0 = (8.7+0.1*(IJ/100));
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -55,8 +63,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+        U(:,i) =0.5*(U_L_0+U_R_0);
+%        U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -142,10 +150,11 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
     end
     Alpha=Alpha_next;
-    Time=Time+d_t
+    Time=Time+d_t;
 %     if Time > 10*d_t
 %         break;
 %     end
+end
 end
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
