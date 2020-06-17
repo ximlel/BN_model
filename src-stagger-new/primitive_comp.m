@@ -126,8 +126,9 @@ lo_sR= lo_s;
 % lo_sR= U_lo_sR/phi_sR;
 u_sL = u_s;
 u_sR = u_s;
-if use_LS == 1 && abs(phi_sL-phi_sR)>ep
-    [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=Riemann_ave(lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR,phi_sR);
+%if use_LS == 1 && 
+if abs(phi_sL-phi_sR)>ep
+    [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=Riemann_ave(lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR,phi_sR)
 end
 end
 
