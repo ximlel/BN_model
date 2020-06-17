@@ -1,12 +1,11 @@
-clc
 warning off 
-for IJ=1:100
-save myfile IJ;
+% for IJ=1:100
+% save myfile IJ;
+clc
 clear
-load myfile
-IJ
-%clear;
-%clc;
+% load myfile
+% IJ
+
 %1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
@@ -14,7 +13,7 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-9;
+ep=1e-6;
 x_min=0;
 x_max=1;
 N=300*1;
@@ -23,7 +22,7 @@ x0=0.5;
 CFL=0.2;
 %state value
 Time=0;
-Tend=0.0001;
+Tend=0.1;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -34,7 +33,8 @@ W_int_s=zeros(4,N+1);
 W_int_g=zeros(4,N+1);
 %initial condition
 load ../test/test_dele0.mat;
-u_sR_0 = (8.7+0.1*(IJ/100));
+% u_sR_0 = (8.7+0.1*(IJ/100));
+
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -155,7 +155,7 @@ while Time<Tend && isreal(Time)
 %         break;
 %     end
 end
-end
+% end
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
 u_g  = 0.5*(u_gL +u_gR);

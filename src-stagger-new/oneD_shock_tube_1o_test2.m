@@ -1,5 +1,6 @@
 clear;
 clc;
+warning off 
 %1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
@@ -7,13 +8,13 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-9;
+ep=1e-6;
 x_min=0;
 x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.1;
+CFL=0.15;
 %state value
 Time=0;
 Tend=0.1;
@@ -104,6 +105,11 @@ while Time<Tend && isreal(Time)
             [F(1:3,i),W_int_g(:,i)]=GRP_solver(lo_gR(i-1),lo_gL(i),0.0,0.0,u_gR(i-1),u_gL(i),0.0,0.0,p_gR(i-1),p_gL(i),0.0,0.0,1-Alpha(i),1-Alpha(i),0.0,0.0,gama_g,d_t);
             [F(4:6,i),W_int_s(:,i)]=GRP_solver(lo_sR(i-1),lo_sL(i),0.0,0.0,u_sR(i-1),u_sL(i),0.0,0.0,p_sR(i-1),p_sL(i),0.0,0.0,  Alpha(i),  Alpha(i),0.0,0.0,gama_s,d_t);
         end
+    if ~isreal(F(:,i))
+        F(:,i)
+        p_gR(i-1)
+        p_gL(i)
+    end
     end
     for i=1:N
         if i<N
@@ -154,7 +160,7 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
     end
     Alpha=Alpha_next;
-    Time=Time+d_t
+    Time=Time+d_t;
 %     if Time > 10*d_t
 %         break;
 %     end

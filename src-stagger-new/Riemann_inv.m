@@ -24,7 +24,7 @@ global ep;
     p_g_n = lo_g_n^gama_g*eta;
     u_g_n = Q/phi_g_n/lo_g_n+u_s;
     p_s_n = (P-Q*(u_g_n-u_s)-phi_g_n*p_g_n)/phi_s_n;
-    if ~isreal(lo_g_n)
-        [phi_s,lo_g,u_g,p_g,u_s,p_s,phi_s_n]
-    end
+%     if ~isreal(lo_g_n)
+%         [phi_s,lo_g,u_g,p_g,u_s,p_s,phi_s_n]
+%     end
 end
