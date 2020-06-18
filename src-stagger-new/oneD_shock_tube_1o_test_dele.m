@@ -5,7 +5,6 @@ clc
 clear
 % load myfile
 % IJ
-
 %1D shock_tube by 1-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
@@ -109,8 +108,8 @@ while Time<Tend && isreal(Time)
         elseif i==N+1
             %F(1:3,N+1)=Riemann_solver_Exact(lo_gR(N),lo_gR(N),p_gR(N),p_gR(N),u_gR(N),u_gR(N),1-Alpha(N+1),gama_g,0.0);
             %F(4:6,N+1)=Riemann_solver_Exact(lo_sR(N),lo_sR(N),p_sR(N),p_sR(N),u_sR(N),u_sR(N),Alpha(N+1),gama_s,0.0);
-            [F(1:3,N+1),W_int_g(:,N+1)]=GRP_solver(lo_gR(N),lo_gL(N),0.0,0.0,u_gR(N),u_gL(N),0.0,0.0,p_gR(N),p_gL(N),0.0,0.0,1-Alpha(N),1-Alpha(N),0.0,0.0,gama_g,d_t);
-            [F(4:6,N+1),W_int_s(:,N+1)]=GRP_solver(lo_sR(N),lo_sL(N),0.0,0.0,u_sR(N),u_sL(N),0.0,0.0,p_sR(N),p_sL(N),0.0,0.0,  Alpha(N),  Alpha(N),0.0,0.0,gama_s,d_t);
+            [F(1:3,N+1),W_int_g(:,N+1)]=GRP_solver(lo_gR(N),lo_gL(N),0.0,0.0,u_gR(N),u_gL(N),0.0,0.0,p_gR(N),p_gL(N),0.0,0.0,1-Alpha(N+1),1-Alpha(N+1),0.0,0.0,gama_g,d_t);
+            [F(4:6,N+1),W_int_s(:,N+1)]=GRP_solver(lo_sR(N),lo_sL(N),0.0,0.0,u_sR(N),u_sL(N),0.0,0.0,p_sR(N),p_sL(N),0.0,0.0,  Alpha(N+1),  Alpha(N+1),0.0,0.0,gama_s,d_t);
         else
             %F(1:3,i)=Riemann_solver_Exact(lo_gR(i-1),lo_gL(i),p_gR(i-1),p_gL(i),u_gR(i-1),u_gL(i),1-Alpha(i),gama_g,0.0);
             %F(4:6,i)=Riemann_solver_Exact(lo_sR(i-1),lo_sL(i),p_sR(i-1),p_sL(i),u_sR(i-1),u_sL(i),Alpha(i),gama_s,0.0);

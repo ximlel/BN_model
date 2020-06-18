@@ -85,6 +85,7 @@ datas_fin.m
 
 # mexFunction
 *.mexa64
+*.mexaw64
 
 # Data in
 *.mat
