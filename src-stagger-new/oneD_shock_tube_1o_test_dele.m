@@ -18,10 +18,10 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.2;
+CFL=0.05;
 %state value
 Time=0;
-Tend=0.001;
+Tend=0.0115;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -62,8 +62,8 @@ for i=1:N
         U(:,i) =U_R_0;
         Alpha(i+1) =phi_sR_0;
     else
-%        U(:,i) =0.5*(U_L_0+U_R_0);
-        U(:,i) =0.5*(U_L_1+U_R_1);
+       U(:,i) =0.5*(U_L_0+U_R_0);
+%         U(:,i) =0.5*(U_L_1+U_R_1);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end

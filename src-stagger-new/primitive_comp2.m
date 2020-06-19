@@ -73,10 +73,10 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
     dfun(2,1) = 0.10e1 * (-U1 * u_s + U2) ^ 2 * area_L ^ 2 * area_R * phi_gR / (-area_R * lo_gR * phi_gR + U1) ^ 3 + gama_g * ((-0.1e1) * 0.5e0 * area_R * phi_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + 0.10e1 * area_R * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) * (-U1 * u_s + U2) / lo_gR + 0.5e0 * area_R * phi_gR * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2 + (-0.1e1) * 0.10e1 * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) * (-U1 * u_s + U2) * area_L * area_R * phi_gR / (-area_R * lo_gR * phi_gR + U1)) / (-area_R * lo_gR * phi_gR + U1) + gama_g * ((U3 + (-0.1e1) * 0.5e0 * area_R * phi_gR * lo_gR * ((-U1 * u_s + U2) / phi_gR / lo_gR + u_s) ^ 2 + (-0.1e1) * 0.5e0 * (-area_R * lo_gR * phi_gR + U1) * ((-U1 * u_s + U2) * area_L / (-area_R * lo_gR * phi_gR + U1) + u_s) ^ 2) * (gama_g - 0.1e1) - area_R * phi_gR * p_gR) * area_R * phi_gR / (gama_g - 0.1e1) / (-area_R * lo_gR * phi_gR + U1) ^ 2 + 0.10e1 * (-U1 * u_s + U2) ^ 2 / phi_gR ^ 2 / lo_gR ^ 3 + gama_g * p_gR / (gama_g - 0.1e1) / lo_gR ^ 2;
     dfun(2,2) = -gama_g * area_R * phi_gR / (gama_g - 1) / (-area_R * lo_gR * phi_gR + U1) - gama_g / (gama_g - 1) / lo_gR;
     [x_star, err2] = NewtonRapshon(fun,dfun',[lo_gR p_gR],ep);
-    if real(x_star(1)) < 1e-6 || real(x_star(1)) > U1/area_R/phi_gR-1e-6 || real(x_star(2)) < 1e-6
-       k = it_max;
-       break; 
-    end
+%     if real(x_star(1)) < 1e-6 || real(x_star(1)) > U1/area_R/phi_gR-1e-6 || real(x_star(2)) < 1e-6
+%        k = it_max;
+%        break; 
+%     end
     lo_gR=max(real(x_star(1)),1e-6);
     lo_gR=min(lo_gR,U1/area_R/phi_gR-1e-6);
     p_gR =max(real(x_star(2)),1e-6);
@@ -111,13 +111,9 @@ if abs(phi_sL-phi_sR)>ep && k>=it_max
         x_k(2)=max(x_k(2),1e-6);
         l=l+1;
     end
-    if l>=it_max_LS
+%     if l>=it_max_LS
         err_LS
-    end
-    lo_gR = x_k(1)
-    p_gR  = x_k(2)
-%     FF21 = f(x_k(1),x_k(2))
-%     FF22 = h(x_k(1),x_k(2))
+%     end
     use_LS = 1;
 end
 Q = U2 - U1*u_s;
@@ -133,7 +129,8 @@ lo_sR= lo_s;
 % lo_sR= U_lo_sR/phi_sR;
 u_sL = u_s;
 u_sR = u_s;
-if use_LS == 1 && abs(phi_sL-phi_sR)>ep
+% if use_LS == 1 && 
+if abs(phi_sL-phi_sR)>ep
     if lo_gL<0 || lo_sL<0 || p_gL<0 || p_sL<0
     [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
     elseif  lo_gR<0 || lo_sR<0 || p_gR<0 || p_sR<0
@@ -142,3 +139,5 @@ if use_LS == 1 && abs(phi_sL-phi_sR)>ep
     [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=Riemann_ave(lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR,phi_sR);
 end
 end
+
+
