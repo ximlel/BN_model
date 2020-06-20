@@ -134,11 +134,14 @@ lo_sR= lo_s;
 u_sL = u_s;
 u_sR = u_s;
 if use_LS == 1 && abs(phi_sL-phi_sR)>ep
-    if lo_gL<0 || lo_sL<0 || p_gL<0 || p_sL<0
+%     if lo_gL<0 || lo_sL<0 || p_gL<0 || p_sL<0
     [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
-    elseif  lo_gR<0 || lo_sR<0 || p_gR<0 || p_sR<0
+%     elseif  lo_gR<0 || lo_sR<0 || p_gR<0 || p_sR<0
     [lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]
-    end
+%     end
     [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=Riemann_ave(lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR,phi_sR);
+
+    [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
+    [lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]
 end
 end

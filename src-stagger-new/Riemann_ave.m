@@ -44,9 +44,9 @@ global ep;
     if k>=it_max
         err
     end
-    p_gL_n = lo_gL_n^gama_g*eta;
-    u_gL_n = Q/phi_gL/lo_gL_n+u_s;
-    p_sL_n = (P-Q*(u_gL_n-u_s)-phi_gL*p_gL_n)/phi_sL;
+    p_gL_n = lo_gL_n^gama_g*eta
+    u_gL_n = Q/phi_gL/lo_gL_n+u_s
+    p_sL_n = (P-Q*(u_gL_n-u_s)-phi_gL*p_gL_n)/phi_sL
     
     k = 0; err = 1e50;
     lo_gR_n = lo_gR;
@@ -60,7 +60,7 @@ global ep;
     if k>=it_max
         err
     end
-    p_gR_n = lo_gR_n^gama_g*eta;
-    u_gR_n = Q/phi_gR/lo_gR_n+u_s;
-    p_sR_n = (P-Q*(u_gR_n-u_s)-phi_gR*p_gR_n)/phi_sR;
+    p_gR_n = lo_gR_n^gama_g*eta
+    u_gR_n = Q/phi_gR/lo_gR_n+u_s
+    p_sR_n = (P-Q*(u_gR_n-u_s)-phi_gR*p_gR_n)/phi_sR
 end

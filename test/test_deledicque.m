@@ -30,5 +30,5 @@ lo_sR_1   =1;
 u_sR_1    =0.01;
 p_sR_1    =4.79385975242962;
 
-u_sL_0    =-2.0;
+u_sL_0    =-1;
 save test_dele0.mat

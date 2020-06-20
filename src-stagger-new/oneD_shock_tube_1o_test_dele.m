@@ -21,7 +21,7 @@ x0=0.5;
 CFL=0.05;
 %state value
 Time=0;
-Tend=0.0115;
+Tend=0.1;
 %Tend=0.15;
 Alpha=zeros(1,N+1);
 U=zeros(6,N);
@@ -166,7 +166,7 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
     end
     Alpha=Alpha_next;
-    Time=Time+d_t
+    Time=Time+d_t;
 %     if Time > 10*d_t
 %         break;
 %     end
