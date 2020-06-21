@@ -24,7 +24,7 @@ global ep;
     P=0.5*(PL+PR);
     H=0.5*(HL+HR);
     H=(phi_sL*lo_sL*HL+phi_sR*lo_sR*HR)/(phi_sL*lo_sL+phi_sR*lo_sR);
-    it_N = 100;
+    it_N =2500;
     it_max = 2*it_N; it_max1 = it_N;
     k = 0; errA1 = 1e50;
     lo_gL_n = lo_gL;
@@ -35,8 +35,8 @@ global ep;
         fun  = H-0.5*(Q/phi_gL)^2/lo_gL_n^2-gama_g/(gama_g-1.0)*eta*lo_gL_n^(gama_g-1.0);
         dfun = (Q/phi_gL)^2/lo_gL_n^3-gama_g*eta*lo_gL_n^(gama_g-2.0);
         % 零特征值修正
-        if abs(dfun) < 1e-5
-            dfun = 1e-5;
+        if abs(fun/dfun) > abs(lo_gL-lo_gR)
+            dfun = dfun*abs((fun/dfun)/(lo_gL-lo_gR));
         end
         [lo_gL_n, errA1] = NewtonRapshon(fun,dfun,lo_gL_n,ep);
         lo_gL_n=max(lo_gL_n,ep);
@@ -59,8 +59,8 @@ global ep;
         fun  = H-0.5*(Q/phi_gR)^2/lo_gR_n^2-gama_g/(gama_g-1.0)*eta*lo_gR_n^(gama_g-1.0);
         dfun = (Q/phi_gR)^2/lo_gR_n^3-gama_g*eta*lo_gR_n^(gama_g-2.0);
         % 零特征值修正
-        if abs(dfun) < 1e-5
-            dfun = 1e-5;
+        if abs(fun/dfun) > abs(lo_gL-lo_gR)
+            dfun = dfun*abs((fun/dfun)/(lo_gL-lo_gR));
         end
         [lo_gR_n, errA2] = NewtonRapshon(fun,dfun,lo_gR_n,ep);
         lo_gR_n=max(lo_gR_n,ep);

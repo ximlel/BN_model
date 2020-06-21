@@ -83,7 +83,7 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
     k=k+1;
 end
 if abs(phi_sL-phi_sR)>ep && k>=it_max
-    err2
+    err2;
     lo_gR;
     p_gR;
 %     FF11=fun(1)
