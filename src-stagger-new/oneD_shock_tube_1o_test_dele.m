@@ -18,7 +18,7 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.05;
+CFL=0.1;
 %state value
 Time=0;
 Tend=0.1;

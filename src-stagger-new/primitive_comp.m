@@ -39,7 +39,7 @@ x_k = [lo_gR;p_gR];
 fun  = ones(1,2);
 dfun = zeros(2,2);
 it_N = 20;
-it_max_LS =500; it_max = 7*it_N;
+it_max_LS =5000; it_max = 7*it_N;
 it_max1 = it_N; it_max2 = 2*it_N; it_max3 = 3*it_N; it_max4 = 4*it_N; it_max5 = 5*it_N; it_max6 = 6*it_N;
 k = 0; l = 0; err2 = 1e10; err_LS = 1e10;
 use_LS = 0;
@@ -84,8 +84,8 @@ while (k<it_max && err2>ep && abs(phi_sL-phi_sR)>ep)
 end
 if abs(phi_sL-phi_sR)>ep && k>=it_max
     err2
-    lo_gR
-    p_gR
+    lo_gR;
+    p_gR;
 %     FF11=fun(1)
 %     FF12=fun(2)
     
@@ -114,8 +114,8 @@ if abs(phi_sL-phi_sR)>ep && k>=it_max
     if l>=it_max_LS
         err_LS
     end
-    lo_gR = x_k(1)
-    p_gR  = x_k(2)
+    lo_gR = x_k(1);
+    p_gR  = x_k(2);
 %     FF21 = f(x_k(1),x_k(2))
 %     FF22 = h(x_k(1),x_k(2))
     use_LS = 1;
@@ -134,14 +134,11 @@ lo_sR= lo_s;
 u_sL = u_s;
 u_sR = u_s;
 if use_LS == 1 && abs(phi_sL-phi_sR)>ep
-%     if lo_gL<0 || lo_sL<0 || p_gL<0 || p_sL<0
-    [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
-%     elseif  lo_gR<0 || lo_sR<0 || p_gR<0 || p_sR<0
-    [lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]
-%     end
     [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]=Riemann_ave(lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL,phi_sL,lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR,phi_sR);
-
-    [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
-    [lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]
+    if lo_gL<0 || lo_sL<0 || p_gL<0 || p_sL<0
+        [lo_gL,u_gL,p_gL,lo_sL,u_sL,p_sL]
+    elseif  lo_gR<0 || lo_sR<0 || p_gR<0 || p_sR<0
+        [lo_gR,u_gR,p_gR,lo_sR,u_sR,p_sR]
+    end
 end
 end

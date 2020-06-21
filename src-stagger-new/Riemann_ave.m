@@ -11,13 +11,6 @@ global ep;
     u_sL_n=u_s;
     u_sR_n=u_s;
     etaL=p_gL/lo_gL^gama_g;
-%     QL=phi_gL*lo_gL*(u_gL-u_sL);
-%     PL=phi_gL*lo_gL*(u_gL-u_sL)^2+phi_gL*p_gL+phi_sL*p_sL;
-%     HL=0.5*(u_gL-u_sL)^2+gama_g/(gama_g-1.0)*p_gL/lo_gL;
-%     etaR=p_gR/lo_gR^gama_g;
-%     QR=phi_gR*lo_gR*(u_gR-u_sR);
-%     PR=phi_gR*lo_gR*(u_gR-u_sR)^2+phi_gR*p_gR+phi_sR*p_sR;
-%     HR=0.5*(u_gR-u_sR)^2+gama_g/(gama_g-1.0)*p_gR/lo_gR;
     QL=phi_gL*lo_gL*(u_gL-u_s);
     PL=phi_gL*lo_gL*(u_gL-u_s)^2+phi_gL*p_gL+phi_sL*p_sL;
     HL=0.5*(u_gL-u_s)^2+gama_g/(gama_g-1.0)*p_gL/lo_gL;
@@ -26,41 +19,58 @@ global ep;
     PR=phi_gR*lo_gR*(u_gR-u_s)^2+phi_gR*p_gR+phi_sR*p_sR;
     HR=0.5*(u_gR-u_s)^2+gama_g/(gama_g-1.0)*p_gR/lo_gR;
     eta=0.5*(etaL+etaR);
-%    eta=(phi_sL*lo_sL^gama_g*etaL+phi_sR*lo_sR^gama_g*etaR)/(phi_sL*lo_sL^gama_g+phi_sR*lo_sR^gama_g);
+    eta=(phi_sL*lo_sL^gama_g*etaL+phi_sR*lo_sR^gama_g*etaR)/(phi_sL*lo_sL^gama_g+phi_sR*lo_sR^gama_g);
     Q=0.5*(QL+QR);
     P=0.5*(PL+PR);
     H=0.5*(HL+HR);
-%    H=(phi_sL*lo_sL*HL+phi_sR*lo_sR*HR)/(phi_sL*lo_sL+phi_sR*lo_sR);
-    it_max = 500;
-    k = 0; err = 1e50;
+    H=(phi_sL*lo_sL*HL+phi_sR*lo_sR*HR)/(phi_sL*lo_sL+phi_sR*lo_sR);
+    it_N = 100;
+    it_max = 2*it_N; it_max1 = it_N;
+    k = 0; errA1 = 1e50;
     lo_gL_n = lo_gL;
-    while (k<it_max && err>ep)
+    while (k<it_max && errA1>ep)
+        if (k == it_max1)
+            lo_gL_n = lo_gR;
+        end
         fun  = H-0.5*(Q/phi_gL)^2/lo_gL_n^2-gama_g/(gama_g-1.0)*eta*lo_gL_n^(gama_g-1.0);
         dfun = (Q/phi_gL)^2/lo_gL_n^3-gama_g*eta*lo_gL_n^(gama_g-2.0);
-        [lo_gL_n, err] = NewtonRapshon(fun,dfun,lo_gL_n,ep);
+        % 零特征值修正
+        if abs(dfun) < 1e-5
+            dfun = 1e-5;
+        end
+        [lo_gL_n, errA1] = NewtonRapshon(fun,dfun,lo_gL_n,ep);
         lo_gL_n=max(lo_gL_n,ep);
         k=k+1;
+        errA1 = abs(fun);
     end
     if k>=it_max
-        err
+        errA1
     end
-    p_gL_n = lo_gL_n^gama_g*eta
-    u_gL_n = Q/phi_gL/lo_gL_n+u_s
-    p_sL_n = (P-Q*(u_gL_n-u_s)-phi_gL*p_gL_n)/phi_sL
+    p_gL_n = lo_gL_n^gama_g*eta;
+    u_gL_n = Q/phi_gL/lo_gL_n+u_s;
+    p_sL_n = (P-Q*(u_gL_n-u_s)-phi_gL*p_gL_n)/phi_sL;
     
-    k = 0; err = 1e50;
+    k = 0; errA2 = 1e50;
     lo_gR_n = lo_gR;
-    while (k<it_max && err>ep)
+    while (k<it_max && errA2>ep)
+        if (k == it_max1)
+            lo_gR_n = lo_gL;
+        end
         fun  = H-0.5*(Q/phi_gR)^2/lo_gR_n^2-gama_g/(gama_g-1.0)*eta*lo_gR_n^(gama_g-1.0);
         dfun = (Q/phi_gR)^2/lo_gR_n^3-gama_g*eta*lo_gR_n^(gama_g-2.0);
-        [lo_gR_n, err] = NewtonRapshon(fun,dfun,lo_gR_n,ep);
+        % 零特征值修正
+        if abs(dfun) < 1e-5
+            dfun = 1e-5;
+        end
+        [lo_gR_n, errA2] = NewtonRapshon(fun,dfun,lo_gR_n,ep);
         lo_gR_n=max(lo_gR_n,ep);
         k=k+1;
+        errA2 = abs(fun);
     end
     if k>=it_max
-        err
+        errA2
     end
-    p_gR_n = lo_gR_n^gama_g*eta
-    u_gR_n = Q/phi_gR/lo_gR_n+u_s
-    p_sR_n = (P-Q*(u_gR_n-u_s)-phi_gR*p_gR_n)/phi_sR
+    p_gR_n = lo_gR_n^gama_g*eta;
+    u_gR_n = Q/phi_gR/lo_gR_n+u_s;
+    p_sR_n = (P-Q*(u_gR_n-u_s)-phi_gR*p_gR_n)/phi_sR;
 end
