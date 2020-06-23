@@ -33,7 +33,14 @@ global ep;
             lo_gL_n = lo_gR;
         end
         fun  = H-0.5*(Q/phi_gL)^2/lo_gL_n^2-gama_g/(gama_g-1.0)*eta*lo_gL_n^(gama_g-1.0);
+        if abs(fun) < ep
+            break;
+        end
         dfun = (Q/phi_gL)^2/lo_gL_n^3-gama_g*eta*lo_gL_n^(gama_g-2.0);
+        if abs(dfun) < ep
+            fun
+            break;
+        end
         % 零特征值修正
         if abs(fun/dfun) > abs(lo_gL-lo_gR)
             dfun = dfun*abs((fun/dfun)/(lo_gL-lo_gR));
@@ -57,7 +64,14 @@ global ep;
             lo_gR_n = lo_gL;
         end
         fun  = H-0.5*(Q/phi_gR)^2/lo_gR_n^2-gama_g/(gama_g-1.0)*eta*lo_gR_n^(gama_g-1.0);
+        if abs(fun) < ep
+            break;
+        end
         dfun = (Q/phi_gR)^2/lo_gR_n^3-gama_g*eta*lo_gR_n^(gama_g-2.0);
+        if abs(dfun) < ep
+            fun
+            break;
+        end
         % 零特征值修正
         if abs(fun/dfun) > abs(lo_gL-lo_gR)
             dfun = dfun*abs((fun/dfun)/(lo_gL-lo_gR));
