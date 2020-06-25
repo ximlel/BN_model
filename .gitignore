@@ -84,6 +84,7 @@ dkms.conf
 datas_fin.m
 
 # mexFunction
+*.mex
 *.mexa64
 *.mexaw64
 

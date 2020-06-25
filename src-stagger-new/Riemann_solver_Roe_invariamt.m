@@ -26,20 +26,31 @@ for rr=1:7
         abs_lamda(rr)=(lamda(rr)^2+TOL^2)/2/TOL;
     end
 end
+eta_sL=p_sL/lo_sL^gama_s;
+eta_gL=p_gL/lo_gL^gama_g;
+QL=phi_gL*lo_gL*(u_gL-u_s);
+PL=phi_gL*lo_gL*(u_gL-u_s)^2+phi_gL*p_gL+phi_sL*p_sL;
+HL=0.5*(u_gL-u_s)^2+gama_g/(gama_g-1.0)*p_gL/lo_gL;
+eta_sR=p_sL/lo_sL^gama_s;
+eta_gR=p_gR/lo_gR^gama_g;
+QR=phi_gR*lo_gR*(u_gR-u_s);
+PR=phi_gR*lo_gR*(u_gR-u_s)^2+phi_gR*p_gR+phi_sR*p_sR;
+HR=0.5*(u_gR-u_s)^2+gama_g/(gama_g-1.0)*p_gR/lo_gR;
+eta_g_wave=0.5*(eta_gL+eta_gR);
+
 %solve right eigenvetors
-K1=[1;      u_wave_g-a_wave_g;H_wave_g-u_wave_g*a_wave_g;0;0;0;0];
-K2=[1;      u_wave_g         ;     0.5*u_wave_g^2       ;0;0;0;0];
-K3=[1;      u_wave_g+a_wave_g;H_wave_g+u_wave_g*a_wave_g;0;0;0;0];
-K4=[0;0;0;1;u_wave_s-a_wave_s;H_wave_s-u_wave_s*a_wave_s;0];
-K5=[0;0;0;1;u_wave_s         ;     0.5*u_wave_s^2       ;0];
-K6=[0;0;0;1;u_wave_s+a_wave_s;H_wave_s+u_wave_s*a_wave_s;0];
+lo_ave_g = sqrt(phi_gR*lo_gR*phi_gL*lo_gL);
+lo_ave_s = sqrt(phi_sR*lo_sR*phi_sL*lo_sL);
+p_ave_g = (phi_gL*p_gL + phi_gR*p_gR)/2.0;
 v_wave_rel = u_wave_g-u_wave_s;
-K7=[gama_g*p_wave_g; gama_g*p_wave_g*u_wave_s;
-lo_wave_g*v_wave_rel^2*H_wave_g-gama_g*p_wave_g*u_wave_g*v_wave_rel-E_wave_g*(v_wave_rel^2-a_wave_g^2);
-(v_wave_rel^2-a_wave_g^2)*(gama_s*(p_wave_s+p0)+p_wave_g-p_wave_s)/a_wave_s^2;
-(v_wave_rel^2-a_wave_g^2)*(gama_s*(p_wave_s+p0)+p_wave_g-p_wave_s)/a_wave_s^2*u_wave_s;
-(v_wave_rel^2-a_wave_g^2)*( E_wave_s+(p_wave_g-p_wave_s)/a_wave_s^2*H_wave_s); v_wave_rel^2-a_wave_g^2];
-K=[K1 K2 K3 K4 K5 K6 K7];	
+K1=[ 0; 0; 0;                                        1;                        v_wave_rel-a_wave_g;                           -a_wave_g/lo_ave_g; 0];
+K2=[ 0; 1; 0;-v_wave_rel*p_ave_g/eta_g_wave/a_wave_g^2;-v_wave_rel^2*p_ave_g/eta_g_wave/a_wave_g^2; 1.0/(gama_g-1.0)*p_ave_g/eta_g_wave/lo_ave_g; 0];
+K3=[ 0; 0; 0;                                        1;                        v_wave_rel+a_wave_g;                            a_wave_g/lo_ave_g; 0];
+K4=[-1; 0; 0;                                 lo_ave_g;    2*lo_ave_g*v_wave_rel+a_wave_s*lo_ave_s;                                   v_wave_rel; 0];
+K5=[ 0; 0; 1;                                        0;                                          0;                                            0; 0];
+K6=[ 0; 0; 0;                                        0;                                          0;                                            0; 1];
+K7=[-1; 0; 0;                                 lo_ave_g;    2*lo_ave_g*v_wave_rel-a_wave_s*lo_ave_s;                                   v_wave_rel; 0];
+K =[K1 K2 K3 K4 K5 K6 K7];	
 %solve wave strengths
 E_gL=p_gL/(gama_g-1)+0.5*lo_gL*u_gL^2;
 E_gR=p_gR/(gama_g-1)+0.5*lo_gR*u_gR^2;
@@ -51,45 +62,24 @@ d_u_g=U_gR-U_gL;
 U_sL=[phi_sL*lo_sL;phi_sL*lo_sL*u_sL;phi_sL*E_sL;phi_sL];
 U_sR=[phi_sR*lo_sR;phi_sR*lo_sR*u_sR;phi_sR*E_sR;phi_sR];
 d_u_s=U_sR-U_sL;
-%alpha2=(gama-1)/a_wave_g^2*(d_u_g(1)*(H_wave_g-u_wave_g^2)+u_wave_g*d_u_g(2)-d_u_g(3));
-%alpha1=1.0/2.0/a_wave_g*(d_u_g(1)*(u_wave_g+a_wave_g)-d_u_g(2)-a_wave_g*alpha2);
-%alpha3=d_u_g(1)-alpha1-alpha2;
-alpha1=( phi_gR*p_gR-phi_gL*p_gL-sqrt(phi_gR*lo_gR*phi_gL*lo_gL)*a_wave_g*(u_gR-u_gL))/(2.0*a_wave_g^2);
-alpha2=(-phi_gR*p_gR+phi_gL*p_gL+    (phi_gR*lo_gR-phi_gL*lo_gL)*a_wave_g^2)          /(    a_wave_g^2);
-alpha3=( phi_gR*p_gR-phi_gL*p_gL+sqrt(phi_gR*lo_gR*phi_gL*lo_gL)*a_wave_g*(u_gR-u_gL))/(2.0*a_wave_g^2);
-alpha1=alpha1-d_u_s(4)*p_wave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/(2.0*a_wave_g^2*(v_wave_rel-a_wave_g));
-alpha2=alpha2+d_u_s(4)*p_wave_g*(gama_g-1.0)/a_wave_g^2;
-alpha3=alpha3+d_u_s(4)*p_wave_g*(a_wave_g-(gama_g-1.0)*v_wave_rel)/(2.0*a_wave_g^2*(v_wave_rel+a_wave_g));
-%alpha5=(gama-1)/a_wave_s^2*(d_u_s(1)*(H_wave_s-u_wave_s^2)+u_wave_s*d_u_s(2)-d_u_s(3));
-%alpha4=1.0/2.0/a_wave_s*(d_u_s(1)*(u_wave_s+a_wave_s)-d_u_s(2)-a_wave_s*alpha5);
-%alpha6=d_u_s(1)-alpha4-alpha5;
-alpha4=( phi_sR*p_sR-phi_sL*p_sL-sqrt(phi_sR*lo_sR*phi_sL*lo_sL)*a_wave_s*(u_sR-u_sL))/(2.0*a_wave_s^2);
-alpha5=(-phi_sR*p_sR+phi_sL*p_sL+    (phi_sR*lo_sR-phi_sL*lo_sL)*a_wave_s^2)          /(    a_wave_s^2);
-alpha6=( phi_sR*p_sR-phi_sL*p_sL+sqrt(phi_sR*lo_sR*phi_sL*lo_sL)*a_wave_s*(u_sR-u_sL))/(2.0*a_wave_s^2);
-alpha4=alpha4-d_u_s(4)*p_wave_g/(2.0*a_wave_s^2);
-alpha5=alpha5-d_u_s(4)*(p_wave_s*(gama_s-1.0)+gama_s*p0)/a_wave_s^2;
-alpha6=alpha6-d_u_s(4)*p_wave_g/(2.0*a_wave_s^2);
-alpha7=-d_u_s(4)/(a_wave_g^2-v_wave_rel^2);
+
+M = p_ave_g/(gama_g-1.0)/eta_g_wave*(eta_gR-eta_gL)-v_wave_rel*(QR-QL)+(PR-PL)-lo_ave_g*(HR-HL);
+alpha1=-lo_ave_g*(v_wave_rel-a_wave_g)/2.0/a_wave_g*(u_sR-u_sL)+p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_g/a_wave_g^2*(eta_gR-eta_gL)+0.5*(QR-QL)-lo_ave_g/2.0/c_wave_g*(HR-HL);              
+alpha3= lo_ave_g*(v_wave_rel+a_wave_g)/2.0/a_wave_g*(u_sR-u_sL)-p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_g/a_wave_g^2*(eta_gR-eta_gL)+0.5*(QR-QL)+lo_ave_g/2.0/c_wave_g*(HR-HL); 
+alpha4=-0.5*(u_sR-u_sL)+M/2.0/lo_ave_s/a_wave_s;
+alpha7=-0.5*(u_sR-u_sL)-M/2.0/lo_ave_s/a_wave_s;
+alpha2=eta_gR-eta_gL;
+alpha5=eta_sR-eta_sL:
+alpha6=phi_sR-phi_sL;
 alpha=[alpha1;alpha2;alpha3;alpha4;alpha5;alpha6;alpha7];
 %solve conservative vector at i+1/2
 [lamda_sort,idx] = sort(lamda(1:7));
 % lamda_pos = find(lamda_sort>0.0);
-UL=[phi_gL*lo_gL;phi_gL*lo_gL*u_gL;phi_gL*E_gL;phi_sL*lo_sL;phi_sL*lo_sL*u_sL;phi_sL*E_sL;phi_sL];
-UR=[phi_gR*lo_gR;phi_gR*lo_gR*u_gR;phi_gR*E_gR;phi_sR*lo_sR;phi_sR*lo_sR*u_sR;phi_sR*E_sR;phi_sR];
-% if lamda_sort(1)>=0.0
-%     U0 = UL;
-% elseif lamda_sort(7)<=0.0
-%     U0 = UR;
-% elseif u_wave_s > 0.0
-%     U0 = UL + K(:,idx(1:(lamda_pos(1)-1)))*alpha(idx(1:(lamda_pos(1)-1)));
-% else
-%     U0 = UR - K(:,idx(lamda_pos(1):7))    *alpha(idx(lamda_pos(1):7));
-% end
-% [lo_g0,u_g0,p_g0,phi_g0,lo_s0,u_s0,p_s0,phi_s0]=primitive_comp(U0);
-U11 = UL + K(:,idx(1:(min(find(idx==5),find(idx==7))-1)))*alpha(idx(1:(min(find(idx==5),find(idx==7))-1)));
-% [lo_g1,u_g1,p_g1,phi_g1,lo_s1,u_s1,p_s1,phi_s1]=primitive_comp(U11);
-U22 = UR - K(:,idx((max(find(idx==5),find(idx==7))+1):7))*alpha(idx((max(find(idx==5),find(idx==7))+1):7));
-% [lo_g2,u_g2,p_g2,phi_g2,lo_s2,u_s2,p_s2,phi_s2]=primitive_comp(U22);
-% solve U_out
-U_out = 0.5*(U11 + U22);
+WL=[u_sL, eta_gL, eta_sL, QL, PL, HL, phi_sL];
+WR=[u_sR, eta_gR, eta_sR, QR, PR, HR, phi_sR];
+W11 = WL + K(:,idx(1:(min(find(idx==5),find(idx==7))-1)))*alpha(idx(1:(min(find(idx==5),find(idx==7))-1)));
+W22 = WR - K(:,idx((max(find(idx==5),find(idx==7))+1):7))*alpha(idx((max(find(idx==5),find(idx==7))+1):7));
+% solve W_out
+W_out = 0.5*(W11 + W22);
+U_out = W_comp_U(W_out);
 end
