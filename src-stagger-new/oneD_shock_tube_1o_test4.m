@@ -70,6 +70,7 @@ for i=1:N
 %        U(:,i) =0.5*(U_L_0+U_R_0);
         U(:,i) =0.5*(U_L_1+U_R_1);
         U_out=Riemann_solver_Roe_prim(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
+        U_out=Riemann_solver_Roe_invariant(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
         U(:,i) =U_out(1:6);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
