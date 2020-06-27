@@ -13,8 +13,8 @@ lamda2=u_wave_g;
 lamda3=u_wave_g+a_wave_g;
 lamda4=u_wave_s-a_wave_s;
 lamda5=u_wave_s;
-lamda6=u_wave_s+a_wave_s;
-lamda7=u_wave_s;
+lamda6=u_wave_s;
+lamda7=u_wave_s+a_wave_s;
 lamda=[lamda1 lamda2 lamda3 lamda4 lamda5 lamda6 lamda7];
 %entropy fix
 TOL=1e-6;
@@ -36,16 +36,17 @@ eta_gR=p_gR/lo_gR^gama_g;
 QR=phi_gR*lo_gR*(u_gR-u_sR);
 PR=phi_gR*lo_gR*(u_gR-u_sR)^2+phi_gR*p_gR+phi_sR*p_sR;
 HR=0.5*(u_gR-u_sR)^2+gama_g/(gama_g-1.0)*p_gR/lo_gR;
-eta_wave_g=0.5*(eta_gL+eta_gR);
+% eta_wave_g=0.5*(eta_gL+eta_gR);
+eta_wave_g=p_wave_g/lo_wave_g^gama_g;
 
 %solve right eigenvetors
-lo_ave_g = sqrt(phi_gR*lo_gR*phi_gL*lo_gL);
-lo_ave_s = sqrt(phi_sR*lo_sR*phi_sL*lo_sL);
-% p_ave_g = sqrt(phi_gR*phi_gL)*p_wave_g;
+lo_ave_g = sqrt(phi_gL*phi_gR)*lo_wave_g;
+lo_ave_s = sqrt(phi_sL*phi_sR)*lo_wave_s;
+p_ave_g  = sqrt(phi_gL*phi_gR)*p_wave_g;
 % lo_ave_g = lo_wave_g*(phi_gR+phi_gL)/2.0;
 % lo_ave_s = lo_wave_s*(phi_sR+phi_sL)/2.0;
 % p_ave_g = p_wave_g*(phi_gR+phi_gL)/2.0;
-p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
+% p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
 
 v_wave_rel = u_wave_g-u_wave_s;
 K1=[ 0; 0; 0;                                        1;                        v_wave_rel-a_wave_g;                           -a_wave_g/lo_ave_g; 0];
@@ -63,7 +64,7 @@ dW=WR-WL;
 
 M = p_ave_g/(gama_g-1.0)/eta_wave_g*dW(2)-v_wave_rel*dW(4)+dW(5)-lo_ave_g*dW(6);
 alpha1=-lo_ave_g*(v_wave_rel-a_wave_g)/2.0/a_wave_g*dW(1)+p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)-lo_ave_g/2.0/a_wave_g*dW(6);              
-alpha3= lo_ave_g*(v_wave_rel+a_wave_g)/2.0/a_wave_g*dW(1)-p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)+lo_ave_g/2.0/a_wave_g*dW(6); 
+alpha3= lo_ave_g*(v_wave_rel+a_wave_g)/2.0/a_wave_g*dW(1)-p_ave_g*(a_wave_g-(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)+lo_ave_g/2.0/a_wave_g*dW(6); 
 alpha4=-0.5*dW(1)+M/2.0/lo_ave_s/a_wave_s;
 alpha7=-0.5*dW(1)-M/2.0/lo_ave_s/a_wave_s;
 alpha2=dW(2);
@@ -73,9 +74,8 @@ alpha=[alpha1;alpha2;alpha3;alpha4;alpha5;alpha6;alpha7];
 %solve conservative vector at i+1/2
 [lamda_sort,idx] = sort(lamda(1:7));
 % lamda_pos = find(lamda_sort>0.0);
-
-W11 = WL + K(:,idx(1:(min(find(idx==5),find(idx==7))-1)))*alpha(idx(1:(min(find(idx==5),find(idx==7))-1)));
-W22 = WR - K(:,idx((max(find(idx==5),find(idx==7))+1):7))*alpha(idx((max(find(idx==5),find(idx==7))+1):7));
+W11 = WL + K(:,idx(1:(min(find(idx==5),find(idx==6))-1)))*alpha(idx(1:(min(find(idx==5),find(idx==6))-1)));
+W22 = WR - K(:,idx((max(find(idx==5),find(idx==6))+1):7))*alpha(idx((max(find(idx==5),find(idx==6))+1):7));
 % solve W_out
 
 U11 = W_comp_U(W11,lo_wave_g);

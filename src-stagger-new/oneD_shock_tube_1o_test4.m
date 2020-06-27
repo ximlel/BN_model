@@ -175,6 +175,7 @@ while Time<Tend && isreal(Time)
 %         break;
 %     end
 end
+error("1")
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
 u_g  = 0.5*(u_gL +u_gR);
