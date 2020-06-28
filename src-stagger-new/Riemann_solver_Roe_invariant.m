@@ -36,8 +36,8 @@ eta_gR=p_gR/lo_gR^gama_g;
 QR=phi_gR*lo_gR*(u_gR-u_sR);
 PR=phi_gR*lo_gR*(u_gR-u_sR)^2+phi_gR*p_gR+phi_sR*p_sR;
 HR=0.5*(u_gR-u_sR)^2+gama_g/(gama_g-1.0)*p_gR/lo_gR;
-% eta_wave_g=0.5*(eta_gL+eta_gR);
-eta_wave_g=p_wave_g/lo_wave_g^gama_g;
+eta_wave_g=0.5*(eta_gL+eta_gR)
+% eta_wave_g=p_wave_g/lo_wave_g^gama_g
 
 %solve right eigenvetors
 lo_ave_g = sqrt(phi_gL*phi_gR)*lo_wave_g;
@@ -46,6 +46,9 @@ p_ave_g  = sqrt(phi_gL*phi_gR)*p_wave_g;
 % lo_ave_g = lo_wave_g*(phi_gR+phi_gL)/2.0;
 % lo_ave_s = lo_wave_s*(phi_sR+phi_sL)/2.0;
 % p_ave_g = p_wave_g*(phi_gR+phi_gL)/2.0;
+lo_ave_g = (lo_gL*phi_gR+lo_gR*phi_gL)/2.0;
+lo_ave_s = (lo_sL*phi_sR+lo_sR*phi_sL)/2.0;
+p_ave_g  = (p_gL*phi_gR+p_gR*phi_gL)/2.0;
 % p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
 
 v_wave_rel = u_wave_g-u_wave_s;
@@ -63,8 +66,8 @@ WR=[u_sR; eta_gR; eta_sR; QR; PR; HR; phi_sR];
 dW=WR-WL;
 
 M = p_ave_g/(gama_g-1.0)/eta_wave_g*dW(2)-v_wave_rel*dW(4)+dW(5)-lo_ave_g*dW(6);
-alpha1=-lo_ave_g*(v_wave_rel-a_wave_g)/2.0/a_wave_g*dW(1)+p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)-lo_ave_g/2.0/a_wave_g*dW(6);              
-alpha3= lo_ave_g*(v_wave_rel+a_wave_g)/2.0/a_wave_g*dW(1)-p_ave_g*(a_wave_g-(gama_g-1.0)*v_wave_rel)/2.0/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)+lo_ave_g/2.0/a_wave_g*dW(6); 
+alpha1=-0.5*lo_ave_g*(v_wave_rel-a_wave_g)/a_wave_g*dW(1)+0.5*p_ave_g*(a_wave_g+(gama_g-1.0)*v_wave_rel)/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)-0.5*lo_ave_g/a_wave_g*dW(6);              
+alpha3= 0.5*lo_ave_g*(v_wave_rel+a_wave_g)/a_wave_g*dW(1)-0.5*p_ave_g*(a_wave_g-(gama_g-1.0)*v_wave_rel)/(gama_g-1.0)/eta_wave_g/a_wave_g^2*dW(2)+0.5*dW(4)+0.5*lo_ave_g/a_wave_g*dW(6); 
 alpha4=-0.5*dW(1)+M/2.0/lo_ave_s/a_wave_s;
 alpha7=-0.5*dW(1)-M/2.0/lo_ave_s/a_wave_s;
 alpha2=dW(2);

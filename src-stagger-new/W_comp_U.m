@@ -15,7 +15,7 @@ k = 0; err5 = 1e50;
 lo_g=lo_g_start;
 N=100;
 for i=1:N
-    lo_g = 1+lo_g_start*i/N*3.0;
+    lo_g = 0.1+lo_g_start*i/N*3.0;
     lo_g_plot(i) = lo_g;
     fun  = H-0.5*(Q/phi_g)^2/lo_g^2-gama_g/(gama_g-1.0)*eta_g*lo_g^(gama_g-1.0);
     fun_plot(i) = fun;
