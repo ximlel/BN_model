@@ -86,6 +86,7 @@ datas_fin.m
 # mexFunction
 *.mex
 *.mexa64
+*.mexw64
 *.mexaw64
 
 # Data in

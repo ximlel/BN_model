@@ -41,15 +41,19 @@ eta_wave_g=0.5*(eta_gL+eta_gR)
 
 %solve right eigenvetors
 lo_ave_g = sqrt(phi_gL*phi_gR)*lo_wave_g;
-lo_ave_s = sqrt(phi_sL*phi_sR)*lo_wave_s;
-p_ave_g  = sqrt(phi_gL*phi_gR)*p_wave_g;
-% lo_ave_g = lo_wave_g*(phi_gR+phi_gL)/2.0;
-% lo_ave_s = lo_wave_s*(phi_sR+phi_sL)/2.0;
-% p_ave_g = p_wave_g*(phi_gR+phi_gL)/2.0;
-lo_ave_g = (lo_gL*phi_gR+lo_gR*phi_gL)/2.0;
-lo_ave_s = (lo_sL*phi_sR+lo_sR*phi_sL)/2.0;
-p_ave_g  = (p_gL*phi_gR+p_gR*phi_gL)/2.0;
-% p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
+lo_ave_s = sqrt(phi_sL*phi_sR)*lo_wave_s;p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
+
+% p_ave_g  = sqrt(phi_gL*phi_gR)*p_wave_g;
+lo_ave_g = 0.5*lo_wave_g*(phi_gR+phi_gL);
+lo_ave_s = 0.5*lo_wave_s*(phi_sR+phi_sL);
+% p_ave_g  = 0.5*p_wave_g *(phi_gR+phi_gL);
+% lo_ave_g = (0.5*(sqrt(lo_gL*phi_gR)+sqrt(lo_gR*phi_gL)))^2;
+% lo_ave_s = (0.5*(sqrt(lo_sL*phi_sR)+sqrt(lo_sR*phi_sL)))^2;
+% p_ave_g  = (0.5*(sqrt(p_gL *phi_gR)+sqrt(p_gR*phi_gL)))^2;
+% lo_ave_g = 0.5*(lo_gL*phi_gR+lo_gR*phi_gL);
+% lo_ave_s = 0.5*(lo_sL*phi_sR+lo_sR*phi_sL);
+% p_ave_g  = 0.5*(p_gL *phi_gR+p_gR*phi_gL);
+p_ave_g = lo_ave_g*a_wave_g^2/gama_g;
 
 v_wave_rel = u_wave_g-u_wave_s;
 K1=[ 0; 0; 0;                                        1;                        v_wave_rel-a_wave_g;                           -a_wave_g/lo_ave_g; 0];
