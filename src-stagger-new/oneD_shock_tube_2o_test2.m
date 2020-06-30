@@ -93,6 +93,18 @@ while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha(i),Alpha(i+1),0.5,0.5);
+        phi_sL=Alpha(i);
+        phi_sR=Alpha(i+1);
+        if abs(phi_sL-phi_sR)>ep
+            phi_gL=1.0-phi_sL;
+            phi_gR=1.0-phi_sR;
+            E_gL=p_gL(i)/(gama_g-1)+0.5*lo_gL(i)*u_gL(i)^2;
+            E_sL=(p_sL(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sL(i)*u_sL(i)^2;
+            U(:,i)=       0.5*[phi_gL*lo_gL(i);phi_gL*lo_gL(i)*u_gL(i);phi_gL*E_gL;phi_sL*lo_sL(i);phi_sL*lo_sL(i)*u_sL(i);phi_sL*E_sL];
+            E_gR=p_gR(i)/(gama_g-1)+0.5*lo_gR(i)*u_gR(i)^2;
+            E_sR=(p_sR(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sR(i)*u_sR(i)^2;
+            U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
+        end
         RI(:,i)=U2RI_cal(Alpha(i),lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),lo_sL(i));
         a_gL(i)=sqrt(gama_g*p_gL(i)/lo_gL(i));
         a_sL(i)=sqrt(gama_s*(p_sL(i)+p0)/lo_sL(i));

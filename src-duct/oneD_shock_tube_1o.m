@@ -12,7 +12,7 @@ x0=0.02;
 %state value
 Time=0;
 Tend=6.3e-6;
-N=200*1;
+N=110*1;
 % gama=1.4;
 % x_max=1;
 % x0=0.7;
@@ -26,23 +26,23 @@ A=zeros(1,N+1);
 U=zeros(3,N);
 F=zeros(3,N+1);
 %initial condition
-lo_L_0  =169.34;
-u_L_0   =0;
-p_L_0   =2.96e8;
-lo_R_0  =0.76278;
-u_R_0   =0;
-p_R_0   =1e5;
-phi_L_0 =1.0;
-phi_R_0 =0.25;
-
-% lo_L_0  =151.13;
-% u_L_0   =212.31;
-% p_L_0   =2.4836e8;
-% lo_R_0  =95.199;
-% u_R_0   =1348.2;
-% p_R_0   =1.4067e8;
+% lo_L_0  =169.34;
+% u_L_0   =0;
+% p_L_0   =2.96e8;
+% lo_R_0  =0.76278;
+% u_R_0   =0;
+% p_R_0   =1e5;
 % phi_L_0 =1.0;
 % phi_R_0 =0.25;
+
+lo_L_0  =151.13;
+u_L_0   =212.31;
+p_L_0   =2.4836e8;
+lo_R_0  =95.199;
+u_R_0   =1348.2;
+p_R_0   =1.4067e8;
+phi_L_0 =1.0;
+phi_R_0 =0.25;
 
 % lo_L_0  =1.0555;
 % u_L_0   =-1.0651;
@@ -87,6 +87,7 @@ U_L_1=[phi_L_0*lo_L_1;phi_L_0*lo_L_1*u_L_1;phi_L_0*E_L_1];
 E_R_1=p_R_1/(gama-1)+0.5*lo_R_1*u_R_1^2;
 U_R_1=[phi_R_0*lo_R_1;phi_R_0*lo_R_1*u_R_1;phi_R_0*E_R_1];
 
+W_int=zeros(4,N+1);
 for i=1:N
     x(i)=x_min+(i-0.5)*d_x;
     if i<round(N*x0/(x_max-x_min))
@@ -124,6 +125,7 @@ while Time<Tend && isreal(Time)
              F(:,N+1)=Riemann_solver_Roe(lo_R(N),lo_R(N),p_R(N),p_R(N),u_R(N),u_R(N),A(N+1));
          else
              F(:,i)=Riemann_solver_Roe(lo_R(i-1),lo_L(i),p_R(i-1),p_L(i),u_R(i-1),u_L(i),A(i));
+            [F(:,i),W_int(:,i)]=GRP_solver(lo_R(i-1),lo_L(i),0.0,0.0,u_R(i-1),u_L(i),0.0,0.0,p_R(i-1),p_L(i),0.0,0.0,A(i),A(i),0.0,0.0,gama,0.0);
          end
     end
     %compute U in next step
@@ -155,12 +157,12 @@ eta= 0.5*(p_L./lo_L.^gama+p_R./lo_R.^gama);
 % p_E=p;
 % lo_E=lo;
 % u_E=u;
-% save('EXACT_duct3.mat','eta_E','p_E','lo_E','u_E');
+% save('EXACT_duct2.mat','eta_E','p_E','lo_E','u_E');
 
-N_MAX = 10000;
+N_MAX = 1000;
 d_xM=(x_max-x_min)/N_MAX;
 W_exact = zeros(N_MAX,4);
-load ./EXACT_duct1-2.mat;
+load ./EXACT_duct2.mat;
 W_exact(:,1)=eta_E';%A(1:N)';
 W_exact(:,2)=p_E';
 W_exact(:,3)=lo_E';
@@ -173,20 +175,23 @@ W_exact(:,4)=u_E';
 %plot
 col = '-m';
 h=figure(1);
-set(h,'position',[100 100 650 500]);
+set(h,'position',[100 100 1150 750]);
 subplot(2,2,1);
 hold on
-plot(x_min:d_xM:x_max-d_xM,W_exact(:,3),'b','LineWidth',0.4);
-plot(x_min:d_x:x_max-d_x,lo,'*r','MarkerSize',4);%col,'LineWidth',1.0);
+hs(3)=plot(x_min:d_xM:x_max-d_xM,W_exact(:,3),'b','LineWidth',0.4);
+hs(1)=plot(x_min:d_x:x_max-d_x,lo,'xr','MarkerSize',6);%col,'LineWidth',1.0);
 %xlabel('Position','FontWeight','bold');
 %ylabel('Density','FontWeight','bold');
-%ylim([90 160])
+ylim([90 160])
+% ylim([0 200])
+hs(2)=plot(0,-100,'+k'); 
+legend(hs,'Godunov solution','GRP solution','Exact solution');
 title('Density');
 set(gca,'box','on');
 subplot(2,2,3);
 hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,4),'b','LineWidth',0.4);
-plot(x_min:d_x:x_max-d_x,u,'*r','MarkerSize',4);%col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,u,'xr','MarkerSize',6);%col,'LineWidth',1.0);
 %xlabel('Position','FontWeight','bold');
 %ylabel('Velocity','FontWeight','bold');
 title('Velocity');
@@ -194,7 +199,7 @@ set(gca,'box','on');
 subplot(2,2,2);
 hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,2),'b','LineWidth',0.4);
-plot(x_min:d_x:x_max-d_x,p,'*r','MarkerSize',4);%,col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,p,'xr','MarkerSize',6);%,col,'LineWidth',1.0);
 %xlabel('Position','FontWeight','bold');
 %ylabel('Pressure','FontWeight','bold');
 title('Pressure');
@@ -203,11 +208,11 @@ subplot(2,2,4);
 hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,1),'b','LineWidth',0.4);
 % plot(x_min:d_x:x_max-d_x,A(1:N),col,'LineWidth',1.0);
-plot(x_min:d_x:x_max-d_x,eta,'*r','MarkerSize',4);%,col,'LineWidth',1.0);
+plot(x_min:d_x:x_max-d_x,eta,'xr','MarkerSize',6);%,col,'LineWidth',1.0);
 %xlabel('Position','FontWeight','bold');
 %ylabel('Entropy','FontWeight','bold');
 title('Entropy');
 set(gca,'box','on');
-%ylim([5.08*10^5 5.2*10^5])
-ylim([0 12*10^5])
+ylim([5.08*10^5 5.2*10^5])
+% ylim([0 12*10^5])
 % ylim([min(eta)-0.00001 max(eta)+0.00001])

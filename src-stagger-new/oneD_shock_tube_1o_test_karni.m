@@ -227,11 +227,13 @@ h1=figure(1);
 set(h1,'position',POS);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
-plot(x,lo_s,col,'MarkerSize',4);
+hs(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
+hs(1)=plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
 ylim([0.41 1.2])
+hs(2)=plot(0,-100,'+k'); 
+legend(hs,'Godunov solution','GRP solution','Exact solution','Location','SouthEast');
 title('Solid density')
 subplot(2,2,3);
 hold on
@@ -267,12 +269,14 @@ h2=figure(2);
 set(h2,'position',POS);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
-plot(x,lo_g,col,'MarkerSize',4);
+hg(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
+hg(1)=plot(x,lo_g,col,'MarkerSize',4);
 ylim([2 3])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
+hg(2)=plot(0,-100,'+k'); 
+legend(hg,'Godunov solution','GRP solution','Exact solution');
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);

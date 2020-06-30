@@ -69,9 +69,9 @@ for i=1:N
     else
 %        U(:,i) =0.5*(U_L_0+U_R_0);
         U(:,i) =0.5*(U_L_1+U_R_1);
-        U_out=Riemann_solver_Roe_prim(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
-        U_out=Riemann_solver_Roe_invariant(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
-        U(:,i) =U_out(1:6);
+%         U_out=Riemann_solver_Roe_prim(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
+%         U_out=Riemann_solver_Roe_invariant(lo_gL_0,lo_gR_0,p_gL_0,p_gR_0,u_gL_0,u_gR_0,lo_sL_0,lo_sR_0,p_sL_0,p_sR_0,u_sL_0,u_sR_0,phi_sL_0,phi_sR_0);
+%         U(:,i) =U_out(1:6);
         Alpha(i) =phi_sL_0;
         Alpha(i+1) =phi_sR_0;
     end
@@ -175,7 +175,7 @@ while Time<Tend && isreal(Time)
 %         break;
 %     end
 end
-error("1")
+% error("1")
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
 u_g  = 0.5*(u_gL +u_gR);
@@ -214,11 +214,13 @@ h1=figure(1);
 set(h1,'position',POS);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
-plot(x,lo_s,col,'MarkerSize',4);
+hs(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
+hs(1)=plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
 ylim([0.5 2.5])
+hs(2)=plot(0,-100,'+k'); 
+legend(hs,'Godunov solution','GRP solution','Exact solution');
 title('Solid density')
 subplot(2,2,2);
 hold on
@@ -248,12 +250,14 @@ h2=figure(2);
 set(h2,'position',POS);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
-plot(x,lo_g,col,'MarkerSize',4);
+hg(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
+hg(1)=plot(x,lo_g,col,'MarkerSize',4);
 ylim([0 7])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
+hg(2)=plot(0,-100,'+k'); 
+legend(hg,'Godunov solution','GRP solution','Exact solution');
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
