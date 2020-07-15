@@ -55,6 +55,10 @@ function [phi_s_mid, rho_s_mid, u_s_mid, p_g_mid]=GRP_RI_solver_mid(rho_g,u_g,p_
             break;
         end
         dfun = (Q_mid/phi_g_mid)^2/rho_g_mid^3-gama_g*eta_g_mid*rho_g_mid^(gama_g-2.0);
+        if dfun^2 < 1e-4
+            dfun = 1e-4/dfun;
+            break;
+        end
         if abs(dfun) < ep
             fun
             break;

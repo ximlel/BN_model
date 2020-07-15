@@ -1,4 +1,4 @@
-function [phi_s_mid,F,W_int]=GRP_RI_solver(rho_gL,rho_gR,u_gL,u_gR,p_gL,p_gR,rho_sL,rho_sR,u_sL,u_sR,p_sL,p_sR,phi_sL,phi_sR,D_L,D_R,d_t)
+function [phi_s_mid,u_s_mid,F,W_int]=GRP_RI_solver(rho_gL,rho_gR,u_gL,u_gR,p_gL,p_gR,rho_sL,rho_sR,u_sL,u_sR,p_sL,p_sR,phi_sL,phi_sR,D_L,D_R,d_t)
     global ep;
     global gama_s gama_g;
     F=zeros(6,1);
@@ -42,9 +42,9 @@ function [phi_s_mid,F,W_int]=GRP_RI_solver(rho_gL,rho_gR,u_gL,u_gR,p_gL,p_gR,rho
     R(6,5) =-c_g/phi_g/rho_g;
     R(6,6) = T_g;
     R(6,7) = c_g/phi_g/rho_g;
-    R(7,6) = 1.0;	   
+    R(7,6) = 1.0;
     W_t = -(R*Lambda_v_p)/R*D_L-(R*Lambda_v_m)/R*D_R;
-
+    
     P = phi_g*rho_g*(u_g-u_s)^2+phi_g*p_g+phi_s*p_s;
     Q = phi_g*rho_g*(u_g-u_s);
     H = 0.5*(u_g-u_s)^2+gama_g/(gama_g-1.0)*p_g/rho_g;
@@ -68,6 +68,10 @@ function [phi_s_mid,F,W_int]=GRP_RI_solver(rho_gL,rho_gR,u_gL,u_gR,p_gL,p_gR,rho
             break;
         end
         dfun = (Q_mid/phi_g_mid)^2/rho_g_mid^3-gama_g*eta_g_mid*rho_g_mid^(gama_g-2.0);
+        if dfun^2 < 1e-4
+            dfun = 1e-4/dfun;
+            break;
+        end
         if abs(dfun) < ep
             fun
             break;

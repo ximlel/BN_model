@@ -13,8 +13,8 @@ x_max=1;
 N=300*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
-CFL=0.2;
-Alpha_G=1.0;
+CFL=0.1;
+Alpha_G=0.01;
 Alpha_GRP=1.7;
 %state value
 Time=0;
@@ -69,7 +69,7 @@ dp_s =zeros(1,N+1);
 dlo_g=zeros(1,N+1);
 du_g =zeros(1,N+1);
 dp_g =zeros(1,N+1);
-IDX  =zeros(1,N+1);
+IDX  =ones(1,N+1);
 W_RI_int=zeros(7,N+1);
 
 %test begin
@@ -119,8 +119,8 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N
-        d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
-%         d_Alpha(i)=minmod(Alpha_G*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_G*(Alpha(:,i+1)-Alpha(:,i))/d_x);
+         d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
+%          d_Alpha(i)=minmod(Alpha_G*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_G*(Alpha(:,i+1)-Alpha(:,i))/d_x);
          dd_Alpha(i)= abs((Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x);
 % if Time/d_t < 50
 %     d_Alpha(i) = 0.0;
@@ -138,8 +138,8 @@ while Time<Tend && isreal(Time)
         HN=2;
     end
     for i=HN+1:N-HN
-%        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
-        d_RI(:,i)=minmod(Alpha_G*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_G*(RI(:,i+1)-RI(:,i))/d_x);
+         d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
+%        d_RI(:,i)=minmod(Alpha_G*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_G*(RI(:,i+1)-RI(:,i))/d_x);
 %         dlo_s(i) =minmod(Alpha_GRP*(lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i-1))/2.0/d_x,Alpha_GRP*(lo_sL(i+1)-lo_sL(i))/d_x);
 %         du_s(i)  =minmod(Alpha_GRP*(u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i-1) )/2.0/d_x,Alpha_GRP*(u_sL(i+1) -u_sL(i) )/d_x);
 %         dp_s(i)  =minmod(Alpha_GRP*(p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i-1) )/2.0/d_x,Alpha_GRP*(p_sL(i+1) -p_sL(i) )/d_x);
@@ -152,11 +152,12 @@ while Time<Tend && isreal(Time)
         dlo_g(i) =minmod2((lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i))/d_x);
         du_g(i)  =minmod2((u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i) )/d_x);
         dp_g(i)  =minmod2((p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i) )/d_x);
-        IDX(i)=0;
-         if max(dd_Alpha(i-HN:i+HN-1)>ep)
-            d_RI(:,i)=0.0;
+%         IDX(i)=0;
+%          if max(dd_Alpha(i-HN:i+HN-1))>ep
+%             d_RI(:,i)=0.0;
+%             d_Alpha(i)=0.0;
             IDX(i)=1;
-        end
+%         end
     end
 %    for i=2:N
 %         d_Alpha(i)=0.0;
@@ -181,14 +182,14 @@ while Time<Tend && isreal(Time)
              d_RI_R=d_RI(:,N);
          else
              Alpha_int=Alpha(i);
-             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(i),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI(:,i-1),lo_gR(i-1));
-             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(i),lo_sR_i]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI(:,i),  lo_gL(i));
              d_RI_L=d_RI(:,i-1);
              d_RI_R=d_RI(:,i);
+             [lo_gL_i,u_gL_i,p_gL_i,u_sL_i,p_sL_i(i),lo_sL_i]=RI2U_cal(Alpha_int,RI(:,i-1)+0.5*d_x*d_RI_L,lo_gR(i-1));
+             [lo_gR_i,u_gR_i,p_gR_i,u_sR_i,p_sR_i(i),lo_sR_i]=RI2U_cal(Alpha_int,  RI(:,i)-0.5*d_x*d_RI_R,  lo_gL(i));
         end
 %        F(1:3,i)=Riemann_solver_Exact(lo_gL_i,lo_gR_i,p_gL_i,   p_gR_i,   u_gL_i,u_gR_i,1-Alpha_int,gama_g,0.0);
 %        F(4:6,i)=Riemann_solver_Exact(lo_sL_i,lo_sR_i,p_sL_i(i),p_sR_i(i),u_sL_i,u_sR_i,  Alpha_int,gama_s,0.0);
-         [Alpha_mid(i),F(:,i),W_RI_int(:,i)]=GRP_RI_solver(lo_gL_i,lo_gR_i,u_gL_i,u_gR_i,p_gL_i,p_gR_i,lo_sL_i,lo_sR_i,u_sL_i,u_sR_i,p_sL_i(i),p_sR_i(i),Alpha_int,Alpha_int,[d_Alpha(i);d_RI_L],[d_Alpha(i);d_RI_R],d_t);
+         [Alpha_mid(i),u_s_mid(i),F(:,i),W_RI_int(:,i)]=GRP_RI_solver(lo_gL_i,lo_gR_i,u_gL_i,u_gR_i,p_gL_i,p_gR_i,lo_sL_i,lo_sR_i,u_sL_i,u_sR_i,p_sL_i(i),p_sR_i(i),Alpha_int,Alpha_int,[d_Alpha(i);d_RI_L],[d_Alpha(i);d_RI_R],d_t);
       end      
     end
     for i=1:N
@@ -196,10 +197,10 @@ while Time<Tend && isreal(Time)
             rho_s(i) =0.5*(lo_sR(i)+lo_sL(i+1));
             arho_s(i)=rho_s(i)*Alpha(i+1);           
         end
-        [lo_gL_m,u_gL_m,p_gL_m,u_sL_m,p_sL_m,lo_sL_m]=RI2U_cal(Alpha(i),  RI(:,i),lo_gR(i));
-        [lo_gR_m,u_gR_m,p_gR_m,u_sR_m,p_sR_m,lo_sR_m]=RI2U_cal(Alpha(i+1),RI(:,i),lo_gR(i));
+        [lo_gL_m,u_gL_m,p_gL_m,u_sL_m,p_sL_m,lo_sL_m]=RI2U_cal(Alpha(i)+0.5*d_x*d_Alpha(:,i),    RI(:,i),lo_gL(i));
+        [lo_gR_m,u_gR_m,p_gR_m,u_sR_m,p_sR_m,lo_sR_m]=RI2U_cal(Alpha(i+1)-0.5*d_x*d_Alpha(:,i+1),RI(:,i),lo_gR(i));
         [phi_s_mL, lo_s_mL, u_s_mL, p_g_mL(i)]=GRP_RI_solver_mid(lo_gL_m,u_gL_m,p_gL_m,lo_sL_m,u_sL_m,p_sL_m,Alpha(:,i)+0.5*d_x*d_Alpha(:,i),    [d_Alpha(i);  d_RI(:,i)],d_t);
-        [phi_s_mR, lo_s_mR, u_s_mR, p_g_mR(i)]=GRP_RI_solver_mid(lo_gR_m,u_gR_m,p_gR_m,lo_sR_m,u_sR_m,p_sR_m,Alpha(:,i+1)+0.5*d_x*d_Alpha(:,i+1),[d_Alpha(i+1);d_RI(:,i)],d_t);
+        [phi_s_mR, lo_s_mR, u_s_mR, p_g_mR(i)]=GRP_RI_solver_mid(lo_gR_m,u_gR_m,p_gR_m,lo_sR_m,u_sR_m,p_sR_m,Alpha(:,i+1)-0.5*d_x*d_Alpha(:,i+1),[d_Alpha(i+1);d_RI(:,i)],d_t);
         if (u_sL(i)>0.0)
             phi_s_m(i) = phi_s_mL;
             lo_s_m = lo_s_mL;
@@ -238,8 +239,8 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
         area_L=0.5+u_s_m(i)*d_t/d_x;
         area_R=1.0-area_L;
-        Alpha_starL = Alpha(i) - u_s_m(i)*d_t/d_x/area_L*(Alpha(i)-Alpha_mid(i));
-        Alpha_starR = Alpha(i+1) - u_s_m(i)*d_t/d_x/area_R*(Alpha(i+1)-Alpha_mid(i+1));
+        Alpha_starL = Alpha(i) - u_s_mid(i)*d_t/d_x/area_L*(Alpha(i)-Alpha_mid(i));
+        Alpha_starR = Alpha(i+1) - u_s_mid(i)*d_t/d_x/area_R*(Alpha(i+1)-Alpha_mid(i+1));
         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha_starL,Alpha_starR,area_L,area_R);
         phi_sL=Alpha_next(i);
         phi_sR=Alpha_next(i+1);
@@ -256,10 +257,10 @@ while Time<Tend && isreal(Time)
       end
     end
     Alpha=Alpha_next;
-    Time=Time+d_t;
-%     if Time > 100*d_t
-%         break;
-%     end
+    Time=Time+d_t
+    if Time > 100*d_t
+        break;
+    end
 end
 
 lo_g = 0.5*(lo_gL+lo_gR);
