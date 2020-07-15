@@ -9,8 +9,8 @@ global ep;
     H=0.5*(u_g-u_s)^2+gama_g/(gama_g-1.0)*p_g/lo_g;
     RI(1)=lo_s;
     RI(2)=u_s;
-    RI(3)=Q;
-    RI(4)=P;
+    RI(3)=P;
+    RI(4)=Q;
     RI(5)=H;
     RI(6)=eta_g;
 end
