@@ -68,8 +68,8 @@ function [phi_s_mid,u_s_mid,F,W_int]=GRP_RI_solver(rho_gL,rho_gR,u_gL,u_gR,p_gL,
             break;
         end
         dfun = (Q_mid/phi_g_mid)^2/rho_g_mid^3-gama_g*eta_g_mid*rho_g_mid^(gama_g-2.0);
-        if dfun^2 < 1e-4
-            dfun = 1e-4/dfun;
+        if dfun^2 < ep
+            dfun = ep/dfun;
             break;
         end
         if abs(dfun) < ep

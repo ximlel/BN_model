@@ -1,5 +1,6 @@
 clear;
 clc;
+warning off;
 %1D shock_tube by 2-order staggered Schemes for BN model
 %state constant
 global gama_s gama_g p0;
@@ -45,7 +46,7 @@ U_lo_sR=zeros(1,N);
 % u_sR_0   =0.3;
 % p_sR_0   =12.85675006887399;
 % phi_sR_0 =0.3;
-load ../test/test4.mat;
+load ../test/test2.mat;
 phi_gL_0=1.0-phi_sL_0;
 phi_gR_0=1.0-phi_sR_0;
 E_gL_0=p_gL_0/(gama_g-1)+0.5*lo_gL_0*u_gL_0^2;
@@ -242,11 +243,10 @@ while Time<Tend && isreal(Time)
     end
     Alpha=Alpha_next;
     Time=Time+d_t
-%     if Time > 10*d_t
+%     if Time > 100*d_t
 %         break;
 %     end
 end
-
 lo_g = 0.5*(lo_gL+lo_gR);
 p_g  = 0.5*(p_gL +p_gR);
 u_g  = 0.5*(u_gL +u_gR);
@@ -271,14 +271,14 @@ W_exact(:,5)=p_s';
 W_exact(:,6)=lo_g';
 W_exact(:,7)=u_g';
 W_exact(:,8)=p_g';
-load ../test/test4.exact;
+load ../test/test2.exact;
 for i=1:N
-     W_exact(i,:) = test4(ceil(i/(N/300)),:);
+     W_exact(i,:) = test2(ceil(i/(N/300)),:);
 end
 %plot
 col = '+k';
 %col = 'or';
-%col = '*m';
+%col = '+m';
 %col = 'xb';
 POS = [50 50 1200 800];
 h1=figure(1);
@@ -289,7 +289,7 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-solid','FontWeight','bold');
-ylim([0.5 2.5])
+ylim([0 2.5])
 title('Solid density')
 subplot(2,2,2);
 hold on
@@ -297,13 +297,13 @@ plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-solid','FontWeight','bold');
-ylim([-1.2 0.2])
+ylim([-1 1.5])
 title('Solid velocity')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
-ylim([1 5])
+ylim([0 6])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-solid','FontWeight','bold');
 title('Solid pressure')
@@ -311,7 +311,7 @@ subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,phi_s,col,'MarkerSize',4);
-ylim([0.1 0.7])
+ylim([0.1 0.2])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Porosity-solid','FontWeight','bold');
 title('Solid volume fraction')
@@ -321,7 +321,7 @@ subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 plot(x,lo_g,col,'MarkerSize',4);
-ylim([0 7])
+ylim([0.4 1.1])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Density-gas','FontWeight','bold');
 title('Gas density')
@@ -329,7 +329,7 @@ subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
-ylim([-0.8 -0.1])
+ylim([-1 2])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Velocity-gas','FontWeight','bold');
 title('Gas velocity')
@@ -337,7 +337,7 @@ subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
-ylim([0 1])
+ylim([0.5 3.03])
 % xlabel('Position','FontWeight','bold');
 % ylabel('Pressure-gas','FontWeight','bold');
 title('Gas pressure')
@@ -351,7 +351,7 @@ hold on
 % title('Gas entropy')
 plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
 plot(x,1.0-phi_s,col,'MarkerSize',4);
-ylim([0.5 1])
+ylim([0.8 0.9])
 title('Gas volume fraction')
 h3=figure(3)
 set(h3,'position',POS);
