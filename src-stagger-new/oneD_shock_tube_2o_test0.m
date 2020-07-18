@@ -11,12 +11,12 @@ global ep;
 ep=1e-9;
 x_min=0;
 x_max=1;
-N=6400*1;
+N=800*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.4;
-Alpha_G=1.0;
-Alpha_GRP=1.0;
+Alpha_G=0.0;
+Alpha_GRP=0.0;
 %state value
 Time=0;
 Tend=0.1;
@@ -38,8 +38,10 @@ p_g_0   =1.0;
 lo_s_0  =1.0;
 u_s_0   =@(x) 0.5 + 0.5*tanh(20*x-10);
 p_s_0   =1.0;
-phi_s_0 =@(x) 0.5 + 0.4*tanh(20*x-8);
-phi_g_0 =@(x) 0.5 - 0.4*tanh(20*x-8);
+% phi_s_0 =@(x) 0.5 + 0.4*tanh(20*x-8);
+% phi_g_0 =@(x) 0.5 - 0.4*tanh(20*x-8);
+phi_s_0 =@(x) 0.5+0*x;
+phi_g_0 =@(x) 0.5+0*x;
 for i=1:(N+1)
     Alpha(i) = integral(phi_s_0,x_min+(i-1.5)*d_x,x_min+(i-0.5)*d_x)/d_x;
 end
@@ -107,28 +109,28 @@ while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=2:N
 %         d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
-%         d_Alpha(i)=minmod(Alpha_G*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_G*(Alpha(:,i+1)-Alpha(:,i))/d_x);
-         d_Alpha(i)=(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x;
+        d_Alpha(i)=minmod(Alpha_G*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_G*(Alpha(:,i+1)-Alpha(:,i))/d_x);
+%          d_Alpha(i)=(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x;
          dd_Alpha(i)= abs((Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x);
     end
     HN=1;
     for i=HN+1:N-HN
-%         d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
-%         d_RI(:,i)=minmod(Alpha_G*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_G*(RI(:,i+1)-RI(:,i))/d_x);
-%         dlo_s(i) =minmod(Alpha_GRP*(lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i-1))/2.0/d_x,Alpha_GRP*(lo_sL(i+1)-lo_sL(i))/d_x);
-%         du_s(i)  =minmod(Alpha_GRP*(u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i-1) )/2.0/d_x,Alpha_GRP*(u_sL(i+1) -u_sL(i) )/d_x);
-%         dp_s(i)  =minmod(Alpha_GRP*(p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i-1) )/2.0/d_x,Alpha_GRP*(p_sL(i+1) -p_sL(i) )/d_x);
-%         dlo_g(i) =minmod(Alpha_GRP*(lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i-1))/2.0/d_x,Alpha_GRP*(lo_gL(i+1)-lo_gL(i))/d_x);
-%         du_g(i)  =minmod(Alpha_GRP*(u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i-1) )/2.0/d_x,Alpha_GRP*(u_gL(i+1) -u_gL(i) )/d_x);
-%         dp_g(i)  =minmod(Alpha_GRP*(p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i-1) )/2.0/d_x,Alpha_GRP*(p_gL(i+1) -p_gL(i) )/d_x);
+        d_RI(:,i)=minmod2((RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i))/d_x);
+        d_RI(:,i)=minmod(Alpha_G*(RI(:,i)-RI(:,i-1))/d_x,(RI(:,i+1)-RI(:,i-1))/2.0/d_x,Alpha_G*(RI(:,i+1)-RI(:,i))/d_x);
+        dlo_s(i) =minmod(Alpha_GRP*(lo_sL(i)-lo_sL(i-1))/d_x,(lo_sL(i+1)-lo_sL(i-1))/2.0/d_x,Alpha_GRP*(lo_sL(i+1)-lo_sL(i))/d_x);
+        du_s(i)  =minmod(Alpha_GRP*(u_sL(i) -u_sL(i-1) )/d_x,(u_sL(i+1) -u_sL(i-1) )/2.0/d_x,Alpha_GRP*(u_sL(i+1) -u_sL(i) )/d_x);
+        dp_s(i)  =minmod(Alpha_GRP*(p_sL(i) -p_sL(i-1) )/d_x,(p_sL(i+1) -p_sL(i-1) )/2.0/d_x,Alpha_GRP*(p_sL(i+1) -p_sL(i) )/d_x);
+        dlo_g(i) =minmod(Alpha_GRP*(lo_gL(i)-lo_gL(i-1))/d_x,(lo_gL(i+1)-lo_gL(i-1))/2.0/d_x,Alpha_GRP*(lo_gL(i+1)-lo_gL(i))/d_x);
+        du_g(i)  =minmod(Alpha_GRP*(u_gL(i) -u_gL(i-1) )/d_x,(u_gL(i+1) -u_gL(i-1) )/2.0/d_x,Alpha_GRP*(u_gL(i+1) -u_gL(i) )/d_x);
+        dp_g(i)  =minmod(Alpha_GRP*(p_gL(i) -p_gL(i-1) )/d_x,(p_gL(i+1) -p_gL(i-1) )/2.0/d_x,Alpha_GRP*(p_gL(i+1) -p_gL(i) )/d_x);
         
-        d_RI(:,i)= (RI(:,i+1)-RI(:,i-1))/2.0/d_x;
-        dlo_s(i) = (lo_sL(i+1)-lo_sL(i-1))/2.0/d_x;
-        du_s(i)  = (u_sL(i+1) -u_sL(i-1) )/2.0/d_x;
-        dp_s(i)  = (p_sL(i+1) -p_sL(i-1) )/2.0/d_x;
-        dlo_g(i) = (lo_gL(i+1)-lo_gL(i-1))/2.0/d_x;
-        du_g(i)  = (u_gL(i+1) -u_gL(i-1) )/2.0/d_x;
-        dp_g(i)  = (p_gL(i+1) -p_gL(i-1) )/2.0/d_x;
+%         d_RI(:,i)= (RI(:,i+1)-RI(:,i-1))/2.0/d_x;
+%         dlo_s(i) = (lo_sL(i+1)-lo_sL(i-1))/2.0/d_x;
+%         du_s(i)  = (u_sL(i+1) -u_sL(i-1) )/2.0/d_x;
+%         dp_s(i)  = (p_sL(i+1) -p_sL(i-1) )/2.0/d_x;
+%         dlo_g(i) = (lo_gL(i+1)-lo_gL(i-1))/2.0/d_x;
+%         du_g(i)  = (u_gL(i+1) -u_gL(i-1) )/2.0/d_x;
+%         dp_g(i)  = (p_gL(i+1) -p_gL(i-1) )/2.0/d_x;
 %         IDX(i)=0;
 %         if max(dd_Alpha(i-HN:i+HN-1)>ep)
             IDX(i)=1;
@@ -191,6 +193,11 @@ while Time<Tend && isreal(Time)
         rho_s(i) = rho_s(i)+d_t/d_x*(F_rho_s(i) -F_rho_s(i+1));
         Alpha_next(i+1)=arho_s(i)/rho_s(i);
     end
+    
+    for i=1:N-1
+        Alpha_next(i+1)=W_RI_int(1,i+1);
+    end
+    
     %compute U in next step
     for i=1:N
 %       if abs(Alpha(i+1)-Alpha(i))<ep
@@ -235,16 +242,31 @@ while Time<Tend && isreal(Time)
 %         break;
 %     end
 end
-U_big = U;
-save('U-exact.mat','U_big');
+% U_big = U;
+% save('U-exact.mat','U_big');
 
-% N_big = 6400;
-% rat = N_big/N;
-% load U-exact.mat;
-% U_exact=zeros(6,N_big);
-% err_U=zeros(1,N);
-% for i=1:N
-%      U_exact(:,i) = sum(U_big(:,(i-1)*rat+1:i*rat),2)/rat;
-%      err_U(i) = norm(U_exact(:,i)-U(:,i));
-% end
-% E_N = sum(err_U)*d_x
+N_big = 3200;
+rat = N_big/N;
+load U-exact.mat;
+U_exact=zeros(6,N_big);
+err_U=zeros(1,N);
+for i=1:N
+     U_exact(:,i) = sum(U_big(:,(i-1)*rat+1:i*rat),2)/rat;
+     err_U(i) = norm(U_exact(:,i)-U(:,i));
+end
+for i=1:N
+     err_U_1(i) = norm(U_exact(1,i)-U(1,i));
+     err_U_2(i) = norm(U_exact(2,i)-U(2,i));
+     err_U_3(i) = norm(U_exact(3,i)-U(3,i));
+     err_U_4(i) = norm(U_exact(4,i)-U(4,i));
+     err_U_5(i) = norm(U_exact(5,i)-U(5,i));
+     err_U_6(i) = norm(U_exact(6,i)-U(6,i));  
+end
+E_N = sum(err_U)*d_x
+E_N_1 = sum(err_U_1)*d_x
+E_N_2 = sum(err_U_2)*d_x
+E_N_3 = sum(err_U_3)*d_x
+E_N_4 = sum(err_U_4)*d_x
+E_N_5 = sum(err_U_5)*d_x
+E_N_6 = sum(err_U_6)*d_x
+E_N_all = [E_N_1,E_N_2,E_N_3,E_N_4,E_N_5,E_N_6];
