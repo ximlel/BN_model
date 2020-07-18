@@ -8,10 +8,10 @@ gama_s=1.4;
 gama_g=1.4;
 p0=0;
 global ep;
-ep=1e-6;
+ep=1e-9;
 x_min=0;
 x_max=1;
-N=12800*1;
+N=6400*1;
 d_x=(x_max-x_min)/N;
 x0=0.5;
 CFL=0.4;
@@ -108,7 +108,7 @@ while Time<Tend && isreal(Time)
     for i=2:N
 %         d_Alpha(i)=minmod2((Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i))/d_x);
 %         d_Alpha(i)=minmod(Alpha_G*(Alpha(:,i)-Alpha(:,i-1))/d_x,(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x,Alpha_G*(Alpha(:,i+1)-Alpha(:,i))/d_x);
-          d_Alpha(i)=(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x;
+         d_Alpha(i)=(Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x;
          dd_Alpha(i)= abs((Alpha(:,i+1)-Alpha(:,i-1))/2.0/d_x);
     end
     HN=1;
@@ -193,40 +193,40 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-      if abs(Alpha(i+1)-Alpha(i))<ep
+%       if abs(Alpha(i+1)-Alpha(i))<ep
           S=0.5*(p_g_mL(i)+p_g_mR(i))*(Alpha(i+1)-Alpha(i));
-      else
-          S_tmp=Alpha_mid(i+1)*p_sL_i(i+1)-Alpha_mid(i)*p_sR_i(i);
-          if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_g_mL(i),p_g_mR(i)))
-              S=max(p_g_mL(i),p_g_mR(i))*(Alpha(i+1)-Alpha(i));
-          elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_g_mL(i),p_g_mR(i)))
-              S=min(p_g_mL(i),p_g_mR(i))*(Alpha(i+1)-Alpha(i));
-          else
-              S=S_tmp;
-          end
-      end
+%       else
+%           S_tmp=Alpha_mid(i+1)*p_sL_i(i+1)-Alpha_mid(i)*p_sR_i(i);
+%           if (S_tmp/(Alpha(i+1)-Alpha(i))>max(p_g_mL(i),p_g_mR(i)))
+%               S=max(p_g_mL(i),p_g_mR(i))*(Alpha(i+1)-Alpha(i));
+%           elseif (S_tmp/(Alpha(i+1)-Alpha(i))<min(p_g_mL(i),p_g_mR(i)))
+%               S=min(p_g_mL(i),p_g_mR(i))*(Alpha(i+1)-Alpha(i));
+%           else
+%               S=S_tmp;
+%           end
+%       end
       if IDX(i) == 0
         U(:,i)=U(:,i)+d_t/d_x*(F_0(:,i)-F_0(:,i+1));
         Alpha_next(i) = Alpha(i);        
       else
-        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_sL(i);0;S;S*u_sL(i)];
-        area_L=0.5+u_s_m(i)*d_t/d_x;
-        area_R=1.0-area_L;
-        Alpha_starL = Alpha(i) - u_s_mid(i)*d_t/d_x/area_L*(Alpha(i)-Alpha_mid(i));
-        Alpha_starR = Alpha(i+1) - u_s_mid(i)*d_t/d_x/area_R*(Alpha(i+1)-Alpha_mid(i+1));
-        [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha_starL,Alpha_starR,area_L,area_R);
-        phi_sL=Alpha_next(i);
-        phi_sR=Alpha_next(i+1);
-        [lo_gL(i),u_gL(i),p_gL(i),p_sL(i)]=Riemann_inv(Alpha(i),  lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),phi_sL);   
-        [lo_gR(i),u_gR(i),p_gR(i),p_sR(i)]=Riemann_inv(Alpha(i+1),lo_gR(i),u_gR(i),p_gR(i),u_sR(i),p_sR(i),phi_sR);   
-        phi_gL=1.0-phi_sL;
-        phi_gR=1.0-phi_sR;
-        E_gL=p_gL(i)/(gama_g-1)+0.5*lo_gL(i)*u_gL(i)^2;
-        E_sL=(p_sL(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sL(i)*u_sL(i)^2;
-        U(:,i)=       0.5*[phi_gL*lo_gL(i);phi_gL*lo_gL(i)*u_gL(i);phi_gL*E_gL;phi_sL*lo_sL(i);phi_sL*lo_sL(i)*u_sL(i);phi_sL*E_sL];
-        E_gR=p_gR(i)/(gama_g-1)+0.5*lo_gR(i)*u_gR(i)^2;
-        E_sR=(p_sR(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sR(i)*u_sR(i)^2;
-        U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
+        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;-S;-S*u_s_m(i);0;S;S*u_s_m(i)];
+%         area_L=0.5+u_s_m(i)*d_t/d_x;
+%         area_R=1.0-area_L;
+%         Alpha_starL = Alpha(i) - u_s_mid(i)*d_t/d_x/area_L*(Alpha(i)-Alpha_mid(i));
+%         Alpha_starR = Alpha(i+1) - u_s_mid(i)*d_t/d_x/area_R*(Alpha(i+1)-Alpha_mid(i+1));
+%         [lo_gL(i),u_gL(i),p_gL(i),lo_sL(i),u_sL(i),p_sL(i),lo_gR(i),u_gR(i),p_gR(i),lo_sR(i),u_sR(i),p_sR(i)]=primitive_comp(U(:,i),Alpha_starL,Alpha_starR,area_L,area_R);
+%         phi_sL=Alpha_next(i);
+%         phi_sR=Alpha_next(i+1);
+%         [lo_gL(i),u_gL(i),p_gL(i),p_sL(i)]=Riemann_inv(Alpha(i),  lo_gL(i),u_gL(i),p_gL(i),u_sL(i),p_sL(i),phi_sL);   
+%         [lo_gR(i),u_gR(i),p_gR(i),p_sR(i)]=Riemann_inv(Alpha(i+1),lo_gR(i),u_gR(i),p_gR(i),u_sR(i),p_sR(i),phi_sR);   
+%         phi_gL=1.0-phi_sL;
+%         phi_gR=1.0-phi_sR;
+%         E_gL=p_gL(i)/(gama_g-1)+0.5*lo_gL(i)*u_gL(i)^2;
+%         E_sL=(p_sL(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sL(i)*u_sL(i)^2;
+%         U(:,i)=       0.5*[phi_gL*lo_gL(i);phi_gL*lo_gL(i)*u_gL(i);phi_gL*E_gL;phi_sL*lo_sL(i);phi_sL*lo_sL(i)*u_sL(i);phi_sL*E_sL];
+%         E_gR=p_gR(i)/(gama_g-1)+0.5*lo_gR(i)*u_gR(i)^2;
+%         E_sR=(p_sR(i)+gama_s*p0)/(gama_s-1)+0.5*lo_sR(i)*u_sR(i)^2;
+%         U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
       end
     end
     Alpha=Alpha_next;
@@ -238,7 +238,7 @@ end
 U_big = U;
 save('U-exact.mat','U_big');
 
-% N_big = 1600;
+% N_big = 6400;
 % rat = N_big/N;
 % load U-exact.mat;
 % U_exact=zeros(6,N_big);
