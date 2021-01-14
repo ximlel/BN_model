@@ -176,7 +176,7 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+0.5*[phi_gR*lo_gR(i);phi_gR*lo_gR(i)*u_gR(i);phi_gR*E_gR;phi_sR*lo_sR(i);phi_sR*lo_sR(i)*u_sR(i);phi_sR*E_sR];
     end
     Alpha=Alpha_next;
-    Time=Time+d_t;
+    Time=Time+d_t
 %     if Time > 10*d_t
 %         break;
 %     end
@@ -222,8 +222,8 @@ subplot(2,2,1);
 hold on
 hs(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 hs(1)=plot(x,lo_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Density-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\rho_s','FontWeight','bold');
 ylim([0 2.5])
 hs(2)=plot(0,-100,'+k'); 
 legend(hs,'Godunov solution','GRP solution','Exact solution','Location','SouthEast');
@@ -232,8 +232,8 @@ subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Velocity-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+y1=ylabel('u_s','FontWeight','bold');
 ylim([-1 1.5])
 title('Solid velocity')
 subplot(2,2,3);
@@ -241,16 +241,16 @@ hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
 ylim([0 6])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Pressure-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('p_s','FontWeight','bold');
 title('Solid pressure')
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,phi_s,col,'MarkerSize',4);
 ylim([0.1 0.2])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Porosity-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\alpha_s','FontWeight','bold');
 title('Solid volume fraction')
 h2=figure(2);
 set(h2,'position',POS);
@@ -259,8 +259,8 @@ hold on
 hg(3)=plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 hg(1)=plot(x,lo_g,col,'MarkerSize',4);
 ylim([0.4 1.1])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Density-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\rho_g','FontWeight','bold');
 title('Gas density')
 hg(2)=plot(0,-100,'+k'); 
 legend(hg,'Godunov solution','GRP solution','Exact solution','Location','NorthWest');
@@ -269,16 +269,16 @@ hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
 ylim([-1 2])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Velocity-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('u_g','FontWeight','bold');
 title('Gas velocity')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
 ylim([0.5 3.03])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Pressure-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('p_g','FontWeight','bold');
 title('Gas pressure')
 subplot(2,2,4);
 hold on
@@ -288,10 +288,19 @@ hold on
 % % ylabel('Entropy-gas','FontWeight','bold');
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
 % title('Gas entropy')
-plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
-plot(x,1.0-phi_s,col,'MarkerSize',4);
-ylim([0.8 0.9])
-title('Gas volume fraction')
+% plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
+% plot(x,1.0-phi_s,col,'MarkerSize',4);
+% ylim([0.8 0.9])
+% title('Gas volume fraction')
+
+WW = W_exact;
+E_total_exa = WW(:,2).*(WW(:,3).*WW(:,4).^2+WW(:,5)./(gama_s-1.0))+(1.0-WW(:,2)).*(WW(:,6).*WW(:,7).^2+WW(:,8)./(gama_g-1.0));
+E_total_num = phi_s.*(lo_s.*u_s.^2+p_s./(gama_s-1.0))+(1.0-phi_s).*(lo_g.*u_g.^2+p_g./(gama_g-1.0));
+plot(x_min:d_x:x_max-d_x,E_total_exa,'b','LineWidth',0.4);
+plot(x,E_total_num,col,'MarkerSize',4);
+%ylim([0.1 0.7])
+title('Total energy')
+
 h3=figure(3)
 set(h3,'position',POS);
 subplot(3,1,1);

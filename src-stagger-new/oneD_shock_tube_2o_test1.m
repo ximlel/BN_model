@@ -279,10 +279,21 @@ hold on
 % % ylabel('Entropy-gas','FontWeight','bold');
 % ylim([min(eta)-0.00001 max(eta)+0.00001])
 % title('Gas entropy')
-plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
-plot(x,1.0-phi_s,col,'MarkerSize',4);
-ylim([0.1 0.7])
-title('Gas volume fraction')
+% plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
+% plot(x,1.0-phi_s,col,'MarkerSize',4);
+% ylim([0.1 0.7])
+% title('Gas volume fraction')
+
+WW = W_exact;
+E_total_exa = WW(:,2).*(WW(:,3).*WW(:,4).^2+WW(:,5)./(gama_s-1.0))+(1.0-WW(:,2)).*(WW(:,6).*WW(:,7).^2+WW(:,8)./(gama_g-1.0));
+E_total_num = phi_s.*(lo_s.*u_s.^2+p_s./(gama_s-1.0))+(1.0-phi_s).*(lo_g.*u_g.^2+p_g./(gama_g-1.0));
+plot(x_min:d_x:x_max-d_x,E_total_exa,'b','LineWidth',0.4);
+plot(x,E_total_num,col,'MarkerSize',4);
+%ylim([0.1 0.7])
+xlabel('x','FontWeight','bold');
+ylabel('E','FontWeight','bold');
+title('Total energy')
+
 h3=figure(3)
 set(h3,'position',POS);
 subplot(3,1,1);

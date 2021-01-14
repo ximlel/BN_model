@@ -287,16 +287,16 @@ subplot(2,2,1);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
 plot(x,lo_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Density-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\rho_s','FontWeight','bold');
 ylim([0.41 1.2])
 title('Solid density')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
 plot(x,u_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Velocity-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+y1=ylabel('u_s','FontWeight','bold');
 ylim([-0.03 0.195])
 title('Solid velocity')
 subplot(2,2,2);
@@ -304,15 +304,15 @@ hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,5),'b','LineWidth',0.4);
 plot(x,p_s,col,'MarkerSize',4);
 ylim([0.2 1.5])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Pressure-solid','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('p_s','FontWeight','bold');
 title('Solid pressure')
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
 plot(x,eta_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Entropy-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\eta_s','FontWeight','bold');
 ylim([0.6 1.4])
 title('Solid entropy')
 % plot(x_min:d_x:x_max-d_x,W_exact(:,2),'b','LineWidth',0.4);
@@ -328,31 +328,31 @@ hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,6),'b','LineWidth',0.4);
 plot(x,lo_g,col,'MarkerSize',4);
 ylim([2 3])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Density-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\rho_g','FontWeight','bold');
 title('Gas density')
 subplot(2,2,3);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
 plot(x,u_g,col,'MarkerSize',4);
 ylim([0.38 0.9])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Velocity-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('u_g','FontWeight','bold');
 title('Gas velocity')
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,8),'b','LineWidth',0.4);
 plot(x,p_g,col,'MarkerSize',4);
 ylim([1.4 2.6])
-% xlabel('Position','FontWeight','bold');
-% ylabel('Pressure-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('p_g','FontWeight','bold');
 title('Gas pressure')
 subplot(2,2,4);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,1),'b','LineWidth',0.4);
 plot(x,eta_g,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Entropy-gas','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\eta_g','FontWeight','bold');
 ylim([0.547 0.557])
 title('Gas entropy')
 % plot(x_min:d_x:x_max-d_x,1.0-W_exact(:,2),'b','LineWidth',0.4);
