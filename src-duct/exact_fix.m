@@ -1,4 +1,4 @@
-load EXACT_duct1.mat;
+load EXACT_duct2.mat;
 Y1=eta_E(7250);
 Y2=eta_E(7380);
 MAX = eta_E(7500);

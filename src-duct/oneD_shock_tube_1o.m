@@ -180,8 +180,8 @@ subplot(2,2,1);
 hold on
 hs(3)=plot(x_min:d_xM:x_max-d_xM,W_exact(:,3),'b','LineWidth',0.4);
 hs(1)=plot(x_min:d_x:x_max-d_x,lo,'xr','MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Density','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\rho','FontWeight','bold');
 ylim([90 160])
 % ylim([0 200])
 hs(2)=plot(0,-100,'+k'); 
@@ -192,16 +192,16 @@ subplot(2,2,3);
 hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,4),'b','LineWidth',0.4);
 plot(x_min:d_x:x_max-d_x,u,'xr','MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Velocity','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('u','FontWeight','bold');
 title('Velocity');
 set(gca,'box','on');
 subplot(2,2,2);
 hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,2),'b','LineWidth',0.4);
 plot(x_min:d_x:x_max-d_x,p,'xr','MarkerSize',6);%,col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Pressure','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('p','FontWeight','bold');
 title('Pressure');
 set(gca,'box','on');
 subplot(2,2,4);
@@ -209,8 +209,8 @@ hold on
 plot(x_min:d_xM:x_max-d_xM,W_exact(:,1),'b','LineWidth',0.4);
 % plot(x_min:d_x:x_max-d_x,A(1:N),col,'LineWidth',1.0);
 plot(x_min:d_x:x_max-d_x,eta,'xr','MarkerSize',6);%,col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Entropy','FontWeight','bold');
+xlabel('x','FontWeight','bold');
+ylabel('\eta','FontWeight','bold');
 title('Entropy');
 set(gca,'box','on');
 ylim([5.08*10^5 5.2*10^5])

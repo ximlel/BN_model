@@ -219,6 +219,8 @@ hs(1)=plot(x,lo_s,col,'MarkerSize',4);
 xlabel('x','FontWeight','bold');
 ylabel('\rho_s','FontWeight','bold');
 ylim([0.5 2.5])
+% ylim([0.9 1.1])
+% xlim([0.4 0.6])
 hs(2)=plot(0,-100,'+k'); 
 legend(hs,'Godunov solution','GRP solution','Exact solution');
 title('Solid density')

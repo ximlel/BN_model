@@ -263,7 +263,7 @@ xlabel('x','FontWeight','bold');
 ylabel('\rho_g','FontWeight','bold');
 title('Gas density')
 hg(2)=plot(0,-100,'+k'); 
-legend(hg,'Godunov solution','GRP solution','Exact solution','Location','NorthWest');
+legend(hg,'Godunov solution','GRP solution','Exact solution','Location','SouthWest');
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,7),'b','LineWidth',0.4);
@@ -299,6 +299,8 @@ E_total_num = phi_s.*(lo_s.*u_s.^2+p_s./(gama_s-1.0))+(1.0-phi_s).*(lo_g.*u_g.^2
 plot(x_min:d_x:x_max-d_x,E_total_exa,'b','LineWidth',0.4);
 plot(x,E_total_num,col,'MarkerSize',4);
 %ylim([0.1 0.7])
+xlabel('x','FontWeight','bold');
+ylabel('E','FontWeight','bold');
 title('Total energy')
 
 h3=figure(3)
