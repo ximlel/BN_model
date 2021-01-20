@@ -265,12 +265,17 @@ h1=figure(1);
 set(h1,'position',POS);
 subplot(2,2,1);
 hold on
-plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
-plot(x,lo_s,col,'MarkerSize',4);
-% xlabel('Position','FontWeight','bold');
-% ylabel('Density-solid','FontWeight','bold');
+hs(2)=plot(x_min:d_x:x_max-d_x,W_exact(:,3),'b','LineWidth',0.4);
+% d_x2=(x_max-x_min)/300;
+% hs(2)=plot(x_min:d_x2:x_max-d_x2,test2(:,3),'b','LineWidth',0.4);
+hs(1)=plot(x,lo_s,col,'MarkerSize',4);
+xlabel('x','FontWeight','bold');
+ylabel('\rho_s','FontWeight','bold');
 ylim([0 2.5])
-title('Solid density')
+% xlim([0.35,0.65])
+% ylim([0.9,1.3])
+% legend(hs,'GRP solution','Exact solution','Location','NorthWest');
+title('Solid density (M=1200)')
 subplot(2,2,2);
 hold on
 plot(x_min:d_x:x_max-d_x,W_exact(:,4),'b','LineWidth',0.4);
