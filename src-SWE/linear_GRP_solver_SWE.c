@@ -165,8 +165,8 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
     B = input[8];
     s_B_L = input[9];
     s_B_R = input[10];
-    g = input[13];
-    eps = input[14];
+    g = input[11];
+    eps = input[12];
 
     double c_L, c_R;
     c_L = sqrt(g * h_L);
@@ -175,26 +175,20 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
     int CRW[2];
     double u_star, h_star, c_star;
     double a_L, b_L, d_L, a_R, b_R, d_R;
-    double pt_pa, ps_pa, pt_pb, pr_pb, alpha, beta, psi;
+    double pt_pa, ps_pa, pt_pb, pr_pb, alpha, beta, phi, det_A;
     double s_L, s_s_L, r_R, s_r_R;
     s_L = u_L + 2.0*c_L;
     s_s_L = s_u_L + sqrt(g/h_L)*s_h_L;
     r_R = u_R - 2.0*c_R;
     s_r_R = s_u_R - sqrt(g/h_R)*s_h_R;
-    
-    double PI, H1, H2, H3;
-    double L_u, L_p, L_rho;
-
-    double u_t_mat, p_t_mat;
-
-    double shk_spd;
-
-    double g_rho, g_u, g_p, f;
-
+    double d_G_L[2], d_G_R[2], d_G[2];
+    double A_gI_L[2][2], A_gI_R[2][2], A_gI[2][2];
     double speed_L, speed_R;
+    double ss_shk_spd, dh_dt, du_dt;
 
     //=========non-acoustic case==========
     Riemann_solver_exact(&u_star, &h_star, g, u_L, u_R, h_L, h_R, CRW, eps, 50);
+    c_star = sqrt(g*h_star);
     
     //----------solving the LINEAR GRP----------
     if(CRW[0])
@@ -207,20 +201,20 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 	speed_R = u_R + h_star * sqrt(0.5*g * (1.0/h_star + 1.0/h_R));
 
     //------trivial case------
-    if(speed_L > 0.0) //the t-axe is on the left side of all the three waves
+    if(speed_L > eps) //the t-axe is on the left side of all the three waves
 	{
 	    dire[0] = -s_h_L*u_L - h_L*s_u_L;
 	    dire[1] = -s_h_L - u_L*s_u_L/g - s_B_L;
-	    dire[1] = g*dire[1];
+	    dire[1]*= g;
 
 	    mid[0] = h_L;
 	    mid[1] = u_L;
 	}
-    else if(speed_R < 0.0) //the t-axe is on the right side of all the three waves
+    else if(speed_R < -eps) //the t-axe is on the right side of all the three waves
 	{
 	    dire[0] = -s_h_R*u_R - h_R*s_u_R;
 	    dire[1] = -s_h_R - u_R*s_u_R/g - s_B_R;
-	    dire[1] = g*dire[1];
+	    dire[1]*= g;
 
 	    mid[0] = h_R;
 	    mid[1] = u_R;
@@ -237,7 +231,7 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    b_L = 1.0;
 		    beta = 0.0;
 		    ps_pa = (phi-2.0*c_L*s_s_L)/pow(3.0*c_L,1.5);
-		    ps_pa = ps_pa - phi*(pow(s_L-beta,-1.5)-pow(3.0*c_L,-1.5));
+		    ps_pa-= phi*(pow(s_L-beta,-1.5)-pow(3.0*c_L,-1.5));
 		    pt_pa = 1.0/pow(s_L-beta,1.5);
 		    d_L = ps_pa/pt_pa;
 		    a_R = -sqrt(g/mid[0]);
@@ -256,8 +250,8 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    b_R = 1.0;
 		    alpha = 0.0;
 		    pr_pb = (phi+2.0*c_R*s_r_R)/pow(3*c_R,1.5);
-		    pr_pb = pr_pb + phi*(pow(alpha-r_R,-1.5)-pow(3.0*c_R,-1.5));
-		    pt_pb = ;
+		    pr_pb+= phi*(pow(alpha-r_R,-1.5)-pow(3.0*c_R,-1.5));
+		    pt_pb = 1.0/pow(r_R-alpha,1.5);
 		    d_R = pr_pb/pt_pb;		    
 		}
 	    //--non-sonic case--
@@ -266,84 +260,111 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    //determine a_L, b_L and d_L
 		    if(CRW[0]) //the 1-wave is a CRW
 			{
-			    a_L = 1.0;
-			    b_L = 1.0 / rho_star_L / c_star_L;
-			    d_L = 0.5*(pow(c_star_L/c_L, 0.5/zeta)*(1.0+zeta) + pow(c_star_L/c_L, (1.0+zeta)/zeta)*zeta)/(0.5+zeta);
-			    d_L = d_L * (s_p_L - s_rho_L*c_L*c_L)/(gamma-1.0)/rho_L;
-			    d_L = d_L - c_L*pow(c_star_L/c_L, 0.5/zeta)*(s_u_L + (gamma*s_p_L/c_L - c_L*s_rho_L)/(gamma-1.0)/rho_L);
+			    phi = -g*s_B_L;
+			    det_A = u_star*u_star - g*h_star;
+			    a_L = ( sqrt(g/h_star)*u_star - g)/det_A;
+			    b_L = (-sqrt(g/h_star)*h_star + u_star)/det_A;
+			    beta = u_star - c_star;
+			    ps_pa = (phi-2.0*c_L*s_s_L)/pow(3.0*c_L,1.5);
+			    ps_pa-= phi*(pow(3.0*c_star,-1.5)-pow(3.0*c_L,-1.5));
+			    pt_pa = 1.0/pow(s_L-beta,1.5);
+			    d_L = ps_pa/pt_pa - (u_star-c_star)*phi*b_L;
+			    a_L*= 2.0*c_star;
+			    b_L*= 2.0*c_star;
 			}
 		    else //the 1-wave is a shock
 			{
-			    H1 = 0.5*sqrt((1.0-zeta)/(rho_L*(p_star+zeta*p_L))) * (p_star + (1.0+2.0*zeta)*p_L)/(p_star+zeta*p_L);
-			    H2 = -0.5*sqrt((1.0-zeta)/(rho_L*(p_star+zeta*p_L))) * ((2.0+zeta)*p_star + zeta*p_L)/(p_star+zeta*p_L);
-			    H3 = -0.5*sqrt((1.0-zeta)/(rho_L*(p_star+zeta*p_L))) * (p_star-p_L) / rho_L;
-			    shk_spd = (rho_star_L*u_star - rho_L*u_L)/(rho_star_L - rho_L);
-
-			    a_L = 1.0 - rho_star_L*(shk_spd-u_star)*H1;
-			    b_L = (u_star - shk_spd)/rho_star_L/c_star_L/c_star_L + H1;
-
-			    L_rho = (u_L-shk_spd) * H3;
-			    L_u = shk_spd - u_L + rho_L*c_L*c_L*H2 + rho_L*H3;
-			    L_p = (u_L-shk_spd)*H2 - 1.0/rho_L;
-
-			    d_L = L_rho*s_rho_L + L_u*s_u_L + L_p*s_p_L;
+			    phi = -g*s_B_L;
+			    d_G_L[0] = (u_L-u_star)*(-0.5*g/h_L   *(2.0*h_L*h_L+h_star*h_star+h_L*h_star));
+			    d_G_L[1] = (u_L-u_star)*(2.0*h_L*h_star*(u_L-u_star)/(h_L-h_star));
+			    d_G[0]   = (u_star-u_L)*(-0.5*g/h_star*(2.0*h_star*h_star+h_L*h_L+h_L*h_star));
+			    d_G[1]   = (u_star-u_L)*(2.0*h_L*h_star*(u_L-u_star)/(h_L-h_star));
+			    A_gI_L[0][0] = sqrt(0.5*g*(h_L+h_star)*h_star/h_L);
+			    A_gI_L[0][1] = h_L;
+			    A_gI_L[1][0] = g;
+			    A_gI_L[1][1] = sqrt(0.5*g*(h_L+h_star)*h_star/h_L);
+			    A_gI[0][0]   = sqrt(0.5*g*(h_L+h_star)*h_L/h_star);
+			    A_gI[0][1]   = h_star;
+			    A_gI[1][0]   = g;
+			    A_gI[1][1]   = sqrt(0.5*g*(h_L+h_star)*h_L/h_star);
+			    a_L = (d_G[0]*A_gI[0][0]+d_G[1]*A_gI[1][0])*u_star - (d_G[0]*A_gI[0][1]+d_G[1]*A_gI[1][1])*g;
+			    a_L/= det_A;
+			    b_L =-(d_G[0]*A_gI[0][0]+d_G[1]*A_gI[1][0])*h_star + (d_G[0]*A_gI[0][1]+d_G[1]*A_gI[1][1])*u_star;
+			    b_L/= det_A;
+			    d_L = (d_G_L[0]*A_gI_L[0][0]+d_G_L[1]*A_gI_L[1][0])*s_h_L - (d_G_L[0]*A_gI_L[0][1]+d_G_L[1]*A_gI_L[1][1])*s_u_L;
+			    d_L-= speed_L*phi*(-h_star*d_G[0]+u_star*d_G[1])/det_A;
+			    d_L-= phi*d_G_L[0];
 			}
 		    //determine a_R, b_R and d_R
 		    if(CRW[1]) //the 3-wave is a CRW
 			{
-			    a_R = 1.0;
-			    b_R = -1.0 / rho_star_R / c_star_R;
-			    d_R = 0.5*(pow(c_star_R/c_R, 0.5/zeta)*(1.0+zeta) + pow(c_star_R/c_R, (1.0+zeta)/zeta)*zeta)/(0.5+zeta);
-			    d_R = d_R * (s_p_R - s_rho_R*c_R*c_R)/(gamma-1.0)/rho_R;
-			    d_R = d_R + c_R*pow(c_star_R/c_R, 0.5/zeta)*(s_u_R - (gamma*s_p_R/c_R - c_R*s_rho_R)/(gamma-1.0)/rho_R);
+			    phi = -g*s_B_R;
+			    det_A = u_star*u_star - g*h_star;
+			    a_R = (-sqrt(g/h_star)*u_star - g)/det_A;
+			    b_R = ( sqrt(g/h_star)*h_star + u_star)/det_A;
+			    alpha = u_star + c_star;
+			    pr_pb = (phi+2.0*c_R*s_r_R)/pow(3*c_R,1.5);
+			    pr_pb = pr_pb + phi*(pow(3.0*c_star,-1.5)-pow(3.0*c_R,-1.5));
+			    pt_pb = 1.0/pow(r_R-alpha,1.5);
+			    d_R = pr_pb/pt_pb - (u_star+c_star)*phi*b_R;	
+			    a_L*=-2.0*c_star;
+			    b_L*=-2.0*c_star;
 			}
 		    else //the 3-wave is a shock
 			{
-			    H1 = 0.5*sqrt((1.0-zeta)/(rho_R*(p_star+zeta*p_R))) * (p_star + (1.0+2.0*zeta)*p_R)/(p_star+zeta*p_R);
-			    H2 = -0.5*sqrt((1.0-zeta)/(rho_R*(p_star+zeta*p_R))) * ((2.0+zeta)*p_star + zeta*p_R)/(p_star+zeta*p_R);
-			    H3 = -0.5*sqrt((1.0-zeta)/(rho_R*(p_star+zeta*p_R))) * (p_star-p_R) / rho_R;
-			    shk_spd = (rho_star_R*u_star - rho_R*u_R)/(rho_star_R - rho_R);
-
-			    a_R = 1.0 + rho_star_R*(shk_spd-u_star)*H1;
-			    b_R = (u_star - shk_spd)/rho_star_R/c_star_R/c_star_R - H1;
-
-			    L_rho = (shk_spd-u_R) * H3;
-			    L_u = shk_spd - u_R - rho_R*c_R*c_R*H2 - rho_R*H3;
-			    L_p = (shk_spd-u_R)*H2 - 1.0/rho_R;
-
-			    d_R = L_rho*s_rho_R + L_u*s_u_R + L_p*s_p_R;
+			    phi = -g*s_B_R;
+			    d_G_R[0] = (u_R-u_star)*(-0.5*g/h_R   *(2.0*h_R*h_R+h_star*h_star+h_R*h_star));
+			    d_G_R[1] = (u_R-u_star)*(2.0*h_R*h_star*(u_R-u_star)/(h_R-h_star));
+			    d_G[0]   = (u_star-u_R)*(-0.5*g/h_star*(2.0*h_star*h_star+h_R*h_R+h_R*h_star));
+			    d_G[1]   = (u_star-u_R)*(2.0*h_R*h_star*(u_R-u_star)/(h_R-h_star));
+			    A_gI_R[0][0] = -sqrt(0.5*g*(h_R+h_star)*h_star/h_R);
+			    A_gI_R[0][1] = h_R;
+			    A_gI_R[1][0] = g;
+			    A_gI_R[1][1] = -sqrt(0.5*g*(h_R+h_star)*h_star/h_R);
+			    A_gI[0][0]   = -sqrt(0.5*g*(h_R+h_star)*h_R/h_star);
+			    A_gI[0][1]   = h_star;
+			    A_gI[1][0]   = g;
+			    A_gI[1][1]   = -sqrt(0.5*g*(h_R+h_star)*h_R/h_star);
+			    a_R = (d_G[0]*A_gI[0][0]+d_G[1]*A_gI[1][0])*u_star - (d_G[0]*A_gI[0][1]+d_G[1]*A_gI[1][1])*g;
+			    a_R/= det_A;
+			    b_R =-(d_G[0]*A_gI[0][0]+d_G[1]*A_gI[1][0])*h_star + (d_G[0]*A_gI[0][1]+d_G[1]*A_gI[1][1])*u_star;
+			    b_R/= det_A;
+			    d_R = (d_G_R[0]*A_gI_R[0][0]+d_G_R[1]*A_gI_R[1][0])*s_h_R - (d_G_R[0]*A_gI_R[0][1]+d_G_R[1]*A_gI_R[1][1])*s_u_R;
+			    d_R-= speed_R*phi*(-h_star*d_G[0]+u_star*d_G[1])/det_A;
+			    d_R-= phi*d_G_R[0];
 			}
-
-		    p_t_mat = (d_L*a_R/a_L-d_R)/(b_L*a_R/a_L-b_R);
-		    u_t_mat = (d_L - b_L*p_t_mat)/a_L;
-
-			
-			    mid[0] = h_star;
-			    mid[1] = u_star;
-			    dire[1] = u_t_mat + u_star*p_t_mat/rho_star_R/c_star_R/c_star_R;
-			    dire[2] = p_t_mat + rho_star_R*u_star * u_t_mat;
-
-			    if(CRW[1]) //the 3-wave is a CRW
-				{
-				    dire[0] = rho_star_R*u_star*pow(c_star_R/c_R, (1.0+zeta)/zeta)*(s_p_R - s_rho_R*c_R*c_R)/rho_R;
-				    dire[0] = (dire[0] + dire[2]) / c_star_R/c_star_R;
-				}
-			    else //the 3-wave is a shock
-				{
-				    shk_spd = (rho_star_R*u_star - rho_R*u_R)/(rho_star_R - rho_R);
-				    H1 = rho_R * p_R    * (1.0 - zts) / (p_R + zeta*p_star) / (p_R + zeta*p_star);
-				    H2 = rho_R * p_star * (zts - 1.0) / (p_R + zeta*p_star) / (p_R + zeta*p_star);
-				    H3 = (p_star + zeta*p_R) / (p_R + zeta*p_star);
-
-				    g_rho = u_star-shk_spd;
-				    g_u   = u_star*rho_star_R*(shk_spd-u_star)*H1;
-				    g_p   = shk_spd/c_star_R/c_star_R - u_star*H1;
-				    f = (shk_spd-u_R)*(H2*s_p_R + H3*s_rho_R) - rho_R*(H2*c_R*c_R+H3)*s_u_R;
-
-				    dire[0] = (f*u_star - g_p*p_t_mat - g_u*u_t_mat) / g_rho;
-				}
-			
+		    mid[0] = h_star;
+		    mid[1] = u_star;
+		    dire[0] = (d_L*b_R - d_R*b_L)/(a_L*b_R - a_R*b_L);
+		    dire[1] = (d_L*a_R - d_R*a_L)/(a_R*b_L - a_L*b_R);	
 		    //--end of non-sonic case--
+		}
+			// stationary shocks case
+	    if ((!CRW[0]) && fabs(speed_L) <= eps)
+		{
+		    phi = -g*s_B_L;
+		    dh_dt = -s_h_L*u_L - h_L*s_u_L;
+		    du_dt = -s_h_L - u_L*s_u_L/g - s_B_L;
+		    du_dt*= g;
+		    ss_shk_spd = 1.0/(h_star - h_L)*(u_star*dire[0] + h_star*dire[1] - u_L*dh_dt - h_L*du_dt);
+		    if (ss_shk_spd > 0.0)
+		    mid[0] = h_L;
+		    mid[1] = u_L;
+		    dire[0] = dh_dt;
+		    dire[1] = du_dt;
+		}
+	    else if ((!CRW[1]) && fabs(speed_R) <= eps)
+		{
+		    phi = -g*s_B_R;
+		    dh_dt = -s_h_R*u_R - h_R*s_u_R;
+		    du_dt = -s_h_R - u_R*s_u_R/g - s_B_R;
+		    du_dt*= g;
+		    ss_shk_spd = 1.0/(h_star - h_R)*(u_star*dire[0] + h_star*dire[1] - u_R*dh_dt - h_R*du_dt);
+		    if (ss_shk_spd > 0.0)
+		    mid[0] = h_R;
+		    mid[1] = u_R;
+		    dire[0] = dh_dt;
+		    dire[1] = du_dt;			
 		}
 	    //----end of non-trivial case----
 	}
