@@ -18,19 +18,19 @@ Alpha_GRP=0;
 CFL=0.5;
 
 %initial condition
-h_L_0  =4.7;
-u_L_0  =0.651;
-h_R_0  =0.8;
-u_R_0  =2.048;
-Z_L_0  =0;
-Z_R_0  =1;
-
-% h_L_0  =2;
-% u_L_0  =0;
-% h_R_0  =1;
-% u_R_0  =0;
-% Z_L_0  =0;        
+% h_L_0  =4.7;
+% u_L_0  =0.651;
+% h_R_0  =0.8;
+% u_R_0  =2.048;
+% Z_L_0  =0;
 % Z_R_0  =1;
+
+h_L_0  =2;
+u_L_0  =0;
+h_R_0  =1;
+u_R_0  =0;
+Z_L_0  =0;        
+Z_R_0  =1;
 
 
 % h_L_0  =4;
@@ -102,9 +102,8 @@ while Time<Tend && isreal(Time)
          elseif i==N+1
              F(:,N+1)=Riemann_solver_HLL(h_R(N),u_R(N),h_R(N),u_R(N));
          else
-             F(:,i)=Riemann_solver_HLL(h_R(i-1),u_R(i-1),h_L(i),u_L(i));
-             %F(:,i)=Riemann_solver_HLL(h_R(i-1)+0.5*d_x*dh(i-1),u_R(i-1)+0.5*d_x*du(i-1),h_L(i)-0.5*d_x*dh(i),u_L(i)-0.5*d_x*du(i));
-             %[F(:,i),W_int(:,i)]=GRP_solver(h_R(i-1)+0.5*d_x*dh(i-1),h_L(i)-0.5*d_x*dh(i),dh(i-1),dh(i),u_R(i-1)+0.5*d_x*du(i-1),u_L(i)-0.5*d_x*du(i),du(i-1),du(i),Z(i),Z(i),0.0,0.0,gama,d_t);
+             %F(:,i)=Riemann_solver_HLL(h_R(i-1),u_R(i-1),h_L(i),u_L(i));
+             [F(:,i),W_int(:,i)]=GRP_solver(h_R(i-1)+0.5*d_x*dh(i-1),h_L(i)-0.5*d_x*dh(i),dh(i-1),dh(i),u_R(i-1)+0.5*d_x*du(i-1),u_L(i)-0.5*d_x*du(i),du(i-1),du(i),Z(i),0.0,0.0,g,d_t);
          end
     end
     %compute U in next step
