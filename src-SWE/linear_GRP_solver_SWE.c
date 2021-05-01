@@ -1,4 +1,4 @@
-me#include <math.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "mex.h"
@@ -250,7 +250,7 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    alpha = 0.0;
 		    pr_pb = (phi+2.0*c_R*s_r_R)/pow(3*c_R,1.5);
 		    pr_pb+= phi*(pow(alpha-r_R,-1.5)-pow(3.0*c_R,-1.5));
-		    pt_pb = 1.0/pow(r_R-alpha,1.5);
+		    pt_pb = 1.0/pow(alpha-r_R,1.5);
 		    d_R = pr_pb/pt_pb;		    
 		}
 	    //--non-sonic case--
@@ -274,6 +274,7 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    else //the 1-wave is a shock
 			{
 			    phi = -g*s_B_L;
+			    det_A = u_star*u_star - g*h_star;
 			    d_G_L[0] = (h_L-h_star)*(-0.5*g/h_L   *(2.0*h_L*h_L+h_star*h_star+h_L*h_star));
 			    d_G_L[1] = (h_L-h_star)*(2.0*h_L*h_star*(u_L-u_star)/(h_L-h_star));
 			    d_G[0]   = (h_star-h_L)*(-0.5*g/h_star*(2.0*h_star*h_star+h_L*h_L+h_L*h_star));
@@ -304,14 +305,15 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 			    alpha = u_star + c_star;
 			    pr_pb = (phi+2.0*c_R*s_r_R)/pow(3*c_R,1.5);
 			    pr_pb = pr_pb + phi*(pow(3.0*c_star,-1.5)-pow(3.0*c_R,-1.5));
-			    pt_pb = 1.0/pow(r_R-alpha,1.5);
+			    pt_pb = 1.0/pow(alpha-r_R,1.5);
 			    d_R = pr_pb/pt_pb - (u_star+c_star)*phi*b_R;	
-			    a_L*=-2.0*c_star;
-			    b_L*=-2.0*c_star;
+			    a_R*=-2.0*c_star;
+			    b_R*=-2.0*c_star;
 			}
 		    else //the 3-wave is a shock
 			{
 			    phi = -g*s_B_R;
+			    det_A = u_star*u_star - g*h_star;
 			    d_G_R[0] = (h_R-h_star)*(-0.5*g/h_R   *(2.0*h_R*h_R+h_star*h_star+h_R*h_star));
 			    d_G_R[1] = (h_R-h_star)*(2.0*h_R*h_star*(u_R-u_star)/(h_R-h_star));
 			    d_G[0]   = (h_star-h_R)*(-0.5*g/h_star*(2.0*h_star*h_star+h_R*h_R+h_R*h_star));
@@ -335,7 +337,7 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		    mid[0] = h_star;
 		    mid[1] = u_star;
 		    dire[0] = (d_L*b_R - d_R*b_L)/(a_L*b_R - a_R*b_L);
-		    dire[1] = (d_L*a_R - d_R*a_L)/(a_R*b_L - a_L*b_R);	
+		    dire[1] = (d_L*a_R - d_R*a_L)/(a_R*b_L - a_L*b_R);
 		    //--end of non-sonic case--
 		}
 	    // stationary shocks case
