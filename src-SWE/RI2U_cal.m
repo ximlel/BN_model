@@ -1,22 +1,21 @@
 %compute flux
-function [lo,u,p]=RI2U_cal(phi,RI,lo_start)
+function [h,u]=RI2U_cal(q,H_s,F)
 global g;
 global ep;
-    Q=RI(1);
-    eta=RI(2);
-    H=RI(3);
-    it_max = 5000;
-    k = 0; err1 = 1e50;
-    lo=lo_start;
-    while (k<it_max && err1>ep)
-        fun  = H-0.5*(Q/phi)^2/lo^2-gama/(gama-1.0)*eta*lo^(gama-1.0);
-        dfun = (Q/phi)^2/lo^3-gama*eta*lo^(gama-2.0);
-        [lo, err1] = NewtonRapshon(fun,dfun,lo,ep);
-        k=k+1;
+alpha = 0.5*q^2/g/H_s^3;
+p=[1, -1, 0, alpha];
+if alpha > 0 && alpha < 4/27
+R=roots(p);
+    if F > 1 % supercritical
+        x = R(find(x>0 & x<2/3));
+    elseif F < 1 % subcritical
+        x = R(find(x>2/3 & x<1));
     end
-    if k>=it_max
-        err1
-    end
-    p = lo^gama*eta;
-    u = Q/phi/lo;
+elseif abs(alpha)<ep % zero velocity
+    x = 0;
+elseif abs(alpha - 4/27)<ep % critical
+    x = 2/3;
+end
+h = H_s*x;
+u = q/h;
 end
