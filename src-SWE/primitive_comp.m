@@ -1,11 +1,10 @@
 %compute flux
-function [h_L,u_L,h_R,u_R]=primitive_comp(U,Z_L,Z_R)
+function [h_L,u_L,h_R,u_R,H_t]=primitive_comp(U,Z_L,Z_R)
 global g;
 global ep;
 h=U(1);
 q=U(2);
 h_R = h;
-%it_max = 50;
 it_max = 500;
 k = 0; err = 1e50;
 while (k<it_max && err>ep && abs(Z_L-Z_R)>ep)
@@ -22,4 +21,5 @@ end
 h_L = 2*h-h_R;
 u_L = q/h_L;
 u_R = q/h_R;
+H_t = 0.5*((h_L + 0.5*q^2/g/h_L^2 + Z_L)+(h_R + 0.5*q^2/g/h_R^2 + Z_R));
 end

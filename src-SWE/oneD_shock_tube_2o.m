@@ -49,26 +49,39 @@ d_x=(x_max-x_min)/N_0;
 N=N_0+1;
 Z=@(x) Z_L_0*(x <= 0.0) + Z_R_0*(x > 0.0);
 
-%Z=@(x) (0.2-0.05*(x-10)^2) * (x>8 && x<12);
+%Z=@(x) (0.2-0.05*(x-10)^2)*(x>8 && x<12);
 
 Z_L=zeros(1,N);
 Z_R=zeros(1,N);
 Z_M=zeros(1,N+1);
-x=zeros(1,N);
-x_M=zeros(1,N+1);
+
 U=zeros(2,N);
 F=zeros(2,N+1);
+h_mid=zeros(1,N+1);
 W_int=zeros(2,N+1);
-dh=zeros(1,N+1);
-du=zeros(1,N+1);
+%dh=zeros(1,N+1);
+%du=zeros(1,N+1);
 dZ=zeros(1,N+1);
+
+h_L=zeros(1,N);
+h_R=zeros(1,N);
+u_L=zeros(1,N);
+u_R=zeros(1,N);
+h_mL=zeros(1,N);
+h_mR=zeros(1,N);
+a_L=zeros(1,N);
+a_R=zeros(1,N);
+H_t=zeros(1,N);
+dq  =zeros(1,N+1);
+dH_t=zeros(1,N+1);
 
 % load ../test/test_new1_pi.mat;
 
+x=zeros(1,N);
+x_M=zeros(1,N+1);
 %test begin
 U_L_0=[h_L_0;h_L_0*u_L_0];
 U_R_0=[h_R_0;h_R_0*u_R_0];
-
 for i=1:N+1
     x_M(i) = x_min+(i-0.5)*d_x;
     Z_M(i) = Z(x_M(i));
@@ -76,11 +89,11 @@ end
 for i=1:N
     x(i)=x_min+(i-1)*d_x;
     if x(i) < ep
-        U(:,i)  =U_L_0;
+        U(:,i)=U_L_0;
     elseif x(i) > ep
-        U(:,i)  =U_R_0;
+        U(:,i)=U_R_0;
     else
-        U(:,i)  =0.5*(U_L_0+U_R_0);
+        U(:,i)=0.5*(U_L_0+U_R_0);
     end
     Z_L(i) = Z(x(i)-ep);
     Z_R(i) = Z(x(i)+ep);
@@ -91,10 +104,12 @@ end
 while Time<Tend && isreal(Time)
     %CFL condition
     for i=1:N
-        [h_L(i),u_L(i),h_R(i),u_R(i)]=primitive_comp(U(:,i),Z_L(i),Z_R(i));
+        [h_L(i),u_L(i),h_R(i),u_R(i),H_t(i)]=primitive_comp(U(:,i),Z_L(i),Z_R(i));
         a_L(i)=sqrt(g*h_L(i));
         a_R(i)=sqrt(g*h_R(i));
     end
+    hh = U(1,:);
+    qq = U(2,:);
     Smax=max(max(abs(u_L)+a_L),max(abs(u_R)+a_R));
     d_t=CFL*d_x/Smax;
     if Time+d_t >= Tend
@@ -103,10 +118,12 @@ while Time<Tend && isreal(Time)
     %reconstruction (minmod limiter)
     for i=3:N-1
         if abs(Z(i+1)-Z(i))<ep && abs(Z(i+2)-Z(i+1))<ep && abs(Z(i)-Z(i-1))<ep
-            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
-%             dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%             du(i)  =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i))/d_x);
+%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
+%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
+%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
+%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i))/d_x);
+            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
         end
     end
     %Riemann problem:compute flux
@@ -118,9 +135,13 @@ while Time<Tend && isreal(Time)
              F(:,N+1)=Riemann_solver_HLL(h_R(N),u_R(N),h_R(N),u_R(N));
          else
              %F(:,i)=Riemann_solver_HLL(h_R(i-1),u_R(i-1),h_L(i),u_L(i));
-             [F(:,i),W_int(:,i)]=GRP_solver(h_R(i-1)+0.5*d_x*dh(i-1),h_L(i)-0.5*d_x*dh(i),dh(i-1),dh(i),u_R(i-1)+0.5*d_x*du(i-1),u_L(i)-0.5*d_x*du(i),du(i-1),du(i),Z_M(i),d_Z(i-1),d_Z(i),g,d_t);
+             [h_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_R(i-1)+0.5*d_x*dh(i-1),h_L(i)-0.5*d_x*dh(i),dh(i-1),dh(i),u_R(i-1)+0.5*d_x*du(i-1),u_L(i)-0.5*d_x*du(i),du(i-1),du(i),Z_M(i),d_Z(i-1),d_Z(i),d_t);
          end
     end
+    for i=1:N
+
+    end
+    
     %compute U in next step
     for i=1:N
         if abs(Z_R(i)-Z_L(i))<ep
