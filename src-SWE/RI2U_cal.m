@@ -7,14 +7,17 @@ p=[1, -1, 0, alpha];
 if alpha > 0 && alpha < 4/27
 R=roots(p);
     if F > 1 % supercritical
-        x = R(find(x>0 & x<2/3));
+        x = R(find(R>0 & R<2/3));
     elseif F < 1 % subcritical
-        x = R(find(x>2/3 & x<1));
+        x = R(find(R>2/3 & R<1));
     end
 elseif abs(alpha)<ep % zero velocity
     x = 0;
 elseif abs(alpha - 4/27)<ep % critical
     x = 2/3;
+else
+    alpha
+    error('alpha error');
 end
 h = H_s*x;
 u = q/h;
