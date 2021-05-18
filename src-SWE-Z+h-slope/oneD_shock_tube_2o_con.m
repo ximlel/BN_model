@@ -228,13 +228,13 @@ while Time<Tend && isreal(Time)
             S=-g*0.5*(h_mL(i)+h_mR(i))*(Z_R(i)-Z_L(i));
         else
             S_tmp=(h_mR(i)*u_mR(i)^2+g*h_mR(i)^2/2-h_mL(i)*u_mL(i)^2-g*h_mL(i)^2/2);
-%             if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
-%                 S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
-%             elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
-%                 S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
-%             else
+            if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
+                S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
+            elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
+                S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
+            else
                 S=S_tmp;
-%             end
+            end
         end
         S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
