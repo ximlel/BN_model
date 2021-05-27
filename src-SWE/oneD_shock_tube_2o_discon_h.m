@@ -12,7 +12,7 @@ x0=0;
 Time=0;
 Tend=0.04;
 CFL=0.5;
-Alpha_GRP=1.5;
+Alpha_GRP=1.0;
 
 %initial condition
 % h_L_0  =4.7;
@@ -25,15 +25,15 @@ Alpha_GRP=1.5;
 % x_max=2;
 % N_0=300;
 
-h_L_0  =2;
-u_L_0  =0;
-h_R_0  =1;
-u_R_0  =0;
-Z_L_0  =0;
-Z_R_0  =1;
-x_min=-1;
-x_max=2;
-N_0=300;
+% h_L_0  =2;
+% u_L_0  =0;
+% h_R_0  =1;
+% u_R_0  =0;
+% Z_L_0  =0;
+% Z_R_0  =1;
+% x_min=-1;
+% x_max=2;
+% N_0=300;
 
 % h_L_0  =4;
 % u_L_0  =-2.894;
@@ -76,7 +76,7 @@ du_R_int=zeros(1,N+1);
 h_mid=zeros(1,N+1);
 W_int=zeros(2,N+1);
 dZ=zeros(1,N-1);
-%dh=zeros(1,N+1);
+dh=zeros(1,N+1);
 %du=zeros(1,N+1);
 
 Fr_L=zeros(1,N);
@@ -92,8 +92,7 @@ u_mR=zeros(1,N);
 a_L=zeros(1,N);
 a_R=zeros(1,N);
 H_t=zeros(1,N);
-dq  =zeros(1,N);
-dH_t=zeros(1,N);
+dq =zeros(1,N);
 
 x=zeros(1,N);
 x_M=zeros(1,N+1);
@@ -131,6 +130,7 @@ end
 while Time<Tend && isreal(Time)
     %boundary condition
     %U(2,1)=q_in;
+    %U(1,1)=Z_0;
     %U(1,N)=h_out;
     %CFL condition
     for i=1:N
@@ -147,7 +147,7 @@ while Time<Tend && isreal(Time)
         else
             Fr_L(i)=0;
         end
-    end    
+    end
     hh = U(1,:);
     qq = U(2,:);
     Smax=max(max(abs(u_L)+a_L),max(abs(u_R)+a_R));
@@ -157,17 +157,15 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N-1
-%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
-%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i))/d_x);
-        if Time < ep
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(qq(i+1)-qq(i-1))/2.0/d_x,   Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(H_t(i+1)-H_t(i-1))/2.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
-        else
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
-        end
+%         if Time < ep
+            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_R(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
+            dh(i) =minmod(Alpha_GRP*(h_L(i)-h_R(i-1))/d_x,dh(i),                      Alpha_GRP*(h_L(i+1)-h_R(i))/d_x);
+            dq(i) =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(qq(i+1) -qq(i-1)) /2.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+%         else
+%             dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
+%             dh(i) =minmod(Alpha_GRP*(h_L(i)-h_R(i-1))/d_x,dh(i),                            Alpha_GRP*(h_L(i+1)-h_R(i))/d_x);
+%             dq(i) =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+%         end
     end
     for i=1:N+1
         if i==1
@@ -185,8 +183,8 @@ while Time<Tend && isreal(Time)
             dh_R_int(i)=0;
             du_R_int(i)=0;
         else
-            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dRI2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),H_t(i-1)+0.5*d_x*dH_t(i-1)-Z_M(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_R(i-1));
-            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dRI2dU_cal(qq(i)  -0.5*d_x*dq(i),  H_t(i)  -0.5*d_x*dH_t(i)  -Z_M(i),dq(i),  dH_t(i),  dZ(i-1),Fr_L(i));
+            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqh2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+0.5*d_x*dh(i-1),dq(i-1),dh(i-1),dZ(i-1),Fr_R(i-1));
+            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqh2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  -0.5*d_x*dh(i)  ,dq(i),  dh(i),  dZ(i-1),Fr_L(i));
         end
     end    
     %Riemann problem:compute flux
@@ -208,8 +206,8 @@ while Time<Tend && isreal(Time)
             u_mL(i) = u_L(i);
             u_mR(i) = u_R(i); 
         else
-            [h_mL(i),u_mL(i),dh_mL,du_mL]=dRI2dU_cal(qq(i),H_t(i)-Z_L(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_L(i));
-            [h_mR(i),u_mR(i),dh_mR,du_mR]=dRI2dU_cal(qq(i),H_t(i)-Z_R(i),dq(i-1),dH_t(i-1),dZ(i),  Fr_R(i));
+            [h_mL(i),u_mL(i),dh_mL,du_mL]=dqh2dU_cal(qq(i),h_L(i),dq(i-1),dh(i-1),dZ(i-1),Fr_L(i));
+            [h_mR(i),u_mR(i),dh_mR,du_mR]=dqh2dU_cal(qq(i),h_R(i),dq(i-1),dh(i-1),dZ(i),  Fr_R(i));
             h_mL(i) = h_mL(i) - 0.5*d_t*(h_mL(i)*du_mL+u_mL(i)*dh_mL);
             h_mR(i) = h_mR(i) - 0.5*d_t*(h_mR(i)*du_mR+u_mR(i)*dh_mR);        
             u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL+u_mL(i)*du_mL/g+dZ(i-1));

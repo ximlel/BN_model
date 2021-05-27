@@ -74,8 +74,6 @@ dh_R_int=zeros(1,N+1);
 du_L_int=zeros(1,N+1);
 du_R_int=zeros(1,N+1);
 h_mid=zeros(1,N+1);
-u_mid=zeros(1,N+1);
-H_t_mid=zeros(1,N+1);
 W_int=zeros(2,N+1);
 dZ=zeros(1,N-1);
 %dh=zeros(1,N+1);
@@ -87,6 +85,10 @@ h_L=zeros(1,N);
 h_R=zeros(1,N);
 u_L=zeros(1,N);
 u_R=zeros(1,N);
+h_mL=zeros(1,N);
+h_mR=zeros(1,N);
+u_mL=zeros(1,N);
+u_mR=zeros(1,N);
 a_L=zeros(1,N);
 a_R=zeros(1,N);
 H_t=zeros(1,N);
@@ -197,14 +199,39 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver_Zh_H_tot(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+    end    
+    for i=1:N
+        if i==1 || i==N
+            h_mL(i) = h_L(i);
+            h_mR(i) = h_R(i);            
+            u_mL(i) = u_L(i);
+            u_mR(i) = u_R(i); 
+        else
+            [h_mL(i),u_mL(i),dh_mL,du_mL]=dRI2dU_cal(qq(i),H_t(i)-Z_L(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_L(i));
+            [h_mR(i),u_mR(i),dh_mR,du_mR]=dRI2dU_cal(qq(i),H_t(i)-Z_R(i),dq(i-1),dH_t(i-1),dZ(i),  Fr_R(i));
+            h_mL(i) = h_mL(i) - 0.5*d_t*(h_mL(i)*du_mL+u_mL(i)*dh_mL);
+            h_mR(i) = h_mR(i) - 0.5*d_t*(h_mR(i)*du_mR+u_mR(i)*dh_mR);        
+            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL+u_mL(i)*du_mL/g+dZ(i-1));
+            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR+u_mR(i)*du_mR/g+dZ(i));
+        end
     end
     %compute U in next step
     for i=1:N
-        S = 0.5*(h_mid(:,i+1)*u_mid(:,i+1)-h_mid(:,i)*u_mid(:,i))*(u_mid(:,i)+u_mid(:,i+1));
-        S = S + 0.5*g*(H_t_mid(:,i+1)-H_t_mid(:,i))*(h_mid(:,i)+h_mid(:,i+1));
-        U(1,i)=U(1,i)+d_t/d_x*(F(1,i)-F(1,i+1));
-        U(2,i)=U(2,i)-d_t/d_x*S;
+        if abs(Z_R(i)-Z_L(i))<ep
+            S=-g*0.5*(h_mL(i)+h_mR(i))*(Z_R(i)-Z_L(i));
+        else
+            S_tmp=(h_mR(i)*u_mR(i)^2+g*h_mR(i)^2/2-h_mL(i)*u_mL(i)^2-g*h_mL(i)^2/2);
+%             if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
+%                 S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
+%             elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
+%                 S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
+%             else
+                S=S_tmp;
+%             end
+        end
+        S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
+        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t
 % if Time > 0.002
