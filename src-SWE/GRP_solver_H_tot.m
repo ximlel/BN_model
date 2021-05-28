@@ -1,4 +1,4 @@
-function [h_mid,F,W_int]=GRP_solver_Zh_H_tot(h_L,h_R,dh_L,dh_R,u_L,u_R,du_L,du_R,Z,dZ_L,dZ_R,d_t)
+function [h_mid,F,W_int]=GRP_solver_H_tot(h_L,h_R,dh_L,dh_R,u_L,u_R,du_L,du_R,Z,dZ_L,dZ_R,d_t)
     global ep;
     global g;
     F=zeros(2,1);

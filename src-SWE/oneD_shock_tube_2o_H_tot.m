@@ -10,133 +10,25 @@ x0=0;
 
 %state value
 Time=0;
-Tend=100;
 CFL=0.5;
 Alpha_GRP=1.5;
 
 %initial condition
-% h_L_0  =4.7;
-% u_L_0  =0.651;
-% h_R_0  =0.8;
-% u_R_0  =2.048;
-% Z_L_0  =0;
-% Z_R_0  =1;
-% x_min=-1;
-% x_max=2;
-% N_0=300;
+%discon_init
+con_init
 
-% h_L_0  =2;
-% u_L_0  =0;
-% h_R_0  =1;
-% u_R_0  =0;
-% Z_L_0  =0;
-% Z_R_0  =1;
-% x_min=-1;
-% x_max=2;
-% N_0=300;
-
-% h_L_0  =4;
-% u_L_0  =-2.894;
-% h_R_0  =2.7;
-% u_R_0  =-3;
-% Z_L_0  =0;
-% Z_R_0  =1;
-% x_min=-3;
-% x_max=1;
-% N_0=400;
-
-x_min=0;
-x_max=25;
-N_0=100;
-
-d_x=(x_max-x_min)/N_0;
-N=N_0+1;
-
-% Z_0   = 2;
-% q_in  = 4.42;
-% h_out = 2;
-
-% Z_0   = 0.66;
-% q_in  = 1.53;
-% h_out = 0.66;
-
-Z_0   = 0.33;
-q_in  = 0.18;
-h_out = 0.33;
-
-%Z=@(x) Z_L_0*(x <= 0.0) + Z_R_0*(x > 0.0);
-Z=@(x) (0.2-0.05*(x-10)^2)*(x>8 && x<12);
-
-Z_L=zeros(1,N);
-Z_R=zeros(1,N);
-Z_M=zeros(1,N+1);
-
-U=zeros(2,N);
-F=zeros(2,N+1);
-h_L_int =zeros(1,N+1);
-h_R_int =zeros(1,N+1);
-u_L_int =zeros(1,N+1);
-u_R_int =zeros(1,N+1);
-dh_L_int=zeros(1,N+1);
-dh_R_int=zeros(1,N+1);
-du_L_int=zeros(1,N+1);
-du_R_int=zeros(1,N+1);
-h_mid=zeros(1,N+1);
-u_mid=zeros(1,N+1);
-H_t_mid=zeros(1,N+1);
-W_int=zeros(2,N+1);
-dZ=zeros(1,N-1);
 %dh=zeros(1,N+1);
-%du=zeros(1,N+1);
-
-Fr_L=zeros(1,N);
-Fr_R=zeros(1,N);
-h_L=zeros(1,N);
-h_R=zeros(1,N);
-u_L=zeros(1,N);
-u_R=zeros(1,N);
-a_L=zeros(1,N);
-a_R=zeros(1,N);
-H_t=zeros(1,N);
-dq  =zeros(1,N);
+h_mL=zeros(1,N);
+h_mR=zeros(1,N);
+u_mL=zeros(1,N);
+u_mR=zeros(1,N);
 dH_t=zeros(1,N);
-
-x=zeros(1,N);
-x_M=zeros(1,N+1);
-%test begin
-for i=1:N+1
-    x_M(i) = x_min+(i-0.5)*d_x;
-    Z_M(i) = Z(x_M(i));
-end
-for i=1:N
-    x(i)=x_min+(i-1)*d_x;
-    Z_L(i) = Z(x(i)-ep);
-    Z_R(i) = Z(x(i)+ep);
-end
-for i=1:N-1
-    dZ(i)  = (Z_L(i+1)-Z_R(i))/d_x;
-end
-
-% U_L_0=[h_L_0;h_L_0*u_L_0];
-% U_R_0=[h_R_0;h_R_0*u_R_0];
-% for i=1:N
-%     if x(i) < -ep
-%         U(:,i)=U_L_0;
-%     elseif x(i) > ep
-%         U(:,i)=U_R_0;
-%     else
-%         U(:,i)=0.5*(U_L_0+U_R_0);
-%     end
-% end
-
-for i=1:N
-    U(:,i)=[Z_0-Z(x(i));0];
-end
 
 %Godunov's Method
 while Time<Tend && isreal(Time)
     %boundary condition
     U(2,1)=q_in;
+    %U(1,1)=Z_0;
     U(1,N)=h_out;
     %CFL condition
     for i=1:N
@@ -205,14 +97,39 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver_mid_H_tot(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver_H_tot(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+    end    
+    for i=1:N
+        if i==1 || i==N
+            h_mL(i) = h_L(i);
+            h_mR(i) = h_R(i);            
+            u_mL(i) = u_L(i);
+            u_mR(i) = u_R(i); 
+        else
+            [h_mL(i),u_mL(i),dh_mL,du_mL]=dRI2dU_cal(qq(i),H_t(i)-Z_L(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_L(i));
+            [h_mR(i),u_mR(i),dh_mR,du_mR]=dRI2dU_cal(qq(i),H_t(i)-Z_R(i),dq(i-1),dH_t(i-1),dZ(i),  Fr_R(i));
+            h_mL(i) = h_mL(i) - 0.5*d_t*(h_mL(i)*du_mL+u_mL(i)*dh_mL);
+            h_mR(i) = h_mR(i) - 0.5*d_t*(h_mR(i)*du_mR+u_mR(i)*dh_mR);        
+            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL+u_mL(i)*du_mL/g+dZ(i-1));
+            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR+u_mR(i)*du_mR/g+dZ(i));
+        end
     end
     %compute U in next step
     for i=1:N
-        S = 0.5*(h_mid(:,i+1)*u_mid(:,i+1)-h_mid(:,i)*u_mid(:,i))*(u_mid(:,i)+u_mid(:,i+1));
-        S = S + 0.5*g*(H_t_mid(:,i+1)-H_t_mid(:,i))*(h_mid(:,i)+h_mid(:,i+1));
-        U(1,i)=U(1,i)+d_t/d_x*(F(1,i)-F(1,i+1));
-        U(2,i)=U(2,i)-d_t/d_x*S;
+        if abs(Z_R(i)-Z_L(i))<ep
+            S=-g*0.5*(h_mL(i)+h_mR(i))*(Z_R(i)-Z_L(i));
+        else
+            S_tmp=(h_mR(i)*u_mR(i)^2+g*h_mR(i)^2/2-h_mL(i)*u_mL(i)^2-g*h_mL(i)^2/2);
+%             if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
+%                 S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
+%             elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
+%                 S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
+%             else
+                S=S_tmp;
+%             end
+        end
+        S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
+        U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t
 % if Time > 0.002
