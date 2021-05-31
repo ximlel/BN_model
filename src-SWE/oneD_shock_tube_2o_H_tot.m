@@ -11,13 +11,12 @@ x0=0;
 %state value
 Time=0;
 CFL=0.5;
-Alpha_GRP=1.5;
+Alpha_GRP=0.0;
 
 %initial condition
 %discon_init
 con_init
 
-%dh=zeros(1,N+1);
 h_mL=zeros(1,N);
 h_mR=zeros(1,N);
 u_mL=zeros(1,N);
@@ -110,8 +109,8 @@ while Time<Tend && isreal(Time)
             [h_mR(i),u_mR(i),dh_mR,du_mR]=dRI2dU_cal(qq(i),H_t(i)-Z_R(i),dq(i-1),dH_t(i-1),dZ(i),  Fr_R(i));
             h_mL(i) = h_mL(i) - 0.5*d_t*(h_mL(i)*du_mL+u_mL(i)*dh_mL);
             h_mR(i) = h_mR(i) - 0.5*d_t*(h_mR(i)*du_mR+u_mR(i)*dh_mR);        
-            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL+u_mL(i)*du_mL/g+dZ(i-1));
-            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR+u_mR(i)*du_mR/g+dZ(i));
+            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL*g+u_mL(i)*du_mL+dZ(i-1)*g);
+            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR*g+u_mR(i)*du_mR+dZ(i)  *g);
         end
     end
     %compute U in next step
@@ -136,39 +135,5 @@ while Time<Tend && isreal(Time)
 %    break;
 % end
 end
-% h = 0.5*(h_L+h_R);
-% u = 0.5*(u_L+u_R);
-h=h_L;
-u=u_L;
 
-N_MAX = 3000;
-d_xM=(x_max-x_min)/N_MAX;
-W_exact = zeros(N_MAX,2);
-% load ./EXACT_SWE1.mat;
-% W_exact(:,1)=h_E';;
-% W_exact(:,2)=u_E';
-
-%plot
-col = '-m';
-%col = '+k';
-% h=figure(1);
-% set(h,'position',[100 100 1150 750]);
-subplot(1,2,1);
-hold on
-%plot(x_min:d_xM:x_max-d_xM,W_exact(:,1),'b','LineWidth',0.4);
-plot(x,h+Z_L(1,1:N),col,'MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Density','FontWeight','bold');
-%ylim([90 160])
-%ylim([0 2])
-title('h+z');
-set(gca,'box','on');
-subplot(1,2,2);
-hold on
-% plot(x_min:d_xM:x_max-d_xM,W_exact(:,2),'b','LineWidth',0.4);
-plot(x,u,col,'MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Velocity','FontWeight','bold');
-%ylim([0 2])
-title('u');
-set(gca,'box','on');
+SWE_plot

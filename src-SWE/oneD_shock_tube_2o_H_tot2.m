@@ -17,7 +17,6 @@ Alpha_GRP=1.5;
 discon_init
 %con_init
 
-%dh=zeros(1,N+1);
 u_mid=zeros(1,N+1);
 H_t_mid=zeros(1,N+1);
 dH_t=zeros(1,N);
@@ -109,39 +108,5 @@ while Time<Tend && isreal(Time)
 %    break;
 % end
 end
-% h = 0.5*(h_L+h_R);
-% u = 0.5*(u_L+u_R);
-h=h_L;
-u=u_L;
 
-N_MAX = 3000;
-d_xM=(x_max-x_min)/N_MAX;
-W_exact = zeros(N_MAX,2);
-% load ./EXACT_SWE1.mat;
-% W_exact(:,1)=h_E';;
-% W_exact(:,2)=u_E';
-
-%plot
-col = '-m';
-%col = '+k';
-% h=figure(1);
-% set(h,'position',[100 100 1150 750]);
-subplot(1,2,1);
-hold on
-%plot(x_min:d_xM:x_max-d_xM,W_exact(:,1),'b','LineWidth',0.4);
-plot(x,h+Z_L(1,1:N),col,'MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Density','FontWeight','bold');
-%ylim([90 160])
-%ylim([0 2])
-title('h+z');
-set(gca,'box','on');
-subplot(1,2,2);
-hold on
-% plot(x_min:d_xM:x_max-d_xM,W_exact(:,2),'b','LineWidth',0.4);
-plot(x,u,col,'MarkerSize',6);%col,'LineWidth',1.0);
-%xlabel('Position','FontWeight','bold');
-%ylabel('Velocity','FontWeight','bold');
-%ylim([0 2])
-title('u');
-set(gca,'box','on');
+SWE_plot
