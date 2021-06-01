@@ -44,6 +44,9 @@ while Time<Tend && isreal(Time)
         else
             Fr_L(i)=0;
         end
+        if (i == N-1 && u_R(i) < a_R(i))
+            U(1,N)=h_out;          
+        end
     end
     hh = U(1,:);
     qq = U(2,:);
