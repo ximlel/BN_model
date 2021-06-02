@@ -14,8 +14,8 @@ CFL=0.5;
 Alpha_GRP=0.0;
 
 %initial condition
-%discon_init
-con_init
+%init_discon
+init_con
 
 h_mL=zeros(1,N);
 h_mR=zeros(1,N);
@@ -136,4 +136,4 @@ while Time<Tend && isreal(Time)
 % end
 end
 
-SWE_plot
+plot_SWE
