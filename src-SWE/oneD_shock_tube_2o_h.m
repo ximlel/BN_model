@@ -3,7 +3,6 @@ clc;
 %1D shock_tube by GRP Schemes for shallow water model
 %state constant
 global g;
-g=9.81;
 global ep;
 ep=1e-6;
 x0=0;
