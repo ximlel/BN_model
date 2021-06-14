@@ -20,7 +20,10 @@ h_mL=zeros(1,N);
 h_mR=zeros(1,N);
 u_mL=zeros(1,N);
 u_mR=zeros(1,N);
-dH_t=zeros(1,N);
+u_mid  =zeros(1,N+1);
+H_t_mid=zeros(1,N+1);
+dzeta  =zeros(1,N+1);
+dH_t   =zeros(1,N);
 
 %Godunov's Method
 while Time<Tend && isreal(Time)
@@ -53,16 +56,16 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N-1
-%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,      Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,      Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
-%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i))/d_x);
         if Time < ep
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(qq(i+1)-qq(i-1))/2.0/d_x,  Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(H_t(i+1)-H_t(i-1))/2.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
+            dzeta(i) =minmod(Alpha_GRP*(h_R(i)+Z_R(i)-h_R(i-1)-Z_R(i-1))/d_x,(h_L(i+1)+Z_L(i+1)-h_R(i-1)-Z_R(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_L(i)-Z_L(i))/d_x);
+            dzeta(i) =minmod(Alpha_GRP*(h_L(i)+Z_L(i)-h_R(i-1)-Z_R(i-1))/d_x,dzeta(i),                                     Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_R(i)-Z_R(i))/d_x);
+            dq(i)    =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,                (qq(i+1) -qq(i-1)) /2.0/d_x,                  Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+            dH_t(i)  =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,                (H_t(i+1)-H_t(i-1))/2.0/d_x,                  Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
         else
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(W_int(4,i+1)-W_int(4,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
+            dzeta(i) =minmod(Alpha_GRP*(h_R(i)+Z_R(i)-h_R(i-1)-Z_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_L(i)-Z_L(i))/d_x);
+            dzeta(i) =minmod(Alpha_GRP*(h_L(i)+Z_L(i)-h_R(i-1)-Z_R(i-1))/d_x,dzeta(i),                         Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_R(i)-Z_R(i))/d_x);
+            dq(i)    =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,                (W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+            dH_t(i)  =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,                (W_int(4,i+1)-W_int(4,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
         end
     end
     for i=1:N+1
@@ -81,8 +84,13 @@ while Time<Tend && isreal(Time)
             dh_R_int(i)=0;
             du_R_int(i)=0;
         else
-            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dRI2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),H_t(i-1)+0.5*d_x*dH_t(i-1)-Z_M(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_R(i-1));
-            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dRI2dU_cal(qq(i)  -0.5*d_x*dq(i),  H_t(i)  -0.5*d_x*dH_t(i)  -Z_M(i),dq(i),  dH_t(i),  dZ(i-1),Fr_L(i));
+            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqzeta2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+Z_R(i-1)+0.5*d_x*dzeta(i-1)-Z_M(i),dq(i-1),dzeta(i-1),dZ(i-1),Fr_R(i-1));
+            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i-1),Fr_L(i));
+            if abs(Z_L(i) - Z_R(i))>0.0001
+                [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dRI2dU_cal(qq(i)  -0.5*d_x*dq(i),  H_t(i)  -0.5*d_x*dH_t(i)  -Z_M(i),dq(i),  dH_t(i),  dZ(i-1),Fr_L(i));
+            elseif abs(Z_L(i-1) - Z_R(i-1))>0.0001
+                [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dRI2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),H_t(i-1)+0.5*d_x*dH_t(i-1)-Z_M(i),dq(i-1),dH_t(i-1),dZ(i-1),Fr_R(i-1));                
+            end
         end
     end    
     %Riemann problem:compute flux
@@ -95,7 +103,7 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
     end    
     for i=1:N
         if i==1 || i==N
@@ -114,8 +122,8 @@ while Time<Tend && isreal(Time)
     end
     %compute U in next step
     for i=1:N
-        if abs(Z_R(i)-Z_L(i))<ep
-            S=-g*0.5*(h_mL(i)+h_mR(i))*(Z_R(i)-Z_L(i));
+        if abs(Z_L(i) - Z_R(i))<0.0001
+            S=-g*(Z_M(i+1)-Z_M(i))*0.5*(h_mid(:,i+1)+h_mid(:,i));
         else
             S_tmp=(h_mR(i)*u_mR(i)^2+g*h_mR(i)^2/2-h_mL(i)*u_mL(i)^2-g*h_mL(i)^2/2);
 %             if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
@@ -125,8 +133,8 @@ while Time<Tend && isreal(Time)
 %             else
                 S=S_tmp;
 %             end
+            S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
         end
-        S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t

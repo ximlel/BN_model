@@ -96,7 +96,7 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
     end    
     for i=1:N
         if i==1 || i==N

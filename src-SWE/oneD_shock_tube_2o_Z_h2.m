@@ -52,15 +52,15 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N-1
-%         if Time < ep
+        if Time < ep
             dzeta(i) =minmod(Alpha_GRP*(h_R(i)+Z_R(i)-h_R(i-1)-Z_R(i-1))/d_x,(h_L(i+1)+Z_L(i+1)-h_R(i-1)-Z_R(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_L(i)-Z_L(i))/d_x);
             dzeta(i) =minmod(Alpha_GRP*(h_L(i)+Z_L(i)-h_R(i-1)-Z_R(i-1))/d_x,dzeta(i),                                     Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_R(i)-Z_R(i))/d_x);
             dq(i)    =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,                (qq(i+1) -qq(i-1)) /2.0/d_x,                  Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-%         else
-%             dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%             dh(i) =minmod(Alpha_GRP*(h_L(i)-h_R(i-1))/d_x,dh(i),                            Alpha_GRP*(h_L(i+1)-h_R(i))/d_x);
-%             dq(i) =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-%         end
+        else
+            dzeta(i) =minmod(Alpha_GRP*(h_R(i)+Z_R(i)-h_R(i-1)-Z_R(i-1))/d_x,(W_int(3,i+1)-W_int(3,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_L(i)-Z_L(i))/d_x);
+            dzeta(i) =minmod(Alpha_GRP*(h_L(i)+Z_L(i)-h_R(i-1)-Z_R(i-1))/d_x,dzeta(i),                         Alpha_GRP*(h_L(i+1)+Z_L(i+1)-h_R(i)-Z_R(i))/d_x);
+            dq(i)    =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,                (W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+        end
     end
     for i=1:N+1
         if i==1
@@ -92,7 +92,7 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver_mid(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
     end
     %compute U in next step
     for i=1:N

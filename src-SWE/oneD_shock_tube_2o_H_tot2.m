@@ -16,9 +16,9 @@ Alpha_GRP=1.5;
 init_discon
 %init_con
 
-u_mid=zeros(1,N+1);
+u_mid  =zeros(1,N+1);
 H_t_mid=zeros(1,N+1);
-dH_t=zeros(1,N);
+dH_t   =zeros(1,N);
 
 %Godunov's Method
 while Time<Tend && isreal(Time)
@@ -51,16 +51,16 @@ while Time<Tend && isreal(Time)
     end
     %reconstruction (minmod limiter)
     for i=2:N-1
-%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
-%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
+%            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(h_L(i+1)-h_L(i-1))/2.0/d_x,      Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
+%            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(u_L(i+1)-u_L(i-1))/2.0/d_x,      Alpha_GRP*(u_L(i+1)-u_L(i) )/d_x);
 %            dh(i) =minmod(Alpha_GRP*(h_R(i)-h_R(i-1))/d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(h_L(i+1)-h_L(i))/d_x);
 %            du(i) =minmod(Alpha_GRP*(u_R(i)-u_R(i-1))/d_x,(W_int(2,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(u_L(i+1)-u_L(i))/d_x);
         if Time < ep
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(qq(i+1)-qq(i-1))/2.0/d_x,   Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(qq(i+1)-qq(i-1))/2.0/d_x,  Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
             dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(H_t(i+1)-H_t(i-1))/2.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
         else
-            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(1,i+1)-W_int(1,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
-            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
+            dq(i)   =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,(W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
+            dH_t(i) =minmod(Alpha_GRP*(H_t(i)-H_t(i-1))/d_x,(W_int(4,i+1)-W_int(4,i))/1.0/d_x,Alpha_GRP*(H_t(i+1)-H_t(i))/d_x);
         end
     end
     for i=1:N+1
@@ -93,14 +93,14 @@ while Time<Tend && isreal(Time)
         else
             dZZ=dZ(i-1);            
         end
-        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver_mid_H_tot(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        [h_mid(:,i),u_mid(:,i),H_t_mid(:,i),F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
     end
     %compute U in next step
     for i=1:N
-        S = 0.5*(h_mid(:,i+1)*u_mid(:,i+1)-h_mid(:,i)*u_mid(:,i))*(u_mid(:,i)+u_mid(:,i+1));
-        S = S + 0.5*g*(H_t_mid(:,i+1)-H_t_mid(:,i))*(h_mid(:,i)+h_mid(:,i+1));
+        S = -0.5*(h_mid(:,i+1)*u_mid(:,i+1)-h_mid(:,i)*u_mid(:,i))*(u_mid(:,i)+u_mid(:,i+1));
+        S = S - 0.5*g*(H_t_mid(:,i+1)-H_t_mid(:,i))*(h_mid(:,i)+h_mid(:,i+1));
         U(1,i)=U(1,i)+d_t/d_x*(F(1,i)-F(1,i+1));
-        U(2,i)=U(2,i)-d_t/d_x*S;
+        U(2,i)=U(2,i)+d_t/d_x*S;
     end
     Time = Time+d_t
 % if Time > 0.002

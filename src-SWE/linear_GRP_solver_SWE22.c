@@ -373,6 +373,18 @@ void linear_GRP_solver_SWE(double * dire, double * mid, double * input)
 		}
 	    //----end of non-trivial case----
 	}
+    if (u_star > 0.0)
+	{
+	    dire[0] = -s_h_L*u_L - h_L*s_u_L;
+	    dire[1] = -s_h_L - u_L*s_u_L/g - s_B_L;
+	    dire[1]*= g;
+	}
+	else if (u_star <= 0.0)
+	{
+	    dire[0] = -s_h_R*u_R - h_R*s_u_R;
+	    dire[1] = -s_h_R - u_R*s_u_R/g - s_B_R;
+	    dire[1]*= g;
+	}
 }
 
 

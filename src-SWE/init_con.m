@@ -1,19 +1,19 @@
 %continuity initial condition
 
-Tend=300;
+Tend=100;
 g=9.81;
 
-% Z_0   = 2;
-% q_in  = 4.42;
-% h_out = 2;
+Z_0   = 2;
+q_in  = 4.42;
+h_out = 2;
 
 % Z_0   = 0.66;
 % q_in  = 1.53;
 % h_out = 0.66;
 
-Z_0   = 0.33;
-q_in  = 0.18;
-h_out = 0.33;
+% Z_0   = 0.33;
+% q_in  = 0.18;
+% h_out = 0.33;
 
 x_min = 0;
 x_max = 25;
@@ -51,7 +51,7 @@ dh_R_int=zeros(1,N+1);
 du_L_int=zeros(1,N+1);
 du_R_int=zeros(1,N+1);
 h_mid   =zeros(1,N+1);
-W_int   =zeros(2,N+1);
+W_int   =zeros(4,N+1);
 
 Fr_L=zeros(1,N);
 Fr_R=zeros(1,N);
