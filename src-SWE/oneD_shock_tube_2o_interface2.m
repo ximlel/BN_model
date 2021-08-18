@@ -10,7 +10,7 @@ x0=0;
 %state value
 Time=0;
 CFL=0.5;
-Alpha_GRP=1.5;
+Alpha_GRP=0.0;
 
 %initial condition
 init_discon

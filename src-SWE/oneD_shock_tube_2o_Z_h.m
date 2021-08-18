@@ -82,7 +82,7 @@ while Time<Tend && isreal(Time)
             [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqzeta2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+Z_R(i-1)+0.5*d_x*dzeta(i-1)-Z_M(i),dq(i-1),dzeta(i-1),dZ(i-1),Fr_R(i-1));
             [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i-1),Fr_L(i));
         end
-    end    
+    end
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
@@ -94,6 +94,11 @@ while Time<Tend && isreal(Time)
             dZZ=dZ(i-1);            
         end
         [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
+        if i==1
+            [h_mid(:,1),u_mid_0,H_t_mid_0,F(:,1),W_int(:,1)]=GRP_solver_inflow(q_in,h_R_int(1),dh_R_int(1),u_R_int(1),du_R_int(1),Z_M(1),dZZ,dZZ,d_t);
+        elseif i==N+1
+            [h_mid(:,N+1),u_mid_0,H_t_mid_0,F(:,N+1),W_int(:,N+1)]=GRP_solver_outflow(h_out,h_R_int(N+1),dh_R_int(N+1),u_R_int(N+1),du_R_int(N+1),Z_M(N+1),dZZ,dZZ,d_t);
+        end    
     end    
     for i=1:N
         if i==1 || i==N

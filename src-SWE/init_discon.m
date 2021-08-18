@@ -101,7 +101,7 @@ for i=1:N+1
     Z_M(i) = Z(x_M(i));
 end
 for i=1:N
-    x(i)    = x_min+(i-1)*d_x;
+    x(i)   = x_min+(i-1)*d_x;
     Z_L(i) = Z(x(i)-ep);
     Z_R(i) = Z(x(i)+ep);
 end

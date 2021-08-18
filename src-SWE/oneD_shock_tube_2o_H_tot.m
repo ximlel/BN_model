@@ -13,8 +13,8 @@ CFL=0.5;
 Alpha_GRP=1.5;
 
 %initial condition
-init_discon
-%init_con
+%init_discon
+init_con
 
 h_mL=zeros(1,N);
 h_mR=zeros(1,N);
@@ -25,9 +25,9 @@ dH_t=zeros(1,N);
 %Godunov's Method
 while Time<Tend && isreal(Time)
     %boundary condition
-    %U(2,1)=q_in;
+    U(2,1)=q_in;
     %U(1,1)=Z_0;
-    %U(1,N)=h_out;
+    U(1,N)=h_out;
     %CFL condition
     for i=1:N
         [h_L(i),u_L(i),h_R(i),u_R(i),H_t(i)]=primitive_comp(U(:,i),Z_L(i),Z_R(i));
@@ -118,21 +118,21 @@ while Time<Tend && isreal(Time)
             S=-g*0.5*(h_mL(i)+h_mR(i))*(Z_R(i)-Z_L(i));
         else
             S_tmp=(h_mR(i)*u_mR(i)^2+g*h_mR(i)^2/2-h_mL(i)*u_mL(i)^2-g*h_mL(i)^2/2);
-%             if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
-%                 S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
-%             elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
-%                 S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
-%             else
+            if (S_tmp/g/(Z_L(i)-Z_R(i))>max(h_mL(i),h_mR(i)))
+                S=-g*max(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));        
+            elseif (S_tmp/g/(Z_L(i)-Z_R(i))<min(h_mL(i),h_mR(i)))
+                S=-g*min(h_mL(i),h_mR(i))*(Z_R(i)-Z_L(i));
+            else
                 S=S_tmp;
-%             end
+            end
         end
         S = S - 0.5*g*(h_mid(i)+h_mL(i))*(Z_L(i)-Z_M(i)) - 0.5*g*(h_mid(i+1)+h_mR(i))*(Z_M(i+1)-Z_R(i));
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t
-% if Time > 0.002
-%    break;
-% end
+if Time >= d_t*2
+   break;
+end
 end
 
 plot_SWE
