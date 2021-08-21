@@ -91,7 +91,7 @@ a_R =zeros(1,N);
 H_t =zeros(1,N);
 du  =zeros(1,N);
 dq  =zeros(1,N);
-dZ  =zeros(1,N-1);
+dZ  =zeros(1,N+1);
 
 x  =zeros(1,N);
 x_M=zeros(1,N+1);
@@ -105,9 +105,11 @@ for i=1:N
     Z_L(i) = Z(x(i)-ep);
     Z_R(i) = Z(x(i)+ep);
 end
-for i=1:N-1
-    dZ(i)  = (Z_L(i+1)-Z_R(i))/d_x;
+dZ(1) = 0;
+for i=2:N
+    dZ(i)  = (Z_L(i)-Z_R(i-1))/d_x;
 end
+dZ(N+1) = 0;
 
 U_L_0=[h_L_0;h_L_0*u_L_0];
 U_R_0=[h_R_0;h_R_0*u_R_0];
