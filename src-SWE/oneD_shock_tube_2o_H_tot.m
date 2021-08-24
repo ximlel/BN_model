@@ -123,9 +123,15 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t
+<<<<<<< HEAD
 %     if Time >= 15
 %         break;
 %     end
+=======
+if Time >= d_t*2
+   break;
+end
+>>>>>>> eed929ea3d5a8db049f4b965acfa88e316ea33d7
 end
 
 plot_SWE

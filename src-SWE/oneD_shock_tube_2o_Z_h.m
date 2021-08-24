@@ -67,15 +67,22 @@ while Time<Tend && isreal(Time)
         dzeta(N) =minmod(Alpha_GRP*(h_L(N)+Z_L(N)-h_R(N-1)-Z_R(N-1))/d_x,dzeta(N),                         Alpha_GRP*(W_int(3,N+1)-h_R(N)-Z_R(N))/d_x/2);
         dq(N)    =minmod(Alpha_GRP*(qq(N) -qq(N-1)) /d_x,                (W_int(2,N+1)-W_int(2,N))/1.0/d_x,Alpha_GRP*(W_int(2,N+1)-qq(N)) /d_x/2); 
     end
+<<<<<<< HEAD
     
     for i=1:N+1
         if i < N+1
             [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i),Fr_L(i));
         end
         if i > 1
+=======
+    for i=1:N+1
+        if i < N+1
+            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i),Fr_L(i));
+        elseif i > 1
+>>>>>>> eed929ea3d5a8db049f4b965acfa88e316ea33d7
             [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqzeta2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+Z_R(i-1)+0.5*d_x*dzeta(i-1)-Z_M(i),dq(i-1),dzeta(i-1),dZ(i),Fr_R(i-1));
         end
-    end    
+    end
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
