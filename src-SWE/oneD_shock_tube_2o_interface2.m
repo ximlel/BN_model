@@ -10,7 +10,7 @@ x0=0;
 %state value
 Time=0;
 CFL=0.5;
-Alpha_GRP=1.5;
+Alpha_GRP=0.0;
 
 %initial condition
 init_discon
@@ -40,7 +40,7 @@ while Time<Tend && isreal(Time)
         if u_R(i) > a_R(i)
             Fr_R(i)=2;
         else
-            Fr_L(i)=0;
+            Fr_R(i)=0;
         end
     end
     hh = U(1,:);

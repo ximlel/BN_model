@@ -17,7 +17,9 @@ elseif abs(alpha)<ep % zero velocity
     elseif F < 1
         x = 1;
     end
-elseif abs(alpha - 4/27)<ep % critical
+% elseif abs(alpha - 4/27)<ep % critical
+%     x = 2/3;
+elseif alpha > (4/27-ep)
     x = 2/3;
 else
     alpha

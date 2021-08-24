@@ -24,10 +24,6 @@ dzeta=zeros(1,N+1);
 
 %Godunov's Method
 while Time<Tend && isreal(Time)
-    %boundary condition
-    U(2,1)=q_in;
-    %U(1,1)=Z_0;
-    U(1,N)=h_out;
     %CFL condition
     for i=1:N
         [h_L(i),u_L(i),h_R(i),u_R(i),H_t(i)]=primitive_comp(U(:,i),Z_L(i),Z_R(i));
@@ -41,7 +37,7 @@ while Time<Tend && isreal(Time)
         if u_R(i) > a_R(i)
             Fr_R(i)=2;
         else
-            Fr_L(i)=0;
+            Fr_R(i)=0;
         end
     end
     hh = U(1,:);
@@ -63,38 +59,34 @@ while Time<Tend && isreal(Time)
             dq(i)    =minmod(Alpha_GRP*(qq(i) -qq(i-1)) /d_x,                (W_int(2,i+1)-W_int(2,i))/1.0/d_x,Alpha_GRP*(qq(i+1) -qq(i)) /d_x);
         end
     end
+    if Time >= ep        
+        dzeta(1) =minmod(Alpha_GRP*(h_R(1)+Z_R(1)-W_int(3,1))/d_x/2,     (W_int(3,2)-W_int(3,1))/1.0/d_x,  Alpha_GRP*(h_L(2)+Z_L(2)-h_L(1)-Z_L(1))/d_x);
+        dzeta(1) =minmod(Alpha_GRP*(h_L(1)+Z_L(1)-W_int(3,1))/d_x/2,     dzeta(1),                         Alpha_GRP*(h_L(2)+Z_L(2)-h_R(1)-Z_R(1))/d_x);
+        dq(1)    =minmod(Alpha_GRP*(qq(1) -W_int(2,1)) /d_x/2,           (W_int(2,2)-W_int(2,1))/1.0/d_x,  Alpha_GRP*(qq(2) -qq(1)) /d_x); 
+        dzeta(N) =minmod(Alpha_GRP*(h_R(N)+Z_R(N)-h_R(N-1)-Z_R(N-1))/d_x,(W_int(3,N+1)-W_int(3,N))/1.0/d_x,Alpha_GRP*(W_int(3,N+1)-h_L(N)-Z_L(N))/d_x/2);
+        dzeta(N) =minmod(Alpha_GRP*(h_L(N)+Z_L(N)-h_R(N-1)-Z_R(N-1))/d_x,dzeta(N),                         Alpha_GRP*(W_int(3,N+1)-h_R(N)-Z_R(N))/d_x/2);
+        dq(N)    =minmod(Alpha_GRP*(qq(N) -qq(N-1)) /d_x,                (W_int(2,N+1)-W_int(2,N))/1.0/d_x,Alpha_GRP*(W_int(2,N+1)-qq(N)) /d_x/2); 
+    end
+    
     for i=1:N+1
-        if i==1
-            h_L_int(i)=h_R(1);
-            u_L_int(i)=u_R(1);
-            h_R_int(i)=h_R(1);
-            u_R_int(i)=u_R(1);           
-            dh_L_int(i)=0;
-            du_L_int(i)=0;
-        elseif i==N+1 
-            h_L_int(i)=h_L(N);
-            u_L_int(i)=u_L(N);
-            h_R_int(i)=h_L(N);
-            u_R_int(i)=u_L(N);
-            dh_R_int(i)=0;
-            du_R_int(i)=0;
-        else
-            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqzeta2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+Z_R(i-1)+0.5*d_x*dzeta(i-1)-Z_M(i),dq(i-1),dzeta(i-1),dZ(i-1),Fr_R(i-1));
-            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i-1),Fr_L(i));
+        if i < N+1
+            [h_R_int(i),u_R_int(i),dh_R_int(i),du_R_int(i)]=dqzeta2dU_cal(qq(i)  -0.5*d_x*dq(i),  h_L(i)  +Z_L(i)  -0.5*d_x*dzeta(i)  -Z_M(i),dq(i),  dzeta(i),  dZ(i),Fr_L(i));
+        end
+        if i > 1
+            [h_L_int(i),u_L_int(i),dh_L_int(i),du_L_int(i)]=dqzeta2dU_cal(qq(i-1)+0.5*d_x*dq(i-1),h_R(i-1)+Z_R(i-1)+0.5*d_x*dzeta(i-1)-Z_M(i),dq(i-1),dzeta(i-1),dZ(i),Fr_R(i-1));
         end
     end    
     %Riemann problem:compute flux
     for i=1:N+1
         %flux on the boundary of i-1 and i
-        if i==1
-            dZZ=0.0;
+        if i==1 %boundary conditionh
+            [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,1)]=GRP_solver_inflow( q_in ,h_R_int(i),dh_R_int(i),u_R_int(i),du_R_int(i),Z_M(i),dZ(i),dZ(i),d_t);
         elseif i==N+1
-            dZZ=0.0;
+            [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver_outflow(h_out,h_L_int(i),dh_L_int(i),u_L_int(i),du_L_int(i),Z_M(i),dZ(i),dZ(i),d_t);
         else
-            dZZ=dZ(i-1);            
+            [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZ(i),dZ(i),d_t);
         end
-        [h_mid(:,i),u_mid_0,H_t_mid_0,F(:,i),W_int(:,i)]=GRP_solver(h_L_int(i),h_R_int(i),dh_L_int(i),dh_R_int(i),u_L_int(i),u_R_int(i),du_L_int(i),du_R_int(i),Z_M(i),dZZ,dZZ,d_t);
-    end    
+    end
     for i=1:N
         if i==1 || i==N
             h_mL(i) = h_L(i);
@@ -102,12 +94,12 @@ while Time<Tend && isreal(Time)
             u_mL(i) = u_L(i);
             u_mR(i) = u_R(i); 
         else
-            [h_mL(i),u_mL(i),dh_mL,du_mL]=dqzeta2dU_cal(qq(i),h_L(i),dq(i-1),dzeta(i-1),dZ(i-1),Fr_L(i));
-            [h_mR(i),u_mR(i),dh_mR,du_mR]=dqzeta2dU_cal(qq(i),h_R(i),dq(i-1),dzeta(i-1),dZ(i),  Fr_R(i));
+            [h_mL(i),u_mL(i),dh_mL,du_mL]=dqzeta2dU_cal(qq(i),h_L(i),dq(i-1),dzeta(i-1),dZ(i),Fr_L(i));
+            [h_mR(i),u_mR(i),dh_mR,du_mR]=dqzeta2dU_cal(qq(i),h_R(i),dq(i-1),dzeta(i-1),dZ(i+1),  Fr_R(i));
             h_mL(i) = h_mL(i) - 0.5*d_t*(h_mL(i)*du_mL+u_mL(i)*dh_mL);
             h_mR(i) = h_mR(i) - 0.5*d_t*(h_mR(i)*du_mR+u_mR(i)*dh_mR);        
-            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL*g+u_mL(i)*du_mL+dZ(i-1)*g);
-            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR*g+u_mR(i)*du_mR+dZ(i)  *g);
+            u_mL(i) = u_mL(i) - 0.5*d_t*(dh_mL*g+u_mL(i)*du_mL+dZ(i)  *g);
+            u_mR(i) = u_mR(i) - 0.5*d_t*(dh_mR*g+u_mR(i)*du_mR+dZ(i+1)*g);
         end
     end
     %compute U in next step
@@ -128,9 +120,9 @@ while Time<Tend && isreal(Time)
         U(:,i)=U(:,i)+d_t/d_x*(F(:,i)-F(:,i+1))+d_t/d_x*[0;S];
     end
     Time = Time+d_t
-% if Time > 0.002
-%    break;
-% end
+%     if Time >= 15
+%         break;
+%     end
 end
 
 plot_SWE
