@@ -2,7 +2,7 @@ function [h_mid,u_mid,H_t_mid,F,W_int]=GRP_solver_outflow(h_out,h_L,dh_L,u_L,du_
     global ep;
     global g;
     F=zeros(2,1);
-    put_out=linear_GRP_solver_inflow_SWE([h_out,h_L,dh_L,u_L,du_L,Z,dZ_L,dZ_R,g,ep]);
+    put_out=linear_GRP_solver_outflow_SWE([h_out,h_L,dh_L,u_L,du_L,Z,dZ_L,dZ_R,g,ep]);
     h_mid = put_out(3) + 0.5*d_t*put_out(1);
     u_mid = put_out(4) + 0.5*d_t*put_out(2);
     H_t_mid = h_mid + 0.5*u_mid^2/g + Z;
